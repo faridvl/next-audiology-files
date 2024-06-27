@@ -1,14 +1,12 @@
-// pages/_app.tsx
-
 import React from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import '../styles/globals.scss'; // Importa los estilos globales aquí
 import '@/shared/i18n/i18n';
-import { DashboardContextProvider } from '@/layouts/dashboard/dashboard-context'; 
-import { NavigationContextProvider } from '@/shared/context/navigation-context'; 
-import { PageLoadingBar } from '@/components/common/page-loading-bar/page-loading-bar'; 
-import { BannerContainer } from '@/components/common/banner-container/banner-container'; 
+import { DashboardContextProvider } from '@/layouts/dashboard/dashboard-context';
+import { NavigationContextProvider } from '@/shared/context/navigation-context';
+import { PageLoadingBar } from '@/components/common/page-loading-bar/page-loading-bar';
+import { BannerContainer } from '@/components/common/banner-container/banner-container';
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   return (

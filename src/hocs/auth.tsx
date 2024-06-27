@@ -15,7 +15,7 @@ export async function redirect(context: NextPageContext, url: string) {
 }
 
 async function checkUrlAndRedirectIfNeeded(context: NextPageContext) {
-  await redirect(context, routesPublic.home);
+  // await redirect(context, routesPublic.home);
 }
 
 export function authorizeServerSidePage(

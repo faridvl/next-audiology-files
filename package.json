@@ -9,14 +9,20 @@
     "watch:styles": "postcss styles/global.scss -o public/styles.css --watch"
   },
   "dependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.13",
     "@types/next": "^9.0.0",
+    "clsx": "^2.1.1",
     "i18next": "^23.11.5",
     "next": "^14.2.4",
     "nextjs-progressbar": "^0.0.16",
+    "postcss-preset-env": "^9.5.14",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^14.1.2",
-    "sass": "^1.77.6"
+    "sass": "^1.77.6",
+    "tailwind-merge": "^2.3.0"
   },
   "devDependencies": {
     "@types/node": "^20",
