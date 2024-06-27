@@ -5,22 +5,22 @@ import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
 
-const Home: React.FC = () => {
+const Dashboard: React.FC = () => {
   // const { t } = useTranslation();
   return (
     <>
       <Head>
-        <title>Home</title>
+        <title>Dashboard</title>
       </Head>
 
       <DashboardLayout
         isMainPage
         contentStyle={BoxedLayoutStyle.FULL}
-        title={"Titulo Home"}
+        title={"Titulo Dashboard"}
       >
         <div className=''>
-          <h1>Titulo de prueba Home</h1>
-          <div>contenido de prueba Home</div>
+          <h1>Titulo de prueba Dashboard</h1>
+          <div>contenido de prueba Dashboard</div>
         </div>
       </DashboardLayout>
     </>
@@ -30,4 +30,4 @@ const Home: React.FC = () => {
 export const getServerSideProps = authorizeServerSidePage();
 
 
-export default Home;
+export default Dashboard;
