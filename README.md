@@ -1,38 +1,59 @@
-# next-audiology-files
-Proyecto de expedientes para clinicas de audiologia
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+### next-audiology-files
 
-## Getting Started
+**Proyecto de expedientes para clínicas de audiología**
 
-First, run the development server:
+Este proyecto utiliza Next.js, TypeScript, y Tailwind CSS para gestionar expedientes en clínicas de audiología.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Instalación
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Clonar el repositorio:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+    ```bash
+    git clone https://github.com/faridvl/next-audiology-files
+    ```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+2. Instalar dependencias:
 
-## Learn More
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
 
-To learn more about Next.js, take a look at the following resources:
+### Uso
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Iniciar el servidor de desarrollo:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+    ```bash
+    npm run dev
+    # or
+    yarn dev
+    ```
 
-## Deploy on Vercel
+2. Abrir [http://localhost:3000](http://localhost:3000) en el navegador para ver el resultado.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Estructura del Proyecto
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- **public/**: Archivos estáticos.
+- **src/**: Código fuente.
+  - **pages/**: Páginas del proyecto.
+  - **components/**: Componentes reutilizables.
+  - **styles/**: Estilos globales y Tailwind CSS.
+
+### Despliegue
+
+Desplegar en [Vercel](https://vercel.com) siguiendo la [documentación de Next.js](https://nextjs.org/docs/deployment).
+
+### Contribuir
+
+1. Hacer un fork del proyecto.
+2. Crear una nueva rama (`git checkout -b feature-nueva-funcionalidad`).
+3. Realizar los cambios y hacer commit (`git commit -m 'Añadir nueva funcionalidad'`).
+4. Hacer push a la rama (`git push origin feature-nueva-funcionalidad`).
+5. Abrir un Pull Request.
+
+### Licencia
+
+Este proyecto está bajo la licencia MIT.
+
+Para más detalles, consulta el [repositorio en GitHub](https://github.com/faridvl/next-audiology-files).
