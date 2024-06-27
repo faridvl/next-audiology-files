@@ -40,9 +40,9 @@ Este proyecto utiliza Next.js, TypeScript, y Tailwind CSS para gestionar expedie
   - **components/**: Componentes reutilizables.
   - **styles/**: Estilos globales y Tailwind CSS.
 
-### Despliegue
+<!-- ### Despliegue
 
-Desplegar en [Vercel](https://vercel.com) siguiendo la [documentación de Next.js](https://nextjs.org/docs/deployment).
+Desplegar en [Vercel](https://vercel.com) siguiendo la [documentación de Next.js](https://nextjs.org/docs/deployment). -->
 
 ### Contribuir
 
