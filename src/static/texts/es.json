@@ -1,0 +1,18 @@
+{
+    "languages": {
+        "es": "Español",
+        "en": "Inglés"
+    },
+    "menu": {
+        "sidebar": {
+            "business": {
+                "name": "Audio Colors"
+            },
+            "files": "Expedientes",
+            "dashboard": "Dashboard",
+            "customers": "Clientes",
+            "about": "Nosotros",
+            "settings": "Ajustes"
+        }
+    }
+}

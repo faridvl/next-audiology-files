@@ -1,49 +1,9 @@
 const customColors = {
-  primary: {
-    DEFAULT: '#124BEA',
-    light: '#ECF3F9',
-    dark: '#1144D1',
-    blush: '#B7C5EB',
-  },
-  alert: {
-    DEFAULT: '#D1112B',
-    light: '#FEF2F2',
-    dark: '#B80F25',
-    disabled: '#EBB7BE',
-  },
-  warning: {
-    DEFAULT: '#F5BC21',
-    light: '#FFF8E3',
-    dark: '#523C07',
-  },
-  success: {
-    DEFAULT: '#45D6A1',
-    light: '#ECFDF5',
-  },
-  body: {
-    active: '#253237',
-    disabled: '#AFB1B1',
-  },
-  gray: {
-    fill: '#F5F6F7',
-    stroke: '#E3E3E3',
-    helper: '#8C8D8E',
-    disabled: '#AFB1B1',
-    disabled_white: '#F4F5F5',
-    fill_white: '#FAFBFC', // This is "fill bg" in Figma
+  'primary': {
 
-    // TODO(2000): Remove all these, once styles are fully migrated
-    50: '#FAFAFA',
-    100: '#F5F5F5',
-    200: '#EEEEEE',
-    300: '#E0E0E0',
-    400: '#BDBDBD',
-    500: '#9E9E9E',
-    600: '#757575',
-    700: '#616161',
-    800: '#424242',
-    900: '#212121',
   },
+  'navy-blue': '#001f3f',
+  'navy-blue-dark': '#001737',
 };
 
 function getColorWhitelist() {
@@ -238,6 +198,7 @@ module.exports = {
       },
       translate: {
         '1/2': '50%',
+        '1/4': '25%',
       },
     },
     fontFamily: {
@@ -258,6 +219,7 @@ module.exports = {
       40: 40,
       50: 50,
       60: 60,
+      1000: 1000,
     },
     letterSpacing: {
       mask: '.2em',

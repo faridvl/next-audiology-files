@@ -1,23 +1,29 @@
+import { TEXT } from "@/static/texts/i18n"
 import Link from "next/link"
+import { useTranslation } from "react-i18next"
+import { TypographyVariant, Typography } from "../../typography/typography"
 
-export default function Component() {
+
+export default function DesktopSidebar() {
+  const { t } = useTranslation()
+
   return (
     <div className="flex h-full max-h-screen flex-col bg-background border-r border-muted/40">
       <div className="flex h-[60px] items-center border-b px-6">
         <Link href="/home" className="flex items-center gap-2 font-semibold" prefetch={false}>
           <MountainIcon className="h-6 w-6" />
-          <span className="text-primary">Acme Inc</span>
+          <Typography variant={TypographyVariant.BODY_SEMIBOLD}>{t(TEXT.MENU.SIDEBAR.BUSINESS.NAME)}</Typography>
         </Link>
       </div>
       <div className="flex-1 overflow-auto py-2">
         <nav className="grid items-start px-4 text-sm font-medium">
           <Link
-            href="/home"
+            href="/files"
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:bg-muted hover:text-primary"
             prefetch={false}
           >
-            <HomeIcon className="h-4 w-4" />
-            Home
+            <BriefcaseIcon className="h-4 w-4" />
+            <Typography variant={TypographyVariant.BODY} >{t(TEXT.MENU.SIDEBAR.FILES)}</Typography>
           </Link>
           <Link
             href="/dashboard"
@@ -25,7 +31,7 @@ export default function Component() {
             prefetch={false}
           >
             <BriefcaseIcon className="h-4 w-4" />
-            Dashboard
+            <Typography variant={TypographyVariant.BODY} >{t(TEXT.MENU.SIDEBAR.DASHBOARD)}</Typography>
           </Link>
           <Link
             href="/customers"
@@ -33,7 +39,7 @@ export default function Component() {
             prefetch={false}
           >
             <UsersIcon className="h-4 w-4" />
-            Customers
+            <Typography variant={TypographyVariant.BODY} >{t(TEXT.MENU.SIDEBAR.CUSTOMERS)}</Typography>
           </Link>
           <Link
             href="/about"
@@ -41,7 +47,15 @@ export default function Component() {
             prefetch={false}
           >
             <PackageIcon className="h-4 w-4" />
-            About
+            <Typography variant={TypographyVariant.BODY} >{t(TEXT.MENU.SIDEBAR.ABOUT)}</Typography>
+          </Link>
+          <Link
+            href="/about"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:bg-muted hover:text-primary"
+            prefetch={false}
+          >
+            <PackageIcon className="h-4 w-4" />
+            <Typography variant={TypographyVariant.BODY} >{t(TEXT.MENU.SIDEBAR.ABOUT)}</Typography>
           </Link>
           <Link
             href="/settings"
@@ -49,7 +63,7 @@ export default function Component() {
             prefetch={false}
           >
             <SettingsIcon className="h-4 w-4" />
-            Settings
+            <Typography variant={TypographyVariant.BODY} >{t(TEXT.MENU.SIDEBAR.SETTINGS)}</Typography>
           </Link>
         </nav>
       </div>

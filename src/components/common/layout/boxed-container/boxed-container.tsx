@@ -29,7 +29,7 @@ export function BoxedLayout({
         >
             <div
                 className={tailwind(
-                    'w-full pt-8 pb-6 px-8',
+                    'w-full pt-8 pb-6 px-8 mb-10',
                     isBoxed && ' xs:max-w-644 md:px-0',
                     boxClassName,
                 )}

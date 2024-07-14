@@ -4,13 +4,14 @@ import Head from 'next/head';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
+import { Table } from '@/components/common/table/table';
 
 const Dashboard: React.FC = () => {
   // const { t } = useTranslation();
   return (
     <>
       <Head>
-        <title>Dashboard</title>
+        <title>hola</title>
       </Head>
 
       <DashboardLayout
@@ -22,6 +23,8 @@ const Dashboard: React.FC = () => {
           <h1>Titulo de prueba Dashboard</h1>
           <div>contenido de prueba Dashboard</div>
         </div>
+        {/* <Table
+          /> */}
       </DashboardLayout>
     </>
   );
