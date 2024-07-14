@@ -1,21 +1,22 @@
-import { routesPublic } from "@/shared/navigation/routes";
-import { NextPageContext } from "next";
-import { useRouter } from 'next/router';
+import { routesPrivate } from '@/shared/navigation/routes';
+import { NextPageContext } from 'next';
+import Router from 'next/router';
 
-export async function redirect(context: NextPageContext, url: string) {
-  const isServerSide = context.res && typeof window === 'undefined';
-
-  if (isServerSide) {
-    context.res?.writeHead(302, { Location: url });
-    context.res?.end();
+async function redirect(context: NextPageContext, url: string) {
+  if (context.res) {
+    context.res.writeHead(302, { Location: url });
+    context.res.end();
   } else {
-    const router = useRouter();
-    await router.push(url);
+    await Router.push(url);
   }
 }
 
 async function checkUrlAndRedirectIfNeeded(context: NextPageContext) {
-  // await redirect(context, routesPublic.home);
+  const { req } = context;
+
+  if (req && req.url === '/') {
+    await redirect(context, routesPrivate.files.index);
+  }
 }
 
 export function authorizeServerSidePage(
@@ -24,7 +25,6 @@ export function authorizeServerSidePage(
   return async (context: NextPageContext) => {
     if (!serverSidePropsHandler) {
       await checkUrlAndRedirectIfNeeded(context);
-
       return {
         props: {},
       };

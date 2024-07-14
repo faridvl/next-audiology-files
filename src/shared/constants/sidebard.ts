@@ -14,7 +14,7 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
         default: false,
         icon: undefined,
         labelKey: "Home",
-        route: routesPrivate.home,
+        route: routesPrivate.files,
         // Ejemplo comentado para subrutas:
         // subRoutes: [
         //   {

@@ -6,7 +6,6 @@ import { DashboardLayoutContent } from './dasboard-content';
 import { BoxedLayoutStyle } from './boxed-container/boxed-container';
 import { MenuAction } from '@/types/system/type-table-actions';
 import useWindowDimensions from '@/hooks/use-windows-dimensions';
-import Sidebar from '../sidebar/sidebar';
 import DesktopSidebar from '../sidebar/desktop-sidebar/desktop-sidebar';
 
 export type UseDashboardLayoutHook = {
@@ -31,13 +30,13 @@ type LayoutProps = {
 export function DashboardLayout({
   children,
   isMainPage = true,
-  title: staticTitle,
+  title,
   contentStyle = BoxedLayoutStyle.BOXED,
   onScroll,
 }: LayoutProps) {
   const router = useRouter();
   const { navigateToHome, navigateToAbout } = useNavigation();
-  const [pageTitle, setPageTitle] = useState(staticTitle);
+  const [pageTitle, setPageTitle] = useState(title);
   const [contentClassNames, setContentClassNames] = useState('');
   const [bottomPadding, setDashBoardPadding] = useState('');
   const [backNavigationHandler, setBackNavigationHandler] = useState<() => void>();
@@ -56,7 +55,7 @@ export function DashboardLayout({
 
       <DesktopSidebar />
       <div className="flex flex-col flex-1 h-full">
-        <Header />
+        <Header title={pageTitle} />
         <DashboardLayoutContent
           contentClassNames={contentClassNames}
           onScroll={onScroll}
