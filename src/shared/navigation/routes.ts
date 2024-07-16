@@ -1,11 +1,10 @@
 export const routesPrivate = {
-      home: '/files',
-    files: {
-        index: '/files',
-        create: '/files/create'
-    }
+  home: "/files",
+  files: {
+    index: "/files",
+    create: "/files/create",
+    view: "/files/view",
+  },
 };
 
-export const routesPublic = {
-
-};
+export const routesPublic = {};

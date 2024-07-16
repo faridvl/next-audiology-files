@@ -1,18 +1,38 @@
 {
-    "languages": {
-        "es": "Español",
-        "en": "Inglés"
-    },
-    "menu": {
-        "sidebar": {
-            "business": {
-                "name": "Audio Colors"
-            },
-            "files": "Expedientes",
-            "dashboard": "Dashboard",
-            "customers": "Clientes",
-            "about": "Nosotros",
-            "settings": "Ajustes"
-        }
+  "languages": {
+    "es": "Español",
+    "en": "Inglés"
+  },
+  "pages": {
+    "view-patient": {
+      "title": "Datos Paciente",
+      "audiometry": "Audiometria",
+      "controls": "Controles",
+      "maintenance": "Mantenimientos",
+      "leftear": "OI",
+      "rightear": "OD",
+      "observations": "Observaciones",
+      "record": "Historial",
+      "creationdate": "Fecha de Creacion",
+      "inputlabel": {
+        "patientName": "Nombre del paciente",
+        "status": "Estado",
+        "email": "Correo Electronico",
+        "age": "Edad",
+        "phone": "Telefono"
+      }
     }
+  },
+  "menu": {
+    "sidebar": {
+      "business": {
+        "name": "Audio Colors"
+      },
+      "files": "Expedientes",
+      "dashboard": "Dashboard",
+      "customers": "Clientes",
+      "about": "Nosotros",
+      "settings": "Ajustes"
+    }
+  }
 }
