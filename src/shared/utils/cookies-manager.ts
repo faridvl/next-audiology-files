@@ -1,29 +1,41 @@
-// shared/utils/cookies-manager.ts
+import Cookies from 'js-cookie';
+import { GetServerSidePropsContext, NextPageContext } from 'next';
+
+const TOKEN_KEY = 'SESSION_ACCESS_TOKEN';
 
 export class CookiesManager {
-    static setCookie(name: string, value: string, days: number) {
-        const date = new Date();
-        date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-        const expires = `expires=${date.toUTCString()}`;
-        document.cookie = `${name}=${value};${expires};path=/`;
+  /**
+   * Lado del Cliente: Guarda el token por 1 hora
+   */
+  static setSessionToken(token: string) {
+    // expires: 1/24 significa 1 hora (js-cookie usa días por defecto)
+    Cookies.set(TOKEN_KEY, token, {
+      expires: 1 / 24,
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
+  }
+
+  /**
+   * Lado del Servidor y Cliente: Obtiene el token
+   */
+  static getAccessToken(context?: GetServerSidePropsContext | NextPageContext): string | undefined {
+    // Si estamos en el SERVIDOR (SSR)
+    if (context?.req?.headers?.cookie) {
+      const cookieHeader = context.req.headers.cookie;
+      const cookies = Object.fromEntries(cookieHeader.split('; ').map((c) => c.split('=')));
+      return cookies[TOKEN_KEY];
     }
 
-    static getCookie(name: string): string | null {
-        const cookieName = `${name}=`;
-        const decodedCookie = decodeURIComponent(document.cookie);
-        const cookieArray = decodedCookie.split(';');
+    // Si estamos en el CLIENTE (Navegador)
+    return Cookies.get(TOKEN_KEY);
+  }
 
-        for (let i = 0; i < cookieArray.length; i++) {
-            let cookie = cookieArray[i].trim();
-            if (cookie.indexOf(cookieName) === 0) {
-                return cookie.substring(cookieName.length, cookie.length);
-            }
-        }
-
-        return null;
-    }
-
-    static deleteCookie(name: string) {
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    }
+  /**
+   * Borra la sesión
+   */
+  static clearAll() {
+    Cookies.remove(TOKEN_KEY, { path: '/' });
+  }
 }

@@ -1,35 +1,37 @@
-import { routesPrivate } from '@/shared/navigation/routes';
-import { NextPageContext } from 'next';
-import Router from 'next/router';
+import { GetServerSidePropsContext } from 'next';
+import { CookiesManager } from '@/shared/utils/cookies-manager';
+import { routesPublic, routesPrivate } from '@/shared/navigation/routes';
 
-async function redirect(context: NextPageContext, url: string) {
-  if (context.res) {
-    context.res.writeHead(302, { Location: url });
-    context.res.end();
-  } else {
-    await Router.push(url);
-  }
-}
+export function authorizeServerSidePage() {
+  return async (context: GetServerSidePropsContext) => {
+    const token = CookiesManager.getAccessToken(context);
 
-async function checkUrlAndRedirectIfNeeded(context: NextPageContext) {
-  const { req } = context;
-
-  if (req && req.url === '/') {
-    await redirect(context, routesPrivate.files.index);
-  }
-}
-
-export function authorizeServerSidePage(
-  serverSidePropsHandler?: (context: NextPageContext) => any,
-) {
-  return async (context: NextPageContext) => {
-    if (!serverSidePropsHandler) {
-      await checkUrlAndRedirectIfNeeded(context);
+    if (!token) {
       return {
-        props: {},
+        redirect: {
+          destination: routesPublic.login,
+          permanent: false,
+        },
       };
     }
 
-    return serverSidePropsHandler(context);
+    return { props: {} };
+  };
+}
+
+export function unauthorizeServerSidePage() {
+  return async (context: GetServerSidePropsContext) => {
+    const token = CookiesManager.getAccessToken(context);
+
+    if (token) {
+      return {
+        redirect: {
+          destination: routesPrivate.home,
+          permanent: false,
+        },
+      };
+    }
+
+    return { props: {} };
   };
 }
