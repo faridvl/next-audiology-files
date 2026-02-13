@@ -18,7 +18,7 @@ import { routesPrivate } from '@/shared/navigation/routes';
 
 
 const columns = [
-  { header: 'Nombre', accessor: 'name', width: '25%' },
+  { header: 'Nombre', accessor: 'name', width: '55%' },
   { header: 'Correo', accessor: 'email', width: '25%' },
   { header: 'Role', accessor: 'role', width: '25%' },
   { header: 'Estado', accessor: 'status', width: '25%' },
@@ -62,49 +62,24 @@ const Home: React.FC = () => {
   };
   return (
     <>
-      <Head>
-        <title>Home</title>
-      </Head>
-
-      <DashboardLayout
-        isMainPage
-        contentStyle={BoxedLayoutStyle.FULL}
-        title={"Titulo Home"}
-      >
-        <div className=''>
-          {/* <button onClick={() => { router.push('/about') }} >hola</button>
-
-          <CustomIcon icon={IconName.ACADEMIC_CAP} onClick={() => console.log(IconName.ACADEMIC_CAP)} />
-
-          <Typography variant={TypographyVariant.HEADER}>{t(TEXT.MENU.SIDEBAR.BUSINESS.NAME)}</Typography>
-          <Typography variant={TypographyVariant.BODY}>{t(TEXT.MENU.SIDEBAR.BUSINESS.NAME)}</Typography>
-          <Typography variant={TypographyVariant.LINK_TEXT} >{t(TEXT.MENU.SIDEBAR.BUSINESS.NAME)}</Typography>
-          <Typography variant={TypographyVariant.HEADER}>{t(TEXT.MENU.SIDEBAR.BUSINESS.NAME)}</Typography>
-
-          <div className={tailwind('flex')}>
-
-            <Typography variant={TypographyVariant.BODY}>Texto de prueba</Typography>
-          </div> */}
-          {/* 
-          <Button variant={ButtonVariant.PRIMARY} onClick={() => alert('Primary clicked')} text="Primary Button" />
-          <Button variant={ButtonVariant.DANGER} onClick={() => alert('Danger clicked')} text="Danger Button" />
-          <Button variant={ButtonVariant.ALERT} onClick={() => alert('Alert clicked')} text="Alert Button" />
-          <Button variant={ButtonVariant.CANCEL} onClick={() => alert('Cancel clicked')} text="Cancel Button" />
-          <Button variant={ButtonVariant.PRIMARY} onClick={() => alert('With Children')}>Button with Children</Button> */}
-
-
+      <DashboardLayout isMainPage contentStyle={BoxedLayoutStyle.FULL} title={'Titulo Home'}>
+        {/* TODO(!): ADD THIS TO GENERIC SEARCH COMPONENT */}
+        <div className="">
           <div className="bg-background rounded-lg shadow-md">
             <div className="flex items-center justify-between bg-muted/40 px-4 py-3">
               <Input
                 variant="primary"
                 type="text"
                 placeholder="Warning Input"
-                value={"hola"}
+                value={'hola'}
                 onChange={(e: any) => console.log(e.target.value)}
               />
               {/* TODO(!): AGREGAR TEXTO AL ES.JS ACTIONS */}
-              <Button variant={ButtonVariant.PRIMARY} text="Agregar" onClick={() => Router.push(routesPrivate.files.create)} />
-
+              <Button
+                variant={ButtonVariant.PRIMARY}
+                text="Agregar"
+                onClick={() => Router.push(routesPrivate.files.create)}
+              />
             </div>
           </div>
           <div className="p-4 mt-10">
@@ -117,14 +92,8 @@ const Home: React.FC = () => {
               onRowClick={handleRowClick}
             />
           </div>
-
-
-
-
         </div>
-
       </DashboardLayout>
-
     </>
   );
 };
