@@ -1,18 +1,19 @@
 {
-    "languages": {
-        "es": "Español",
-        "en": "Inglés"
-    },
-    "menu": {
-        "sidebar": {
-            "business": {
-                "name": "Audio Colors"
-            },
-            "files": "Expedientes",
-            "dashboard": "Dashboard",
-            "customers": "Clientes",
-            "about": "Nosotros",
-            "settings": "Ajustes"
-        }
+  "languages": {
+    "es": "Español",
+    "en": "Inglés"
+  },
+  "menu": {
+    "sidebar": {
+      "business": {
+        "name": "Audiology Files"
+      },
+      "files": "Expedientes",
+      "patients": "Pacientes",
+      "dashboard": "Dashboard",
+      "customers": "Clientes",
+      "about": "Nosotros",
+      "settings": "Ajustes"
     }
+  }
 }

@@ -1,27 +1,23 @@
-
 import React from 'react';
 import Head from 'next/head';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
+import { PatientListContainer } from '@/components/containers/patients/patient-list-container';
 
-const Customers: React.FC = () => {
-  // const { t } = useTranslation();
+const PatientsPage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Customers</title>
+        <title>Pacientes | AudiologyFiles</title>
       </Head>
 
       <DashboardLayout
         isMainPage
         contentStyle={BoxedLayoutStyle.FULL}
-        title={"Titulo Customers"}
+        title="Gestión de Pacientes"
       >
-        <div className=''>
-          <h1>Titulo de prueba Customers</h1>
-          <div>contenido de prueba Customers</div>
-        </div>
+        <PatientListContainer />
       </DashboardLayout>
     </>
   );
@@ -29,5 +25,4 @@ const Customers: React.FC = () => {
 
 export const getServerSideProps = authorizeServerSidePage();
 
-
-export default Customers;
+export default PatientsPage;

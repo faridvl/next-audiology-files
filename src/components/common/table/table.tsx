@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Pagination } from './pagination';
 import { Action, ToggleMenu } from '../menu-item/menu-item';
+import { Typography, TypographyVariant } from '../typography/typography';
 
 type Column = {
     header: string;
@@ -17,8 +18,6 @@ type TableProps = {
     itemsPerPage?: number;
     onRowClick?: (row: any) => void;
 };
-
-const itemsPerPage = 5;
 
 export function Table({
     columns,
@@ -39,49 +38,63 @@ export function Table({
     const endIndex = startIndex + itemsPerPage;
     const currentData = data.slice(startIndex, endIndex);
 
-    const handleRowClick = (row: any) => {
-        if (onRowClick) {
-            onRowClick(row);
-        }
-    };
-
     return (
-        <div className="bg-background rounded-lg shadow-md">
-            <table className="w-full table-auto">
-                <thead className="bg-muted border-b">
-                    <tr>
-                        {columns.map((column) => (
-                            <th
-                                key={column.accessor}
-                                className="px-4 py-3 text-left font-medium text-muted-foreground"
-                                style={{ width: column.width }}
-                            >
-                                {column.header}
-                            </th>
-                        ))}
-                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentData.map((item, rowIndex) => (
-                        <tr
-                            key={rowIndex}
-                            className="border-b hover:bg-muted/40 transition-colors cursor-pointer"
-                            onClick={() => handleRowClick(item)}
-                        >
+        <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                    <thead>
+                        <tr className="bg-slate-50/50 border-b border-slate-100">
                             {columns.map((column) => (
-                                <td key={column.accessor} className="px-4 py-3 text-muted-foreground">
-                                    {item[column.accessor]}
-                                </td>
+                                <th
+                                    key={column.accessor}
+                                    className="px-6 py-4 text-left shadow-sm"
+                                    style={{ width: column.width }}
+                                >
+                                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+                                        {column.header}
+                                    </span>
+                                </th>
                             ))}
-                            <td className="px-4 py-3 relative">
-                                <ToggleMenu actions={actions} onClick={() => { }} />
-                            </td>
+                            <th className="px-6 py-4 text-right">
+                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+                                    Acciones
+                                </span>
+                            </th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-            <Pagination currentPage={page} onPageChange={handlePageChange} startIndex={startIndex + 1} endIndex={endIndex} totalRows={totalRows} />
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                        {currentData.map((item, rowIndex) => (
+                            <tr
+                                key={rowIndex}
+                                className="group hover:bg-blue-50/30 transition-all duration-200 cursor-pointer"
+                                onClick={() => onRowClick?.(item)}
+                            >
+                                {columns.map((column) => (
+                                    <td key={column.accessor} className="px-6 py-4">
+                                        <div className="text-slate-600 font-medium group-hover:text-slate-900 transition-colors text-sm">
+                                            {item[column.accessor]}
+                                        </div>
+                                    </td>
+                                ))}
+                                <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                                    <ToggleMenu actions={actions} rowData={item} />
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Footer de la tabla con paginación */}
+            <div className="bg-slate-50/30 border-t border-slate-100 px-6 py-4">
+                <Pagination
+                    currentPage={page}
+                    onPageChange={handlePageChange}
+                    startIndex={startIndex + 1}
+                    endIndex={Math.min(endIndex, totalRows)}
+                    totalRows={totalRows}
+                />
+            </div>
         </div>
     );
 }

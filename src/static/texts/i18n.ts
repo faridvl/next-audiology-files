@@ -1,28 +1,20 @@
 export const TEXT = {
-    GENERAL: {
+  GENERAL: {},
 
+  COMPONENTS: {},
+  CONTAINERS: {},
+  PAGES: {},
+  MENU: {
+    SIDEBAR: {
+      BUSINESS: {
+        NAME: 'menu.sidebar.business.name',
+      },
+      FILES: 'menu.sidebar.files',
+      PATIENTS: 'menu.sidebar.patients',
+      DASHBOARD: 'menu.sidebar.dashboard',
+      CUSTOMERS: 'menu.sidebar.customers',
+      ABOUT: 'menu.sidebar.about',
+      SETTINGS: 'menu.sidebar.settings',
     },
-
-    COMPONENTS: {
-
-    },
-    CONTAINERS: {
-
-    },
-    PAGES: {
-
-    },
-    MENU: {
-        SIDEBAR: {
-            BUSINESS: {
-                NAME: "menu.sidebar.business.name",
-            },
-            FILES: "menu.sidebar.files",
-            DASHBOARD: "menu.sidebar.dashboard",
-            CUSTOMERS: "menu.sidebar.customers",
-            ABOUT: "menu.sidebar.about",
-            SETTINGS: "menu.sidebar.settings"
-        }
-    },
-
-} as const
+  },
+} as const;

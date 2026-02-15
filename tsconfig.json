@@ -32,8 +32,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/pages/files"
-  ],
+    "src/pages/patients"
+, "src/pages/users/[id]"  ],
   "exclude": [
     "node_modules"
   ]

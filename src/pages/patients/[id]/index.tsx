@@ -1,26 +1,26 @@
-
 import React from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
-import { PatientForm } from '@/components/containers/add-patient/add-patient';
+import { PatientDetailContainer } from '@/components/containers/patients/patient-detail-container';
 
-const AddPatient: React.FC = () => {
-    // const { t } = useTranslation();
+const PatientDetailPage: React.FC = () => {
+    const router = useRouter();
+    const { id } = router.query;
     return (
         <>
             <Head>
-                <title>Agregar Pacientes</title>
+                <title>Detalle de Paciente | AudiologyFiles</title>
             </Head>
 
             <DashboardLayout
-                isMainPage
+                isMainPage={false}
                 contentStyle={BoxedLayoutStyle.FULL}
-                title={"Agregar Paciente"}
+                title="Expediente del Paciente"
             >
-
-                <PatientForm />
+                <PatientDetailContainer id={id as string} />
             </DashboardLayout>
         </>
     );
@@ -28,5 +28,4 @@ const AddPatient: React.FC = () => {
 
 export const getServerSideProps = authorizeServerSidePage();
 
-
-export default AddPatient;
+export default PatientDetailPage;

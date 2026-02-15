@@ -1,67 +1,46 @@
-// // src/hooks/useNavigation.ts
-
-// import { useContext } from 'react';
-// import { useRouter } from 'next/router';
-// import { routesPrivate, routesPublic } from '@/shared/navigation/routes';
-
-// type UseNavigationHook = {
-//     navigateToHome: () => void;
-//     navigateToAbout: () => void;
-//     // Agrega más funciones de navegación según las rutas definidas
-// };
-
-// export const useNavigation = (): UseNavigationHook => {
-//     const router = useRouter();
-
-//     const navigateToHome = () => {
-//         router.push(routesPublic.home);
-//     };
-
-//     const navigateToAbout = () => {
-//         router.push(routesPrivate.about);
-//     };
-
-//     return {
-//         navigateToHome,
-//         navigateToAbout,
-//         // Devuelve más funciones de navegación según las rutas definidas
-//     };
-// };
-// src/hooks/useNavigation.ts
-
 import { useRouter } from 'next/router';
 import { routesPrivate, routesPublic } from '@/shared/navigation/routes';
 
-type UseNavigationHook = {
-  navigateToLogin: () => void;
-  navigateToFiles: () => void;
-  navigateToCreateFile: () => void;
-  goBack: () => void;
-};
-
-export const useNavigation = (): UseNavigationHook => {
+export const useNavigation = () => {
   const router = useRouter();
 
-  const navigateToLogin = () => {
-    router.push(routesPublic.login);
-  };
-
-  const navigateToFiles = () => {
-    router.push(routesPrivate.files.index);
-  };
-
-  const navigateToCreateFile = () => {
-    router.push(routesPrivate.files.create);
-  };
-
-  const goBack = () => {
-    router.back();
-  };
-
   return {
-    navigateToLogin,
-    navigateToFiles,
-    navigateToCreateFile,
-    goBack,
+    // Autenticación y General
+    auth: {
+      login: () => router.push(routesPublic.login),
+      register: () => router.push(routesPublic.register),
+    },
+
+    common: {
+      dashboard: () => router.push(routesPrivate.dashboard),
+      settings: () => router.push(routesPrivate.settings),
+      back: () => router.back(),
+    },
+
+    // Módulo de Usuarios
+    users: {
+      list: () => router.push(routesPrivate.users.index),
+      create: () => router.push(routesPrivate.users.create),
+      detail: (id: string | number) => router.push(routesPrivate.users.detail(id)),
+      edit: (id: string | number) => router.push(routesPrivate.users.edit(id)),
+    },
+
+    // Módulo de Pacientes y Controles
+    patients: {
+      list: () => router.push(routesPrivate.patients.index),
+      create: () => router.push(routesPrivate.patients.create),
+      detail: (id: string | number) => router.push(routesPrivate.patients.detail(id)),
+      addControl: (id: string | number) => router.push(routesPrivate.controls.create(id)),
+    },
+
+    // Módulo de Citas
+    appointments: {
+      list: () => router.push(routesPrivate.appointments.index),
+      create: () => router.push(routesPrivate.appointments.create),
+    },
+
+    // Otros
+    inventory: () => router.push(routesPrivate.inventory),
+    tests: () => router.push(routesPrivate.tests),
   };
 };

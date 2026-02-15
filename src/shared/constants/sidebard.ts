@@ -1,36 +1,49 @@
-// navigationPaths.ts
+// src/shared/navigation/navigationPaths.ts
 import { INavigationPath } from '@/types/system/navigation-path';
-import { routesPrivate } from './routes';
-
-export enum ParentMenuKeys {
-    CONFIGURATION = 'configuration',
-    INVENTORY = 'inventory',
-    TRANSACTIONS = 'transactions',
-}
+import { routesPrivate } from '../navigation/routes';
+import { LayoutDashboard, Users, Calendar, Activity, Archive, Settings } from 'lucide-react';
 
 export const NAVIGATION_PATHS: INavigationPath[] = [
-    {
-        menuKey: ParentMenuKeys.INVENTORY,
-        default: false,
-        icon: undefined,
-        labelKey: "Home",
-        route: routesPrivate.files,
-        // Ejemplo comentado para subrutas:
-        // subRoutes: [
-        //   {
-        //     menuKey: 'inventory.products',
-        //     parentMenuKey: ParentMenuKeys.INVENTORY,
-        //     parentLabel: "Home",
-        //     labelKey: "Products",
-        //     route: routesPrivate.home,
-        //   },
-        // ],
-    },
-    {
-        menuKey: ParentMenuKeys.TRANSACTIONS,
-        default: false,
-        icon: undefined,
-        labelKey: "About",
-        route: routesPrivate.about,
-    },
+  {
+    menuKey: 'dashboard',
+    default: false,
+    icon: LayoutDashboard,
+    labelKey: 'Dashboard',
+    route: routesPrivate.dashboard,
+  },
+  {
+    menuKey: 'patients',
+    default: true,
+    icon: Users,
+    labelKey: 'Pacientes',
+    route: routesPrivate.patients.index,
+  },
+  {
+    menuKey: 'appointments',
+    default: false,
+    icon: Calendar,
+    labelKey: 'Agenda',
+    route: routesPrivate.appointments.index,
+  },
+  {
+    menuKey: 'tests',
+    default: false,
+    icon: Activity,
+    labelKey: 'Pruebas',
+    route: routesPrivate.tests,
+  },
+  {
+    menuKey: 'inventory',
+    default: false,
+    icon: Archive,
+    labelKey: 'Inventario',
+    route: routesPrivate.inventory,
+  },
+  {
+    menuKey: 'users',
+    default: false,
+    icon: Settings,
+    labelKey: 'Usuarios',
+    route: routesPrivate.users.index,
+  },
 ];

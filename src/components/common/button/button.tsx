@@ -8,48 +8,61 @@ export enum ButtonVariant {
     CANCEL = 'CANCEL'
 }
 
-type ButtonProps = {
-    variant: ButtonVariant;
-    text?: string;
-    onClick: () => void;
-    children?: React.ReactNode;
-};
-
 type VariantStyle = {
-    bgColor: string;
-    textColor: string;
     className: string;
 };
 
-export function Button({ variant, text, onClick, children, ...props }: ButtonProps) {
-    const baseStyle = 'px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-offset-2';
+type ButtonProps = {
+    variant: ButtonVariant;
+    text?: string;
+    onClick?: () => void;
+    children?: React.ReactNode;
+    className?: string;
+    type?: 'button' | 'submit' | 'reset';
+    disabled?: boolean;
+};
+
+export function Button({
+    variant,
+    text,
+    onClick,
+    children,
+    className: customClassName,
+    type = 'button',
+    disabled,
+    ...props
+}: ButtonProps) {
+
+    // Base común para todos los botones: transiciones, focus y estado presionado
+    const baseStyle = 'flex items-center justify-center gap-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100';
+
     const variantStyles: { [key in ButtonVariant]: VariantStyle } = {
         [ButtonVariant.PRIMARY]: {
-            bgColor: 'bg-navy-blue',
-            textColor: 'text-white',
-            className: `${baseStyle} hover:bg-navy-blue-dark`,
+            // Estilo solicitado: Azul intenso, sombra profunda y bordes muy redondeados
+            className: `${baseStyle} bg-blue-600 text-white px-5 py-2.5 rounded-2xl text-sm font-black shadow-xl shadow-blue-200 hover:bg-blue-700 hover:shadow-blue-300`,
         },
         [ButtonVariant.DANGER]: {
-            bgColor: 'bg-red-600',
-            textColor: 'text-white',
-            className: `${baseStyle} hover:bg-red-700`,
+            className: `${baseStyle} bg-red-600 text-white px-5 py-2.5 rounded-2xl text-sm font-bold shadow-lg shadow-red-100 hover:bg-red-700`,
         },
         [ButtonVariant.ALERT]: {
-            bgColor: 'bg-yellow-500',
-            textColor: 'text-black',
-            className: `${baseStyle} hover:bg-yellow-600`,
+            className: `${baseStyle} bg-yellow-500 text-black px-5 py-2.5 rounded-2xl text-sm font-bold shadow-lg shadow-yellow-100 hover:bg-yellow-600`,
         },
         [ButtonVariant.CANCEL]: {
-            bgColor: 'bg-gray-400',
-            textColor: 'text-black',
-            className: `${baseStyle} hover:bg-gray-500`,
+            // Estilo: Gris suave, más minimalista para acciones secundarias
+            className: `${baseStyle} bg-slate-100 text-slate-500 px-6 py-2.5 rounded-2xl text-sm font-bold hover:bg-slate-200 hover:text-slate-600`,
         },
     };
 
-    const { bgColor, textColor, className } = variantStyles[variant];
+    const { className: variantClassName } = variantStyles[variant];
 
     return (
-        <button className={tailwind(bgColor, textColor, className)} onClick={onClick} {...props}>
+        <button
+            type={type}
+            disabled={disabled}
+            className={tailwind(variantClassName, customClassName)}
+            onClick={onClick}
+            {...props}
+        >
             {children || text}
         </button>
     );

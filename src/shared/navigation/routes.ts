@@ -1,9 +1,26 @@
 export const routesPrivate = {
-  home: '/files',
-  files: {
-    index: '/files',
-    create: '/files/create',
+  dashboard: '/dashboard',
+  users: {
+    index: '/users',
+    create: '/users/create',
+    detail: (id: string | number) => `/users/${id}`,
+    edit: (id: string | number) => `/users/edit/${id}`,
   },
+  patients: {
+    index: '/patients',
+    create: '/patients/create',
+    detail: (id: string | number) => `/patients/${id}`,
+  },
+  appointments: {
+    index: '/appointments',
+    create: '/appointments/create',
+  },
+  controls: {
+    create: (id: string | number) => `/controls/${id}`,
+  },
+  tests: '/tests',
+  inventory: '/inventory',
+  settings: '/settings',
 };
 
 export const routesPublic = {
