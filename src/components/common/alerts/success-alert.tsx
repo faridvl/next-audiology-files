@@ -22,7 +22,12 @@ export const SuccessAlert = ({
                     <h3 className="text-slate-900 font-black text-sm uppercase tracking-wider">{title}</h3>
                     <p className="text-slate-500 text-sm font-medium">{message}</p>
                 </div>
-                {/* ... resto del botón X ... */}
+                <button
+                    onClick={onClose}
+                    className="p-1.5 hover:bg-slate-100 rounded-xl transition-colors text-slate-400"
+                >
+                    <XMarkIcon className="h-5 w-5 stroke-[2.5px]" />
+                </button>
             </div>
         </div>
     );

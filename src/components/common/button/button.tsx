@@ -33,12 +33,10 @@ export function Button({
     ...props
 }: ButtonProps) {
 
-    // Base común para todos los botones: transiciones, focus y estado presionado
     const baseStyle = 'flex items-center justify-center gap-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100';
 
     const variantStyles: { [key in ButtonVariant]: VariantStyle } = {
         [ButtonVariant.PRIMARY]: {
-            // Estilo solicitado: Azul intenso, sombra profunda y bordes muy redondeados
             className: `${baseStyle} bg-blue-600 text-white px-5 py-2.5 rounded-2xl text-sm font-black shadow-xl shadow-blue-200 hover:bg-blue-700 hover:shadow-blue-300`,
         },
         [ButtonVariant.DANGER]: {
@@ -48,7 +46,6 @@ export function Button({
             className: `${baseStyle} bg-yellow-500 text-black px-5 py-2.5 rounded-2xl text-sm font-bold shadow-lg shadow-yellow-100 hover:bg-yellow-600`,
         },
         [ButtonVariant.CANCEL]: {
-            // Estilo: Gris suave, más minimalista para acciones secundarias
             className: `${baseStyle} bg-slate-100 text-slate-500 px-6 py-2.5 rounded-2xl text-sm font-bold hover:bg-slate-200 hover:text-slate-600`,
         },
     };

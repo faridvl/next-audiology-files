@@ -3,7 +3,6 @@ import { useState, useCallback } from 'react';
 export const useAudiogram = (frequencies: number[], dbs: number[]) => {
   const [points, setPoints] = useState<any[]>([]);
 
-  // Evitar que un clic fuera de rango rompa el array
   const addPoint = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       const container = e.currentTarget;

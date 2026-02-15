@@ -63,12 +63,10 @@ export default function DesktopSidebar() {
                 `}
                 prefetch={false}
               >
-                {/* Indicador minimalista lateral */}
                 {isActive && (
                   <div className="absolute left-0 w-1 h-5 bg-blue-600 rounded-r-full" />
                 )}
 
-                {/* Icono con strokeWidth dinámico */}
                 {Icon && (
                   <Icon
                     size={18}
@@ -89,7 +87,6 @@ export default function DesktopSidebar() {
         </nav>
       </div>
 
-      {/* Footer: Perfil de Usuario */}
       <div className="px-3 py-6 mt-auto border-t border-slate-50">
         <div className="flex items-center gap-3 px-4 py-3 bg-slate-50/80 rounded-2xl border border-slate-100">
           <UserAvatar name={user.name} />

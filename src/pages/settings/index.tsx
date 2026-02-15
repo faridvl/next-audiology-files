@@ -13,7 +13,6 @@ import {
   Plus
 } from 'lucide-react';
 
-// --- Componentes Internos para Organización ---
 
 const SettingSection = ({ title, description, children }: any) => (
   <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 py-8 border-b border-slate-100 last:border-0">

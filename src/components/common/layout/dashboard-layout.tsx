@@ -62,7 +62,6 @@ export function DashboardLayout({
   return (
     <div className="flex flex-row justify-start h-screen w-screen overflow-hidden relative">
 
-      {/* Notificación Flotante de Éxito */}
       <div className="absolute top-6 right-6 z-[100] pointer-events-none">
         {showSuccess && (
           <div className="pointer-events-auto animate-in fade-in slide-in-from-top-5 duration-300">

@@ -10,7 +10,7 @@ export interface ClinicalControl {
   specialistName: string;
   type: ControlType;
   date: string;
-  note: string; // Resumen breve para la lista
+  note: string;
   details?: {
     reason: string;
     diagnosis: string;

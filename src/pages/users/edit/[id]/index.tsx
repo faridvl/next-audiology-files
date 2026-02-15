@@ -13,7 +13,6 @@ const EditUserPage = () => {
     const { id } = router.query;
     const nav = useNavigation();
 
-    // Estado del formulario
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -22,10 +21,8 @@ const EditUserPage = () => {
     });
     const [loading, setLoading] = useState(true);
 
-    // Simulamos la carga de datos del usuario al montar el componente
     useEffect(() => {
         if (id) {
-            // Aquí harías tu fetch(id)
             setTimeout(() => {
                 setFormData({
                     name: 'Dr. Roberto Gómez',
@@ -41,7 +38,6 @@ const EditUserPage = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         console.log("Actualizando usuario:", id, formData);
-        // Aquí iría tu mutación/axios.put
         nav.users.list();
     };
 

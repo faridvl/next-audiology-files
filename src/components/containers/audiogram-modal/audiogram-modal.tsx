@@ -89,7 +89,7 @@ export const AudiogramModal = ({ isOpen, onClose, onConfirm, side, initialPoints
                         <Button variant={ButtonVariant.CANCEL} onClick={onClose} text="Cancelar" />
                         <Button
                             variant={ButtonVariant.PRIMARY}
-                            onClick={() => onConfirm(points)} // <--- AHORA SÍ ENVÍA LOS DATOS
+                            onClick={() => onConfirm(points)}
                             text="Confirmar Puntos"
                         />
                     </div>
