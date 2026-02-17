@@ -2,40 +2,51 @@ import Cookies from 'js-cookie';
 import { GetServerSidePropsContext, NextPageContext } from 'next';
 
 const TOKEN_KEY = 'SESSION_ACCESS_TOKEN';
+const USER_NAME_KEY = 'SESSION_USER_NAME';
+
+type CookieConfig = Cookies.CookieAttributes;
 
 export class CookiesManager {
-  /**
-   * Lado del Cliente: Guarda el token por 1 hora
-   */
-  static setSessionToken(token: string) {
-    // expires: 1/24 significa 1 hora (js-cookie usa días por defecto)
-    Cookies.set(TOKEN_KEY, token, {
-      expires: 1 / 24,
-      path: '/',
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    });
+  private static readonly config: CookieConfig = {
+    expires: 1 / 24, // 1 hora
+    path: '/',
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+  };
+
+  static setSession(token: string, userName: string): void {
+    Cookies.set(TOKEN_KEY, token, this.config);
+    Cookies.set(USER_NAME_KEY, userName, this.config);
   }
 
-  /**
-   * Lado del Servidor y Cliente: Obtiene el token
-   */
   static getAccessToken(context?: GetServerSidePropsContext | NextPageContext): string | undefined {
-    // Si estamos en el SERVIDOR (SSR)
+    return this.getCookieByKey(TOKEN_KEY, context);
+  }
+
+  static getUserName(context?: GetServerSidePropsContext | NextPageContext): string | undefined {
+    return this.getCookieByKey(USER_NAME_KEY, context);
+  }
+
+  private static getCookieByKey(
+    key: string,
+    context?: GetServerSidePropsContext | NextPageContext,
+  ): string | undefined {
     if (context?.req?.headers?.cookie) {
       const cookieHeader = context.req.headers.cookie;
-      const cookies = Object.fromEntries(cookieHeader.split('; ').map((c) => c.split('=')));
-      return cookies[TOKEN_KEY];
+      const cookies = Object.fromEntries(
+        cookieHeader.split('; ').map((c) => {
+          const [name, ...value] = c.split('=');
+          return [name.trim(), value.join('=')];
+        }),
+      );
+      return cookies[key];
     }
 
-    // Si estamos en el CLIENTE (Navegador)
-    return Cookies.get(TOKEN_KEY);
+    return Cookies.get(key);
   }
 
-  /**
-   * Borra la sesión
-   */
-  static clearAll() {
+  static clearAll(): void {
     Cookies.remove(TOKEN_KEY, { path: '/' });
+    Cookies.remove(USER_NAME_KEY, { path: '/' });
   }
 }

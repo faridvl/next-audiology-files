@@ -2,76 +2,71 @@ import React from 'react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import {
     User, History, Calendar, Phone, AlertCircle,
-    Stethoscope, Pill, FileText, ChevronRight
+    Stethoscope, Pill, FileText
 } from 'lucide-react';
+import { usePatientSummary } from './use-patient-summary-header';
 
 interface PatientHeaderProps {
+    patientId: string;
     onOpenFollowUp: () => void;
     onToggleHistory: () => void;
     showHistory: boolean;
 }
 
 export const PatientSummaryHeader: React.FC<PatientHeaderProps> = ({
+    patientId,
     onOpenFollowUp,
     onToggleHistory,
     showHistory
 }) => {
-    // Datos puramente clínicos
-    const patient = {
-        name: "Juan Pérez Rodríguez",
-        id: "00214",
-        age: "45 años (15/05/1980)",
-        bloodType: "O+",
-        phone: "+506 8888-8888",
-        lastVisit: "12 de Enero, 2026",
-        mainDiagnosis: "Hipoacusia Sensorineural Bilateral",
-        allergies: ["Penicilina", "AINES"],
-        medications: ["Enalapril 10mg", "Atorvastatina 20mg"],
-        observations: "Paciente con implante coclear en oído izquierdo."
-    };
+    const { patient, isLoading } = usePatientSummary(patientId);
+
+    if (isLoading || !patient) {
+        return <div className="h-48 w-full bg-slate-50 animate-pulse rounded-3xl border border-slate-100" />;
+    }
 
     return (
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 mb-8 shadow-sm flex flex-col gap-6">
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 mb-8 shadow-sm flex flex-col gap-6 animate-in fade-in duration-500">
 
             {/* FILA 1: IDENTIDAD Y CONTACTO */}
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col md:flex-row items-start justify-between gap-4">
                 <div className="flex gap-5">
-                    <div className="h-16 w-16 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-500 border border-slate-200">
-                        <User size={32} strokeWidth={1.5} />
+                    <div className="h-16 w-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-100">
+                        <User size={30} strokeWidth={2} />
                     </div>
                     <div>
                         <div className="flex items-center gap-3 mb-1">
-                            <Typography variant={TypographyVariant.BODY_BOLD} className="text-2xl text-slate-900">
+                            <Typography variant={TypographyVariant.BODY_BOLD} className="text-2xl text-slate-900 leading-none">
                                 {patient.name}
                             </Typography>
-                            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-md border border-blue-100">
+                            <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-md border border-slate-200">
                                 ID: {patient.id}
                             </span>
                         </div>
                         <div className="flex items-center gap-4 text-slate-500">
-                            <Typography variant={TypographyVariant.CAPTION} className="font-medium">
-                                {patient.age} • <span className="font-bold text-slate-700">{patient.bloodType}</span>
+                            <Typography variant={TypographyVariant.CAPTION} className="font-medium text-slate-400">
+                                {patient.age} • <span className="font-bold text-blue-600">{patient.bloodType}</span>
                             </Typography>
-                            <span className="text-slate-300">|</span>
-                            <div className="flex items-center gap-1">
-                                <Phone size={14} />
-                                <Typography variant={TypographyVariant.CAPTION} className="font-medium">{patient.phone}</Typography>
+                            <span className="text-slate-200">|</span>
+                            <div className="flex items-center gap-1.5">
+                                <Phone size={14} className="text-slate-400" />
+                                <Typography variant={TypographyVariant.CAPTION} className="font-bold text-slate-600">{patient.phone}</Typography>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex gap-3 w-full md:w-auto">
                     <button
                         onClick={onOpenFollowUp}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all"
                     >
                         <Calendar size={16} /> Próxima Cita
                     </button>
                     <button
                         onClick={onToggleHistory}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${showHistory
-                            ? 'bg-slate-900 text-white'
+                        className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-xs font-bold transition-all ${showHistory
+                            ? 'bg-slate-900 text-white shadow-xl shadow-slate-200'
                             : 'bg-blue-600 text-white shadow-lg shadow-blue-100'
                             }`}
                     >
@@ -82,63 +77,66 @@ export const PatientSummaryHeader: React.FC<PatientHeaderProps> = ({
 
             <hr className="border-slate-100" />
 
-            {/* FILA 2: RESUMEN CLÍNICO (LO QUE EL MÉDICO NECESITA SABER) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* FILA 2: RESUMEN CLÍNICO */}
+            {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <ClinicalItem
+                    icon={<Stethoscope size={18} />}
+                    label="Diagnóstico Base"
+                    value={patient.mainDiagnosis}
+                    color="blue"
+                />
+                <ClinicalItem
+                    icon={<AlertCircle size={18} />}
+                    label="Alergias"
+                    value={patient.allergies.join(', ')}
+                    color="red"
+                    isWarning={patient.allergies.length > 0 && patient.allergies[0] !== 'Ninguna'}
+                />
+                <ClinicalItem
+                    icon={<Pill size={18} />}
+                    label="Medicación"
+                    value={patient.medications.length > 0 ? patient.medications.join(' • ') : 'Ninguna registrada'}
+                    color="emerald"
+                />
+            </div> */}
 
-                {/* Diagnóstico Principal */}
-                <div className="flex gap-3">
-                    <div className="mt-1 p-2 bg-blue-50 text-blue-600 rounded-lg h-fit">
-                        <Stethoscope size={18} />
-                    </div>
-                    <div>
-                        <Typography variant={TypographyVariant.OVERLINE} className="text-slate-400 font-bold mb-1">Diagnóstico Base</Typography>
-                        <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-slate-800">
-                            {patient.mainDiagnosis}
-                        </Typography>
-                    </div>
-                </div>
-
-                {/* Alergias y Riesgos */}
-                <div className="flex gap-3">
-                    <div className="mt-1 p-2 bg-red-50 text-red-600 rounded-lg h-fit">
-                        <AlertCircle size={18} />
-                    </div>
-                    <div>
-                        <Typography variant={TypographyVariant.OVERLINE} className="text-slate-400 font-bold mb-1">Alergias / Contraindicaciones</Typography>
-                        <div className="flex flex-wrap gap-1">
-                            {patient.allergies.map(a => (
-                                <span key={a} className="text-sm font-bold text-red-700">{a}{patient.allergies.indexOf(a) !== patient.allergies.length - 1 ? ',' : ''}</span>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Medicación Actual */}
-                <div className="flex gap-3">
-                    <div className="mt-1 p-2 bg-emerald-50 text-emerald-600 rounded-lg h-fit">
-                        <Pill size={18} />
-                    </div>
-                    <div>
-                        <Typography variant={TypographyVariant.OVERLINE} className="text-slate-400 font-bold mb-1">Medicación Permanente</Typography>
-                        <Typography variant={TypographyVariant.CAPTION} className="text-slate-700 font-medium">
-                            {patient.medications.join(' • ')}
-                        </Typography>
-                    </div>
-                </div>
-            </div>
-
-            {/* BARRA INFERIOR: ÚLTIMA NOTA / OBSERVACIÓN RAPIDA */}
-            <div className="bg-slate-50 rounded-2xl p-4 flex items-center justify-between border border-slate-100">
+            {/* BARRA INFERIOR */}
+            <div className="bg-slate-50/50 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between border border-slate-100 gap-3">
                 <div className="flex items-center gap-3">
-                    <FileText size={16} className="text-slate-400" />
-                    <Typography variant={TypographyVariant.CAPTION} className="text-slate-600 italic">
-                        <span className="font-bold not-italic text-slate-800 mr-2">Nota clave:</span>
-                        "{patient.observations}"
+                    <FileText size={16} className="text-blue-500" />
+                    <Typography variant={TypographyVariant.CAPTION} className="text-slate-600">
+                        <span className="font-bold text-slate-800 mr-2 uppercase text-[9px] tracking-wider">Nota clínica:</span>
+                        <span className="italic">"{patient.observations}"</span>
                     </Typography>
                 </div>
-                <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white px-3 py-1 rounded-full border border-slate-100">
                     Última visita: {patient.lastVisit}
                 </div>
+            </div>
+        </div>
+    );
+};
+
+/* Componente Interno para los items clínicos */
+const ClinicalItem = ({ icon, label, value, color, isWarning }: any) => {
+    const colors: any = {
+        blue: 'bg-blue-50 text-blue-600',
+        red: 'bg-red-50 text-red-600',
+        emerald: 'bg-emerald-50 text-emerald-600'
+    };
+
+    return (
+        <div className="flex gap-3">
+            <div className={`mt-1 p-2 rounded-xl h-fit ${colors[color]}`}>
+                {icon}
+            </div>
+            <div>
+                <Typography variant={TypographyVariant.OVERLINE} className="text-slate-400 font-black text-[9px] mb-1 tracking-tighter uppercase">
+                    {label}
+                </Typography>
+                <Typography variant={TypographyVariant.BODY_BOLD} className={`text-sm ${isWarning ? 'text-red-700' : 'text-slate-700'}`}>
+                    {value}
+                </Typography>
             </div>
         </div>
     );

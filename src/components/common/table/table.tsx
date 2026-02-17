@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Pagination } from './pagination';
 import { Action, ToggleMenu } from '../menu-item/menu-item';
-import { Typography, TypographyVariant } from '../typography/typography';
 
 type Column = {
     header: string;
@@ -14,9 +13,11 @@ type TableProps = {
     data: any[];
     currentPage: number;
     totalRows: number;
+    onPageChange: (page: number) => void;
     actions?: Action[];
     itemsPerPage?: number;
     onRowClick?: (row: any) => void;
+    isLoading?: boolean;
 };
 
 export function Table({
@@ -24,19 +25,24 @@ export function Table({
     data,
     currentPage,
     totalRows,
+    onPageChange,
     actions = [],
-    itemsPerPage = 5,
+    itemsPerPage = 10,
     onRowClick,
+    isLoading
 }: TableProps) {
-    const [page, setPage] = useState(currentPage);
 
-    const handlePageChange = (newPage: number) => {
-        setPage(newPage);
-    };
+    if (isLoading) {
+        return (
+            <div className="bg-white rounded-[24px] border border-slate-100 p-20 flex flex-col items-center justify-center gap-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="text-slate-500 font-medium">Cargando datos...</span>
+            </div>
+        );
+    }
 
-    const startIndex = (page - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentData = data.slice(startIndex, endIndex);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + data.length;
 
     return (
         <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm overflow-hidden">
@@ -47,7 +53,7 @@ export function Table({
                             {columns.map((column) => (
                                 <th
                                     key={column.accessor}
-                                    className="px-6 py-4 text-left shadow-sm"
+                                    className="px-6 py-4 text-left"
                                     style={{ width: column.width }}
                                 >
                                     <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
@@ -55,43 +61,54 @@ export function Table({
                                     </span>
                                 </th>
                             ))}
-                            <th className="px-6 py-4 text-right">
-                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
-                                    Acciones
-                                </span>
-                            </th>
+                            {actions.length > 0 && (
+                                <th className="px-6 py-4 text-right">
+                                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+                                        Acciones
+                                    </span>
+                                </th>
+                            )}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
-                        {currentData.map((item, rowIndex) => (
-                            <tr
-                                key={rowIndex}
-                                className="group hover:bg-blue-50/30 transition-all duration-200 cursor-pointer"
-                                onClick={() => onRowClick?.(item)}
-                            >
-                                {columns.map((column) => (
-                                    <td key={column.accessor} className="px-6 py-4">
-                                        <div className="text-slate-600 font-medium group-hover:text-slate-900 transition-colors text-sm">
-                                            {item[column.accessor]}
-                                        </div>
-                                    </td>
-                                ))}
-                                <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
-                                    <ToggleMenu actions={actions} rowData={item} />
+                        {data.length > 0 ? (
+                            data.map((item, rowIndex) => (
+                                <tr
+                                    key={item.id || rowIndex}
+                                    className="group hover:bg-blue-50/30 transition-all duration-200 cursor-pointer"
+                                    onClick={() => onRowClick?.(item)}
+                                >
+                                    {columns.map((column) => (
+                                        <td key={column.accessor} className="px-6 py-4">
+                                            <div className="text-slate-600 font-medium group-hover:text-slate-900 transition-colors text-sm">
+                                                {item[column.accessor]}
+                                            </div>
+                                        </td>
+                                    ))}
+                                    {actions.length > 0 && (
+                                        <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                                            <ToggleMenu actions={actions} rowData={item} />
+                                        </td>
+                                    )}
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={columns.length + 1} className="px-6 py-10 text-center text-slate-400 text-sm">
+                                    No se encontraron resultados
                                 </td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
                 </table>
             </div>
 
-            {/* Footer de la tabla con paginación */}
             <div className="bg-slate-50/30 border-t border-slate-100 px-6 py-4">
                 <Pagination
-                    currentPage={page}
-                    onPageChange={handlePageChange}
-                    startIndex={startIndex + 1}
-                    endIndex={Math.min(endIndex, totalRows)}
+                    currentPage={currentPage}
+                    onPageChange={onPageChange}
+                    startIndex={totalRows > 0 ? startIndex + 1 : 0}
+                    endIndex={endIndex}
                     totalRows={totalRows}
                 />
             </div>

@@ -1,7 +1,8 @@
 export enum ControlType {
-  AUDIOLOGY = 'Audiología',
-  DERMATOLOGY = 'Control de Piel',
-  DENTAL = 'Odontología',
+  AUDIOLOGY = 'AUDIOLOGY',
+  DERMATOLOGY = 'DERMATOLOGY',
+  GENERAL = 'GENERAL',
+  DENTAL = 'DENTAL',
 }
 
 export interface ClinicalControl {

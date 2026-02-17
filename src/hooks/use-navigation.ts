@@ -31,6 +31,8 @@ export const useNavigation = () => {
       create: () => router.push(routesPrivate.patients.create),
       detail: (id: string | number) => router.push(routesPrivate.patients.detail(id)),
       addControl: (id: string | number) => router.push(routesPrivate.controls.create(id)),
+      viewControl: (patientUUID: string | number, controlUUID: string) =>
+        router.push(routesPrivate.controls.detail(patientUUID, controlUUID)),
     },
 
     // Módulo de Citas

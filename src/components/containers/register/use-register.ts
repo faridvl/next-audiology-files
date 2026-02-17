@@ -1,45 +1,31 @@
+import { useRegisterMutation } from '@/shared/api/mutations/auth/use-register-mutation';
 import { useState } from 'react';
-import { useRouter } from 'next/router';
-import { routesPublic } from '@/shared/navigation/routes';
 
 export const useRegister = () => {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState<any | null>(null);
 
-  const handleRegisterSubmit = async (values: any, actions: any) => {
-    try {
-      setError(null);
-      setIsLoading(true);
+  const { executeRegister, isPending: isLoading, error } = useRegisterMutation();
 
-      const response = await fetch('http://localhost:7170/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
+  const nextStep = () => setStep((prev) => prev + 1);
+  const prevStep = () => setStep((prev) => prev - 1);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Error al registrar la clínica');
-      }
-
-      // Registro exitoso, redirigimos al login
-      router.push(`${routesPublic.login}?registered=true`);
-    } catch (err: any) {
-      setError(err.message || 'No se pudo conectar con el servidor');
-    } finally {
-      setIsLoading(false);
-      actions.setSubmitting(false);
-    }
+  const handleAccountInfo = (values: any) => {
+    executeRegister(values, {
+      onSuccess: (data) => {
+        setFormData(data);
+        nextStep();
+      },
+    });
   };
 
   return {
-    handleRegisterSubmit,
+    step,
+    nextStep,
+    prevStep,
+    handleAccountInfo,
     isLoading,
-    error,
-    handleResetError: () => setError(null),
+    error: error?.message || null,
+    formData,
   };
 };

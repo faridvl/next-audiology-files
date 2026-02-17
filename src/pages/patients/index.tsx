@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
-import { PatientListContainer } from '@/components/containers/patients/patient-list-container';
+import { PatientListContainer } from '@/components/containers/patients/patients-list/patient-list-container';
 
 const PatientsPage: React.FC = () => {
   return (

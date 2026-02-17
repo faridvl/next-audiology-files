@@ -16,6 +16,8 @@ export const routesPrivate = {
     create: '/appointments/create',
   },
   controls: {
+    detail: (patientUUID: string | number, controlUUID: string) =>
+      `/controls/detail/${patientUUID}/${controlUUID}`,
     create: (id: string | number) => `/controls/${id}`,
   },
   tests: '/tests',

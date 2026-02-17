@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
-import '../styles/globals.scss'; // Importa los estilos globales aquí
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import '../styles/globals.scss';
 import '@/shared/i18n/i18n';
 import { DashboardContextProvider } from '@/layouts/dashboard/dashboard-context';
 import { NavigationContextProvider } from '@/shared/context/navigation-context';
@@ -9,27 +11,34 @@ import { PageLoadingBar } from '@/components/common/page-loading-bar/page-loadin
 import { BannerContainer } from '@/components/common/banner-container/banner-container';
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        retry: 1,
+      },
+    },
+  }));
+
   return (
     <>
       <Head>
-        <link rel="icon" type="image/png" sizes="32x32" href="/next.svg" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/next.svg" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/site.webmanifest" />
-        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/zynka-logo.png" />
         <meta name="theme-color" content="#ffffff" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="viewport" content="width=device-width, minimal-ui" />
       </Head>
 
-      <NavigationContextProvider>
-        <DashboardContextProvider>
-          <PageLoadingBar />
-          <BannerContainer />
-          <Component {...pageProps} />
-        </DashboardContextProvider>
-      </NavigationContextProvider>
+      <QueryClientProvider client={queryClient}>
+        <NavigationContextProvider>
+          <DashboardContextProvider>
+            <PageLoadingBar />
+            <BannerContainer />
+            <Component {...pageProps} />
+          </DashboardContextProvider>
+        </NavigationContextProvider>
+
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
     </>
   );
 };

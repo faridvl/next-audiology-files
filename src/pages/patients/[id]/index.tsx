@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
-import { PatientDetailContainer } from '@/components/containers/patients/patient-detail-container';
+import { PatientDetailContainer } from '@/components/containers/patients/patients-detail/patient-detail-container';
 
 const PatientDetailPage: React.FC = () => {
     const router = useRouter();
