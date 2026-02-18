@@ -14,7 +14,7 @@ const Tests: React.FC = () => {
 
     return (
         <>
-            <Head><title>Pruebas | AudiologyFiles</title></Head>
+            <Head><title>Pruebas </title></Head>
             <DashboardLayout isMainPage contentStyle={BoxedLayoutStyle.FULL} title="Registro de Pruebas">
                 <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
                     <table className="w-full text-left">

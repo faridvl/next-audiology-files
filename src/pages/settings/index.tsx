@@ -41,7 +41,7 @@ const InputGroup = ({ label, placeholder, type = "text", defaultValue }: any) =>
 const Settings: React.FC = () => {
   return (
     <>
-      <Head><title>Configuración | AudiologyFiles</title></Head>
+      <Head><title>Configuración </title></Head>
 
       <DashboardLayout
         isMainPage

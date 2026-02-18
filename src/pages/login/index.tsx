@@ -25,7 +25,7 @@ const LoginPage = () => {
   return (
     <div className="relative min-h-screen bg-slate-50">
       <Head>
-        <title>Login | AudiologyFiles</title>
+        <title>Login </title>
       </Head>
 
       {showSuccess && (

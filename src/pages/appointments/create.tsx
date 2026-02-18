@@ -44,7 +44,7 @@ const CreateAppointment: React.FC = () => {
     return (
         <>
             <Head>
-                <title>Nueva Cita | AudiologyFiles</title>
+                <title>Nueva Cita </title>
             </Head>
             <DashboardLayout
                 title="Agendar Nueva Cita"

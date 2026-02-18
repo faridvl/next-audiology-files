@@ -71,6 +71,7 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                 <div className={`flex-1 transition-all duration-700 ${showHistory ? 'max-w-[65%]' : 'max-w-4xl mx-auto'}`}>
 
                     <PatientSummaryHeader
+                        patientId={patientId}
                         onOpenFollowUp={() => setters.setIsFollowUpModalOpen(true)}
                         onToggleHistory={() => setters.setShowHistory(!showHistory)}
                         showHistory={showHistory}

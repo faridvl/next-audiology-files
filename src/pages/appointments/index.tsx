@@ -110,7 +110,7 @@ const Appointments: React.FC = () => {
     return (
         <>
             <Head>
-                <title>Agenda | AudiologyFiles</title>
+                <title>Agenda </title>
             </Head>
             <DashboardLayout
                 isMainPage

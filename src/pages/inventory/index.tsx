@@ -32,7 +32,7 @@ const ProductCard = ({ brand, model, stock, price }: any) => (
 const Inventory: React.FC = () => {
     return (
         <>
-            <Head><title>Inventario | AudiologyFiles</title></Head>
+            <Head><title>Inventario </title></Head>
             <DashboardLayout isMainPage contentStyle={BoxedLayoutStyle.FULL} title="Control de Inventario">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     <ProductCard brand="Phonak" model="Audéo L-R" stock={3} price="$1,200" />

@@ -5,11 +5,23 @@ class MyDocument extends Document {
     return (
       <Html>
         <Head>
-          <link rel="icon" href="/next.svg" sizes="16x16" />
+          {/* Brand Favicon */}
+          <link rel="icon" type="image/png" sizes="32x32" href="/zynka-logo.png" />
+          {/* TODO: Soportar favicon dinámico dark/light */}
+
           <link rel="manifest" href="/site.webmanifest" />
+
+          {/* Brand Theme Color (alineado a Tailwind background) */}
           <meta name="theme-color" content="#ffffff" />
+
+          {/* Preconnect para performance si usas Google Fonts */}
+          {/* <link rel="preconnect" href="https://fonts.googleapis.com" /> */}
+          {/* <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" /> */}
+
+          {/* TODO: Si usas Poppins/Inter desde Google, cargarlas aquí */}
         </Head>
-        <body>
+
+        <body className="text-neutral-100 font-sans antialiased">
           <Main />
           <NextScript />
         </body>

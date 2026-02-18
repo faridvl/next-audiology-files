@@ -1,14 +1,23 @@
-// src/components/common/menu-item/menu-item.tsx
 import React, { ReactNode } from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems, Transition, Portal } from '@headlessui/react';
+import {
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuItems,
+    Transition,
+    Portal,
+} from '@headlessui/react';
 import { MoreVertical } from 'lucide-react';
+import { Typography, TypographyVariant } from '../typography/typography';
+import { tailwind } from '@/utils/tailwind-utils';
+
+export type ActionVariant = 'default' | 'danger';
 
 export type Action = {
     name: string;
-    icon: ReactNode;
+    icon?: ReactNode;
     onClick: (row: any) => void | Promise<any>;
-    isDanger?: boolean;
-    variant?: any; // TODO(!)L agregar el variant real 
+    variant?: ActionVariant;
 };
 
 interface ToggleMenuProps {
@@ -22,13 +31,19 @@ export function ToggleMenu({ actions, rowData }: ToggleMenuProps) {
             <Menu>
                 {({ open }) => (
                     <>
+                        {/* BUTTON */}
                         <MenuButton
-                            className={`p-2 rounded-xl transition-all outline-none ${open ? 'bg-blue-50 text-blue-600' : 'text-slate-400 hover:text-blue-600 hover:bg-blue-50'
-                                }`}
+                            className={tailwind(
+                                'p-2 rounded-xl transition-all outline-none',
+                                open
+                                    ? 'bg-slate-100 text-[#1E3A8A]'
+                                    : 'text-slate-400 hover:text-[#1E3A8A] hover:bg-slate-100'
+                            )}
                         >
                             <MoreVertical size={18} strokeWidth={2.5} />
                         </MenuButton>
 
+                        {/* DROPDOWN */}
                         <Portal>
                             <Transition
                                 as={React.Fragment}
@@ -41,26 +56,45 @@ export function ToggleMenu({ actions, rowData }: ToggleMenuProps) {
                             >
                                 <MenuItems
                                     anchor="bottom end"
-                                    className="w-48 rounded-2xl bg-white shadow-2xl shadow-slate-300/50 border border-slate-100 ring-0 focus:outline-none z-[9999] overflow-hidden p-1.5"
+                                    className="w-52 rounded-2xl bg-white shadow-xl border border-slate-100 z-[9999] overflow-hidden p-1.5"
                                 >
-                                    {actions?.map((action, index) => (
-                                        <MenuItem key={`${action.name}-${index}`}>
-                                            {({ active }) => (
-                                                <button
-                                                    className={`
-                            flex w-full items-center gap-3 px-3 py-2 text-[13px] font-bold rounded-xl transition-colors
-                            ${active
-                                                            ? (action.variant === 'danger' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600')
-                                                            : (action.variant === 'danger' ? 'text-red-500' : 'text-slate-600')
-                                                        }
-                          `}
-                                                    onClick={() => action.onClick(rowData)}
-                                                >
-                                                    {action.name}
-                                                </button>
-                                            )}
-                                        </MenuItem>
-                                    ))}
+                                    {actions?.map((action, index) => {
+                                        const isDanger = action.variant === 'danger';
+
+                                        return (
+                                            <MenuItem key={`${action.name}-${index}`}>
+                                                {({ active }) => (
+                                                    <button
+                                                        onClick={() => action.onClick(rowData)}
+                                                        className={tailwind(
+                                                            'flex w-full items-center gap-3 px-3 py-2 rounded-xl transition-colors',
+                                                            active &&
+                                                            (isDanger
+                                                                ? 'bg-red-50'
+                                                                : 'bg-slate-100')
+                                                        )}
+                                                    >
+                                                        {action.icon}
+
+                                                        <Typography
+                                                            variant={TypographyVariant.BODY_SEMIBOLD}
+                                                            textColor={
+                                                                isDanger
+                                                                    ? active
+                                                                        ? 'text-red-600'
+                                                                        : 'text-red-500'
+                                                                    : active
+                                                                        ? 'text-[#1E3A8A]'
+                                                                        : undefined
+                                                            }
+                                                        >
+                                                            {action.name}
+                                                        </Typography>
+                                                    </button>
+                                                )}
+                                            </MenuItem>
+                                        );
+                                    })}
                                 </MenuItems>
                             </Transition>
                         </Portal>

@@ -46,4 +46,11 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
     labelKey: 'Usuarios',
     route: routesPrivate.users.index,
   },
+  {
+    menuKey: 'documents',
+    default: false,
+    icon: Settings,
+    labelKey: 'Documentos',
+    route: routesPrivate.documents,
+  },
 ];

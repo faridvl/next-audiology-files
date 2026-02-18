@@ -33,72 +33,77 @@ type Props = TextProps & HtmlSvgElement;
 
 type VariantStyle = {
     colorClassName?: string;
-    styleClassName?: string;
     className?: string;
     spacingClassName?: string;
     component: ElementType;
 };
 
-const commonStylesClassName = 'font-sans';
+const brandPrimary = 'text-[#1E3A8A]';
+const neutralDark = 'text-slate-900';
+const neutralBase = 'text-slate-700';
+const neutralLight = 'text-slate-500';
+
+const commonStylesClassName = 'font-sans tracking-tight';
+
 const variantStyles: { [key in TypographyVariant]: VariantStyle } = {
     [TypographyVariant.HEADER]: {
         component: 'h1',
-        className: `${commonStylesClassName} font-extrabold text-2xl md:text-4xl`,
-        colorClassName: 'text-gray-900',
+        className: `${commonStylesClassName} font-extrabold text-2xl md:text-3xl leading-tight`,
+        colorClassName: neutralDark,
     },
     [TypographyVariant.SUBTITLE]: {
         component: 'h2',
-        className: `${commonStylesClassName} font-semibold text-xl md:text-3xl`,
-        colorClassName: 'text-gray-700',
+        className: `${commonStylesClassName} font-semibold text-xl md:text-2xl leading-snug`,
+        colorClassName: neutralBase,
     },
     [TypographyVariant.ACCENT]: {
         component: 'h3',
-        className: `${commonStylesClassName} font-bold text-lg md:text-2xl`,
-        colorClassName: 'text-gray-800',
+        className: `${commonStylesClassName} font-semibold text-lg md:text-xl`,
+        colorClassName: brandPrimary,
     },
     [TypographyVariant.BODY]: {
         component: 'p',
-        className: `${commonStylesClassName} font-normal text-base md:text-lg`,
-        colorClassName: 'text-gray-700',
+        className: `${commonStylesClassName} font-normal text-[15px] leading-relaxed`,
+        colorClassName: neutralBase,
     },
     [TypographyVariant.BODY_BOLD]: {
         component: 'p',
-        className: `${commonStylesClassName} font-bold text-base md:text-lg`,
-        colorClassName: 'text-gray-700',
+        className: `${commonStylesClassName} font-bold text-[15px]`,
+        colorClassName: neutralBase,
     },
     [TypographyVariant.BODY_SEMIBOLD]: {
         component: 'p',
-        className: `${commonStylesClassName} font-semibold text-base md:text-lg`,
-        colorClassName: 'text-gray-700',
+        className: `${commonStylesClassName} font-semibold text-[15px]`,
+        colorClassName: neutralBase,
     },
     [TypographyVariant.HELPER]: {
         component: 'p',
-        className: `${commonStylesClassName} font-normal text-sm md:text-base`,
-        colorClassName: 'text-gray-500',
+        className: `${commonStylesClassName} font-normal text-[13px]`,
+        colorClassName: neutralLight,
     },
     [TypographyVariant.LINK_TEXT]: {
-        component: 'p',
-        className: `${commonStylesClassName} text-blue-600 cursor-pointer font-normal hover:underline text-base md:text-lg`,
-        colorClassName: 'text-blue-600',
+        component: 'a',
+        className: `${commonStylesClassName} font-medium text-[15px] cursor-pointer transition-colors duration-200 hover:opacity-80`,
+        colorClassName: brandPrimary,
     },
     [TypographyVariant.CAPTION]: {
         component: 'span',
-        className: `${commonStylesClassName} font-normal text-xs md:text-sm`,
-        colorClassName: 'text-gray-500',
+        className: `${commonStylesClassName} font-normal text-[12px]`,
+        colorClassName: neutralLight,
     },
     [TypographyVariant.OVERLINE]: {
         component: 'span',
-        className: `${commonStylesClassName} font-semibold text-xs uppercase tracking-widest`,
-        colorClassName: 'text-gray-600',
+        className: `${commonStylesClassName} font-semibold text-[11px] uppercase tracking-[0.18em]`,
+        colorClassName: neutralLight,
     },
     [TypographyVariant.QUOTE]: {
         component: 'blockquote',
-        className: `${commonStylesClassName} font-light italic text-lg md:text-xl`,
-        colorClassName: 'text-gray-800',
+        className: `${commonStylesClassName} font-light italic text-lg`,
+        colorClassName: neutralDark,
     },
     [TypographyVariant.BUTTON_TEXT]: {
         component: 'span',
-        className: `${commonStylesClassName} font-semibold text-base md:text-lg`,
+        className: `${commonStylesClassName} font-semibold text-[14px]`,
         colorClassName: 'text-white',
     },
 };
@@ -130,11 +135,10 @@ function TextComponent({
             href={href}
             target={target}
             className={tailwind(
-                'font-sans',
                 variantClassName,
-                colorClassName,
+                textColor || colorClassName,
                 !ignoreImplicitSpacing && spacingClassName,
-                { 'text-gray-400': disabled },
+                { 'text-slate-400': disabled },
                 className,
             )}
         />

@@ -9,7 +9,7 @@ const PatientsPage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Pacientes | AudiologyFiles</title>
+        <title>Pacientes </title>
       </Head>
 
       <DashboardLayout

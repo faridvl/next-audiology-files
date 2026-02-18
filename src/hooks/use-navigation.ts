@@ -44,5 +44,6 @@ export const useNavigation = () => {
     // Otros
     inventory: () => router.push(routesPrivate.inventory),
     tests: () => router.push(routesPrivate.tests),
+    documents: () => router.push(routesPrivate.documents),
   };
 };

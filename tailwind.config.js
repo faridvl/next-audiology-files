@@ -1,29 +1,70 @@
 const customColors = {
-  'primary': {
-
+  primary: {
+    DEFAULT: '#2563EB',
+    light: '#3B82F6',
+    dark: '#1E40AF',
+    soft: '#DBEAFE',
   },
+
+  secondary: {
+    DEFAULT: '#0EA5E9',
+    dark: '#0369A1',
+  },
+
+  accent: {
+    DEFAULT: '#7C3AED',
+    dark: '#5B21B6',
+  },
+
+  neutral: {
+    50: '#F9FAFB',
+    100: '#F3F4F6',
+    200: '#E5E7EB',
+    300: '#D1D5DB',
+    400: '#9CA3AF',
+    500: '#6B7280',
+    600: '#4B5563',
+    700: '#374151',
+    800: '#1F2937',
+    900: '#111827',
+  },
+
+  success: {
+    DEFAULT: '#10B981',
+    dark: '#047857',
+  },
+
+  warning: {
+    DEFAULT: '#F59E0B',
+  },
+
+  danger: {
+    DEFAULT: '#EF4444',
+    dark: '#B91C1C',
+  },
+
+  background: '#0F172A',
+  surface: '#1E293B',
+
   'navy-blue': '#001f3f',
   'navy-blue-dark': '#001737',
 };
 
 function getColorWhitelist() {
   const prefixes = ['hover:bg', 'hover:text', 'hover:border', 'bg', 'text', 'border', 'ring'];
+
   const whitelist = [];
 
   function insertColor(className) {
-    const classNameIndex = whitelist.indexOf(className);
-
-    if (classNameIndex !== -1) {
-      whitelist[classNameIndex] = classNameIndex;
-    } else {
+    if (!whitelist.includes(className)) {
       whitelist.push(className);
     }
   }
 
   prefixes.forEach((prefix) =>
-    Object.keys(customColors).forEach((color) => {
-      if (typeof customColors[color] !== 'string') {
-        Object.keys(customColors[color]).forEach((subColor) => {
+    Object.entries(customColors).forEach(([color, value]) => {
+      if (typeof value === 'object') {
+        Object.keys(value).forEach((subColor) => {
           if (subColor === 'DEFAULT') {
             insertColor(`${prefix}-${color}`);
           } else {
@@ -41,62 +82,49 @@ function getColorWhitelist() {
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
+
   future: {
     purgeLayersByDefault: true,
     removeDeprecatedGapUtilities: true,
   },
-  // rule disabled because this file is only used during dev stages, and cannot use 'import'
-  // eslint-disable-next-line import/no-extraneous-dependencies,global-require
-  plugins: [],
+
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
+
   safelist: getColorWhitelist(),
+
   theme: {
     extend: {
       colors: customColors,
+
       boxShadow: {
-        'primary-button': '0px 3px 6px rgba(0, 0, 0, 0.16)',
+        card: '0 10px 25px -5px rgba(0, 0, 0, 0.25)',
+        'card-hover': '0 20px 40px -10px rgba(0, 0, 0, 0.35)',
+        glow: '0 0 0 3px rgba(37, 99, 235, 0.4)',
+        'primary-button': '0 6px 12px rgba(37, 99, 235, 0.3)',
         'top-md': '0px -3px 6px rgba(0, 0, 0, 0.16)',
         lg: '0px 3px 6px rgba(0, 0, 0, 0.16)',
         custom: '0px 0px 6px 0px #00000029',
       },
+
       fontSize: {
-        // size: font size - line height
         '2xs': '0.625rem',
-        xs: [
-          '0.75rem', // 12px
-          '1rem', // 16px
-        ],
-        sm: [
-          '0.875rem', // 14px
-          '1.25rem', // 20px
-        ],
-        base: [
-          '1rem', // 16px
-          '1.5rem', // 24px
-        ],
-        lg: [
-          '1.125rem', // 18px
-          '1.75rem', // 28px
-        ],
-        xl: [
-          '1.25rem', // 20px
-          '1.75rem', // 28px
-        ],
-        '2xl': [
-          '1.5rem', // 24px
-          '2rem', // 32px
-        ],
-        '3xl': [
-          '1.75rem', // 28px
-          '2.125rem', // 34px
-        ],
+        xs: ['0.75rem', '1rem'],
+        sm: ['0.875rem', '1.25rem'],
+        base: ['1rem', '1.5rem'],
+        lg: ['1.125rem', '1.75rem'],
+        xl: ['1.25rem', '1.75rem'],
+        '2xl': ['1.5rem', '2rem'],
+        '3xl': ['1.75rem', '2.125rem'],
       },
+
       maxHeight: {
         select: '12rem',
         42: '10.5rem',
         51: '12.75rem',
         '5/6': '83.333333%',
       },
+
       minWidth: {
         '1/2': '50%',
         '1/4': '25%',
@@ -104,11 +132,12 @@ module.exports = {
         8: '2rem',
         10: '2.5rem',
         16: '4rem',
+        48: '12rem',
         56: '14rem',
         64: '16rem',
-        48: '12rem',
         88: '22rem',
       },
+
       maxWidth: {
         36: '9rem',
         40: '10rem',
@@ -126,36 +155,21 @@ module.exports = {
         644: '644px',
         1366: '1366px',
       },
+
       width: {
         18: '4.5rem',
         54: '13.5rem',
         68: '17rem',
         71: '17.75rem',
-        644: '644px',
         106: '424px',
+        644: '644px',
         fit: 'fit-content',
       },
+
       height: {
         fit: 'fit-content',
       },
-      transitionProperty: {
-        width: 'width',
-      },
-      keyframes: {
-        'fade-in-down': {
-          '0%': {
-            opacity: '0',
-            transform: 'translateY(-10px)',
-          },
-          '100%': {
-            opacity: '1',
-            transform: 'translateY(0)',
-          },
-        },
-      },
-      animation: {
-        'fade-in-down': 'fade-in-down 0.7s ease-out',
-      },
+
       spacing: {
         4.5: '1.125rem',
         18: '4.5rem',
@@ -196,14 +210,39 @@ module.exports = {
         224: '56rem',
         228: '57rem',
       },
+
+      transitionProperty: {
+        width: 'width',
+      },
+
+      keyframes: {
+        'fade-in-down': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(-10px)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)',
+          },
+        },
+      },
+
+      animation: {
+        'fade-in-down': 'fade-in-down 0.7s ease-out',
+      },
+
       translate: {
         '1/2': '50%',
         '1/4': '25%',
       },
     },
+
     fontFamily: {
-      sans: ['Inter', 'system-ui', 'Segoe UI', 'Trebuchet MS', 'Arial'],
+      sans: ['Inter', 'system-ui', 'Segoe UI', 'Arial'],
+      display: ['Poppins', 'Inter', 'sans-serif'],
     },
+
     screens: {
       xs: '340px',
       sm: '644px',
@@ -211,6 +250,7 @@ module.exports = {
       lg: '924px',
       xl: '1366px',
     },
+
     zIndex: {
       0: 0,
       10: 10,
@@ -221,8 +261,11 @@ module.exports = {
       60: 60,
       1000: 1000,
     },
+
     letterSpacing: {
       mask: '.2em',
     },
   },
+
+  plugins: [],
 };

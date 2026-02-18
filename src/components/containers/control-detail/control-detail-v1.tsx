@@ -3,122 +3,201 @@ import { ArrowLeft, Printer } from 'lucide-react';
 import { useNavigation } from '@/hooks/use-navigation';
 import { useControlDetail } from './use-control-detail';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
 interface Props { patientId: string; controlId: string; }
 
-export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }) => {
+export const ControlDetailContainer: React.FC<Props> = ({
+    patientId,
+    controlId
+}) => {
     const navigation = useNavigation();
-    const { data, isLoading, isError } = useControlDetail(patientId, controlId);
+    const { data, isLoading, isError } = useControlDetail(
+        patientId,
+        controlId
+    );
 
-    if (isLoading) return <div className="p-20 text-center animate-pulse text-slate-400 font-bold uppercase tracking-widest text-xs">Cargando Expediente...</div>;
-    if (isError || !data) return <div className="p-20 text-center text-slate-500 font-medium">Error al recuperar el registro médico.</div>;
+    if (isLoading)
+        return (
+            <div className="p-20 text-center">
+                <Typography variant={TypographyVariant.OVERLINE}>
+                    Cargando expediente...
+                </Typography>
+            </div>
+        );
+
+    if (isError || !data)
+        return (
+            <div className="p-20 text-center">
+                <Typography variant={TypographyVariant.BODY}>
+                    Error al recuperar el registro médico.
+                </Typography>
+            </div>
+        );
 
     const { patient, control } = data;
 
     return (
-        <div className="max-w-5xl mx-auto py-12 px-6 space-y-8 font-['Roboto',sans-serif] animate-in fade-in duration-700">
-            {/* ACCIONES */}
-            <div className="flex justify-between items-center no-print">
+        <div className="max-w-6xl mx-auto pb-12 px-6 space-y-4 animate-in fade-in duration-500">
+
+            {/* NAV BAR SUPERIOR */}
+            <div className="flex justify-between items-center">
                 <button
                     onClick={() => navigation.patients.detail(patientId)}
-                    className="flex items-center gap-2 text-slate-400 hover:text-slate-900 font-bold text-[10px] uppercase tracking-widest transition-all"
+                    className="flex items-center gap-2 text-slate-500 hover:text-[#1E3A8A] transition-colors"
                 >
-                    <ArrowLeft size={14} /> Volver al detalle del paciente
+                    <ArrowLeft size={16} />
+                    <Typography variant={TypographyVariant.LINK_TEXT}>
+                        Volver al paciente
+                    </Typography>
                 </button>
-                <button onClick={() => window.print()} className="p-2 text-slate-400 hover:text-slate-900 transition-colors">
-                    <Printer size={18} />
+
+                <button
+                    onClick={() => window.print()}
+                    className="p-2 rounded-xl hover:bg-slate-100 transition"
+                >
+                    <Printer size={18} className="text-slate-500" />
                 </button>
             </div>
 
-            <div className="bg-white border border-slate-300 shadow-sm rounded-none print:shadow-none print:border-slate-200">
-                {/* CABECERA HOSPITALARIA */}
-                <div className="p-10 border-b-4 border-slate-900 flex justify-between items-start bg-slate-50">
-                    <div className="space-y-1">
-                        <p className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">{control.institution}</p>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Expediente Clínico Digital</p>
+            {/* HEADER ZYNKA */}
+            <div className="bg-white border border-slate-100 rounded-3xl p-10 shadow-sm space-y-6">
+
+                <div className="flex justify-between items-start">
+                    <div className="space-y-2">
+                        <Typography variant={TypographyVariant.ACCENT}>
+                            {control.institution}
+                        </Typography>
+
+                        <Typography variant={TypographyVariant.HEADER}>
+                            Expediente Clínico
+                        </Typography>
+
+                        <Typography variant={TypographyVariant.CAPTION}>
+                            Generado el {control.date}
+                        </Typography>
                     </div>
-                    <div className="text-right">
-                        <div className="inline-block bg-slate-900 text-white px-3 py-1 text-[9px] font-black tracking-[0.2em] uppercase">
-                            Copia de Archivo
-                        </div>
+
+                    <div className="px-4 py-2 bg-[#1E3A8A]/5 rounded-xl">
+                        <Typography variant={TypographyVariant.OVERLINE}>
+                            Folio {control.id.substring(0, 8).toUpperCase()}
+                        </Typography>
                     </div>
                 </div>
 
-                {/* TABLA DE DATOS DEL PACIENTE */}
-                <div className="bg-white grid grid-cols-2 md:grid-cols-4 border-b border-slate-200">
-                    <HeaderCell label="Nombre del Paciente" value={patient.fullName} className="col-span-2" />
-                    <HeaderCell label="ID Registro" value={patient.documentId} />
-                    <HeaderCell label="Género" value={patient.gender} />
-                    <HeaderCell label="Edad Cronológica" value={patient.age} />
-                    <HeaderCell label="Tipo Sangre" value={patient.bloodType} />
-                    <HeaderCell label="Fecha Emisión" value={control.date} />
-                    <HeaderCell label="Folio Interno" value={control.id.substring(0, 8).toUpperCase()} />
+                {/* Datos paciente */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100">
+
+                    <InfoBlock label="Paciente" value={patient.fullName} />
+                    <InfoBlock label="Documento" value={patient.documentId} />
+                    <InfoBlock label="Edad" value={patient.age} />
+                    <InfoBlock label="Género" value={patient.gender} />
+                    <InfoBlock label="Tipo de sangre" value={patient.bloodType} />
+                    <InfoBlock label="Especialidad" value={control.speciality} />
+                </div>
+            </div>
+
+            {/* HALLAZGOS */}
+            <SectionCard title="Hallazgos Clínicos">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                    <ObservationCard
+                        title="Otoscopía Derecha"
+                        value={control.findings.otoscopyRight}
+                    />
+
+                    <ObservationCard
+                        title="Otoscopía Izquierda"
+                        value={control.findings.otoscopyLeft}
+                    />
+
                 </div>
 
-                {/* CUERPO TÉCNICO */}
-                <div className="p-12 md:p-16 space-y-12">
-                    <DetailRow label="Especialidad" value={control.speciality === MedicalSpeciality.AUDIOLOGY ? 'AUDIOLOGÍA CLÍNICA' : control.speciality} isBold />
+                <div className="pt-8 border-t border-slate-100">
+                    <Typography variant={TypographyVariant.SUBTITLE}>
+                        Observaciones técnicas
+                    </Typography>
 
-                    {/* HALLAZGOS AUDIOLÓGICOS */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-4 border-t border-slate-50 pt-8">
-                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] pt-1 leading-relaxed">Hallazgos Clínicos</div>
-                        <div className="md:col-span-3 space-y-8">
-                            {/* Observaciones de Otoscopía */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-                                <div>
-                                    <p className="text-[10px] font-black text-slate-900 uppercase mb-2 tracking-wide">Otoscopía Derecha</p>
-                                    <p className="text-sm text-slate-600 leading-relaxed border-l border-slate-900 pl-4 uppercase text-xs">{control.findings.otoscopyRight}</p>
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-black text-slate-900 uppercase mb-2 tracking-wide">Otoscopía Izquierda</p>
-                                    <p className="text-sm text-slate-600 leading-relaxed border-l border-slate-900 pl-4 uppercase text-xs">{control.findings.otoscopyLeft}</p>
-                                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <StatusRow label="Limpieza técnica realizada" status={control.findings.cleaningPerformed} />
+                        <StatusRow label="Usuario de auxiliares auditivos" status={control.findings.usesAuxiliaries} />
+                        <StatusRow label="Presencia de tinnitus" status={control.findings.tinnitus} />
+                    </div>
+                </div>
+            </SectionCard>
+
+            {/* DIAGNÓSTICO */}
+            <SectionCard title="Diagnóstico Final">
+                <Typography variant={TypographyVariant.BODY}>
+                    {control.diagnosis}
+                </Typography>
+            </SectionCard>
+
+            {/* PLAN */}
+            <SectionCard title="Plan de Tratamiento">
+                <ul className="space-y-4">
+                    {control.plan.map((item, i) => (
+                        <li key={i} className="flex gap-4">
+                            <div className="h-6 w-6 flex items-center justify-center bg-[#1E3A8A]/10 text-[#1E3A8A] rounded-full text-sm font-semibold">
+                                {i + 1}
                             </div>
 
-                            {/* Notas Adicionales con Viñetas */}
-                            <div className="space-y-2 border-t border-slate-100 pt-6">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Observaciones Técnicas</p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
-                                    <StatusRow label="Limpieza técnica realizada" status={control.findings.cleaningPerformed} />
-                                    <StatusRow label="Usuario de auxiliares auditivos" status={control.findings.usesAuxiliaries} />
-                                    <StatusRow label="Presencia de Tinnitus" status={control.findings.tinnitus} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                            <Typography variant={TypographyVariant.BODY}>
+                                {item}
+                            </Typography>
+                        </li>
+                    ))}
+                </ul>
+            </SectionCard>
 
-                    <DetailRow label="Diagnóstico Final" value={control.diagnosis} isBold />
+            {/* FIRMA */}
+            <div className="pt-10">
+                <div className="w-72 border-t border-slate-300 pt-4">
+                    <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+                        {control.specialistName}
+                    </Typography>
 
-                    {/* PLAN MÉDICO */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-slate-50 pt-8">
-                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] pt-1">Plan de Tratamiento</div>
-                        <ul className="md:col-span-3 space-y-3">
-                            {control.plan.map((item, i) => (
-                                <li key={i} className="text-[13px] text-slate-700 flex gap-3 font-medium uppercase tracking-tight">
-                                    <span className="text-slate-300 font-black">{i + 1}.</span> {item}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-
-                {/* FIRMA Y SELLO */}
-                <div className="p-16 pt-0 mt-12 flex justify-start">
-                    <div className="w-72 border-t-2 border-slate-900 pt-4">
-                        <p className="text-xs font-black text-slate-900 uppercase tracking-tighter">{control.specialistName}</p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Firma y Cédula Profesional</p>
-                    </div>
-                </div>
-
-                <div className="bg-slate-50 p-6 text-[8px] text-slate-400 font-black uppercase tracking-[0.3em] text-center border-t border-slate-200">
-                    Generado digitalmente por sistema clínico • {new Date().toLocaleString('es-ES')}
+                    <Typography variant={TypographyVariant.CAPTION}>
+                        Profesional responsable
+                    </Typography>
                 </div>
             </div>
         </div>
     );
 };
-
 // --- SUB-COMPONENTES AUXILIARES ---
+
+const SectionCard = ({ title, children }: any) => (
+    <div className="bg-white border border-slate-100 rounded-3xl p-10 shadow-sm space-y-6">
+        <Typography variant={TypographyVariant.SUBTITLE}>
+            {title}
+        </Typography>
+        {children}
+    </div>
+);
+const InfoBlock = ({ label, value }: any) => (
+    <div className="space-y-1">
+        <Typography variant={TypographyVariant.CAPTION}>
+            {label}
+        </Typography>
+        <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+            {value || "---"}
+        </Typography>
+    </div>
+);
+
+const ObservationCard = ({ title, value }: any) => (
+    <div className="bg-[#F8FAFC] p-6 rounded-2xl border border-slate-100">
+        <Typography variant={TypographyVariant.OVERLINE}>
+            {title}
+        </Typography>
+
+        <Typography variant={TypographyVariant.BODY} className="mt-3">
+            {value}
+        </Typography>
+    </div>
+);
 
 const StatusRow = ({ label, status }: { label: string, status: boolean }) => (
     <div className="flex items-center gap-2">

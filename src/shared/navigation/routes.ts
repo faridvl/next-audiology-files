@@ -23,6 +23,7 @@ export const routesPrivate = {
   tests: '/tests',
   inventory: '/inventory',
   settings: '/settings',
+  documents: '/documents',
 };
 
 export const routesPublic = {

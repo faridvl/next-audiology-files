@@ -45,7 +45,6 @@ export function DashboardLayout({
   const [actionsButton, setActionsButton] = useState<MenuAction>();
   const [hasBackButton, setHasBackButton] = useState(true);
   const [boxClassName, setBoxClassName] = useState('');
-
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
@@ -60,21 +59,27 @@ export function DashboardLayout({
   const isChildrenRenderProperty = children && typeof children === 'function';
 
   return (
-    <div className="flex flex-row justify-start h-screen w-screen overflow-hidden relative">
+    <div className="flex flex-row h-screen w-screen overflow-hidden relative bg-slate-50">
 
+      {/* Success Alert */}
       <div className="absolute top-6 right-6 z-[100] pointer-events-none">
         {showSuccess && (
-          <div className="pointer-events-auto animate-in fade-in slide-in-from-top-5 duration-300">
+          <div className="pointer-events-auto animate-fade-in-down">
             <SuccessAlert onClose={() => setShowSuccess(false)} />
           </div>
         )}
       </div>
 
+      {/* Sidebar */}
       <DesktopSidebar />
 
-      <div className="flex flex-col flex-1 h-full bg-slate-50">
+      {/* Main Content */}
+      <div className="flex flex-col flex-1 h-full bg-slate-50 border-l">
+
+        {/* Header */}
         <Header title={pageTitle} />
 
+        {/* Content */}
         <DashboardLayoutContent
           contentClassNames={contentClassNames}
           onScroll={onScroll}
@@ -98,4 +103,4 @@ export function DashboardLayout({
       </div>
     </div>
   );
-};
+}

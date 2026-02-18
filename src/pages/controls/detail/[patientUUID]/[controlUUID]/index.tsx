@@ -36,5 +36,4 @@ const ControlDetailPage = () => {
     );
 };
 
-// IMPORTANTE: El export default es lo que soluciona tu error actual
 export default ControlDetailPage;

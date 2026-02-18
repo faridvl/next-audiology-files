@@ -33,20 +33,36 @@ export function Button({
     ...props
 }: ButtonProps) {
 
-    const baseStyle = 'flex items-center justify-center gap-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100';
+    const baseStyle =
+        'flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100';
 
     const variantStyles: { [key in ButtonVariant]: VariantStyle } = {
         [ButtonVariant.PRIMARY]: {
-            className: `${baseStyle} bg-blue-600 text-white px-5 py-2.5 rounded-2xl text-sm font-black shadow-xl shadow-blue-200 hover:bg-blue-700 hover:shadow-blue-300`,
+            className: `${baseStyle}
+                bg-[#1E3A8A] text-white
+                hover:bg-[#1A337A]
+                focus:ring-[#1E3A8A]/40`,
         },
+
         [ButtonVariant.DANGER]: {
-            className: `${baseStyle} bg-red-600 text-white px-5 py-2.5 rounded-2xl text-sm font-bold shadow-lg shadow-red-100 hover:bg-red-700`,
+            className: `${baseStyle}
+                bg-red-600 text-white
+                hover:bg-red-700
+                focus:ring-red-500/40`,
         },
+
         [ButtonVariant.ALERT]: {
-            className: `${baseStyle} bg-yellow-500 text-black px-5 py-2.5 rounded-2xl text-sm font-bold shadow-lg shadow-yellow-100 hover:bg-yellow-600`,
+            className: `${baseStyle}
+                bg-amber-500 text-white
+                hover:bg-amber-600
+                focus:ring-amber-500/40`,
         },
+
         [ButtonVariant.CANCEL]: {
-            className: `${baseStyle} bg-slate-100 text-slate-500 px-6 py-2.5 rounded-2xl text-sm font-bold hover:bg-slate-200 hover:text-slate-600`,
+            className: `${baseStyle}
+                bg-slate-100 text-slate-700
+                hover:bg-slate-200
+                focus:ring-slate-300`,
         },
     };
 
