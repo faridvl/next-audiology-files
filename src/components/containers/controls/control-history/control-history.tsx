@@ -78,7 +78,7 @@ export const MedicalHistorySidebar: React.FC<{ patientId: string }> = ({ patient
                                     <span className="text-[10px] text-slate-400">{new Date(control.createdAt).toLocaleDateString()}</span>
                                 </div>
                                 <p className="text-xs text-slate-600 line-clamp-2 italic leading-relaxed leading-relaxed">
-                                    "{control.clinicalData.diagnosis}"
+                                    {control.clinicalData.diagnosis}
                                 </p>
                             </div>
                         ))}
