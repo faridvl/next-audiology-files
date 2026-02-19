@@ -10,6 +10,7 @@ export type PatientFormValues = {
   email: string;
   dob: string;
   gender: 'male' | 'female' | '';
+  nationality: string; // <-- Nuevo dato
 };
 
 export function usePatientForm(onSuccess?: () => void) {
@@ -24,6 +25,7 @@ export function usePatientForm(onSuccess?: () => void) {
     email: '',
     dob: '',
     gender: '',
+    nationality: 'Costa Rica', // Valor por defecto común
   };
 
   const validationSchema = Yup.object().shape({
@@ -33,12 +35,10 @@ export function usePatientForm(onSuccess?: () => void) {
     email: Yup.string().email('Email inválido').required('Requerido'),
     dob: Yup.date().required('Fecha requerida'),
     gender: Yup.string().oneOf(['male', 'female'], 'Seleccione un género').required('Requerido'),
+    nationality: Yup.string().required('Requerido'),
   });
 
-  const handleSubmit = async (
-    values: PatientFormValues,
-    { resetForm }: { resetForm: () => void },
-  ) => {
+  const handleSubmit = async (values: PatientFormValues, { resetForm }: any) => {
     const nameParts = values.name.trim().split(/\s+/);
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(' ') || '';
@@ -51,6 +51,10 @@ export function usePatientForm(onSuccess?: () => void) {
       email: values.email,
       documentId: values.id,
       gender: values.gender,
+      nationality: values.nationality,
+      metadata: {
+        employmentArea: values.employmentArea, // Guardamos el área de empleo
+      },
     };
 
     executeCreatePatient(payload, {
@@ -59,16 +63,9 @@ export function usePatientForm(onSuccess?: () => void) {
         if (onSuccess) onSuccess();
         router.push('/patients');
       },
-      onError: (err) => {
-        console.error('Error al registrar paciente:', err);
-      },
+      onError: (err) => console.error('Error:', err),
     });
   };
 
-  return {
-    initialValues,
-    validationSchema,
-    handleSubmit,
-    isLoading: isPending,
-  };
+  return { initialValues, validationSchema, handleSubmit, isLoading: isPending };
 }

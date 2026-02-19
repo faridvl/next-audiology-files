@@ -1,7 +1,15 @@
-// src/shared/navigation/navigationPaths.ts
 import { INavigationPath } from '@/types/system/navigation-path';
 import { routesPrivate } from '../navigation/routes';
-import { LayoutDashboard, Users, Calendar, Activity, Archive, Settings } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Users,
+  Calendar,
+  Activity,
+  Archive,
+  ShieldCheck,
+  FileText,
+  ClipboardList,
+} from 'lucide-react';
 
 export const NAVIGATION_PATHS: INavigationPath[] = [
   {
@@ -42,15 +50,15 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
   {
     menuKey: 'users',
     default: false,
-    icon: Settings,
+    icon: ShieldCheck,
     labelKey: 'Usuarios',
     route: routesPrivate.users.index,
   },
   {
-    menuKey: 'documents',
+    menuKey: 'appointmentType',
     default: false,
-    icon: Settings,
-    labelKey: 'Documentos',
-    route: routesPrivate.documents,
+    icon: ClipboardList,
+    labelKey: 'Tipos de Citas',
+    route: routesPrivate.appointmentType.index,
   },
 ];

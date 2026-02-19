@@ -21,7 +21,7 @@ class MyDocument extends Document {
           {/* TODO: Si usas Poppins/Inter desde Google, cargarlas aquí */}
         </Head>
 
-        <body className="text-neutral-100 font-sans antialiased">
+        <body className=" font-sans antialiased">
           <Main />
           <NextScript />
         </body>

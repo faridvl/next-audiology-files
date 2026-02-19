@@ -39,11 +39,16 @@ export const useNavigation = () => {
     appointments: {
       list: () => router.push(routesPrivate.appointments.index),
       create: () => router.push(routesPrivate.appointments.create),
+      manage: (id: string | number) => router.push(routesPrivate.appointments.manage(id)),
     },
 
     // Otros
     inventory: () => router.push(routesPrivate.inventory),
     tests: () => router.push(routesPrivate.tests),
-    documents: () => router.push(routesPrivate.documents),
+    profile: () => router.push(routesPrivate.profile),
+    appointmentType: {
+      list: () => router.push(routesPrivate.appointmentType.index),
+      create: () => router.push(routesPrivate.appointmentType.create),
+    },
   };
 };

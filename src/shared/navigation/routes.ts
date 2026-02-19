@@ -14,6 +14,7 @@ export const routesPrivate = {
   appointments: {
     index: '/appointments',
     create: '/appointments/create',
+    manage: (id: string | number) => `/appointments/manage/${id}`,
   },
   controls: {
     detail: (patientUUID: string | number, controlUUID: string) =>
@@ -24,6 +25,8 @@ export const routesPrivate = {
   inventory: '/inventory',
   settings: '/settings',
   documents: '/documents',
+  profile: '/profile',
+  appointmentType: { index: '/appointment-type', create: '/appointment-type/create' },
 };
 
 export const routesPublic = {

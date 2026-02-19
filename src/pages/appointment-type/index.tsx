@@ -3,26 +3,24 @@ import Head from 'next/head';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
-import { AppointmentsView } from '@/components/containers/appointment/appointment-list/appointment-list-container';
+import { AppointmentTypesContainer } from '@/components/containers/appointment-types/appointment-types-container';
 
-const AppointmentsPage: React.FC = () => {
-
+const AppointmentTypesPage: React.FC = () => {
     return (
         <>
             <Head>
-                <title>Agenda de Citas</title>
+                <title>Mantenimiento de Citas </title>
             </Head>
             <DashboardLayout
                 isMainPage={false}
                 contentStyle={BoxedLayoutStyle.FULL}
-                title="Agenda de Control"
+                title="Configuración de Servicios"
             >
-                <AppointmentsView />
+                <AppointmentTypesContainer />
             </DashboardLayout>
         </>
     );
 };
 
 export const getServerSideProps = authorizeServerSidePage();
-
-export default AppointmentsPage;
+export default AppointmentTypesPage;

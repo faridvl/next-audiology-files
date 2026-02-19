@@ -84,24 +84,32 @@ export default function DesktopSidebar() {
         </nav>
       </div>
 
+
       {/* User Section (Footer) */}
       <div className="px-3 py-6 mt-auto border-t border-slate-100">
-        <div className="flex items-center gap-3 px-4 py-3 bg-slate-50 rounded-2xl border border-slate-100">
-
-          {/* Avatar dinámico */}
-          <div className="h-9 w-9 rounded-xl bg-[#1E3A8A] flex items-center justify-center font-bold text-white text-[11px] flex-shrink-0">
+        <Link
+          href="/settings"
+          className="flex items-center gap-3 px-4 py-3 bg-slate-50 hover:bg-white rounded-2xl border border-slate-100 hover:border-blue-200 hover:shadow-md hover:shadow-blue-500/5 transition-all duration-300 group cursor-pointer"
+        >
+          <div className="h-9 w-9 rounded-xl bg-[#1E3A8A] group-hover:bg-blue-600 flex items-center justify-center font-bold text-white text-[11px] flex-shrink-0 transition-colors shadow-sm">
             {isLoading ? '?' : initials}
           </div>
 
-          <div className="flex flex-col min-w-0">
-            <span className="text-[12px] font-semibold text-slate-800 truncate">
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className="text-[12px] font-bold text-slate-800 truncate group-hover:text-blue-700 transition-colors">
               {isLoading ? 'Cargando...' : businessName}
             </span>
-            <span className="text-[10px] text-slate-400 font-medium truncate uppercase tracking-wide">
+            <span className="text-[10px] text-slate-400 font-black truncate uppercase tracking-widest">
               {isLoading ? '...' : userRole}
             </span>
           </div>
-        </div>
+
+          <div className="text-slate-300 group-hover:text-blue-400 transition-colors">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </div>
+        </Link>
       </div>
     </div>
   );

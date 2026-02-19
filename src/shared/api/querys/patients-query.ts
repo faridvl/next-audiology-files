@@ -1,20 +1,8 @@
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
 import { PaginatedResponse } from '@/types/otros/paginate.types';
+import { Patient } from '@/types/patients/patient';
 import { useQuery } from '@tanstack/react-query';
-
-export interface Patient {
-  id: number;
-  uuid: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  address: string | null;
-  birthDate: string;
-  tenantId: number;
-  tenantUuid: string;
-  createdAt: string;
-}
 
 const PATIENTS_URL = env.API.MEDICAL_RECORDS_URL;
 

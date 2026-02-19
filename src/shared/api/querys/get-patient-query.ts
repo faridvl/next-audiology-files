@@ -1,6 +1,6 @@
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
-import { Patient } from './patients-query';
+import { Patient } from '@/types/patients/patient';
 import { useQuery } from '@tanstack/react-query';
 
 export const FETCH_PATIENT_DETAIL_KEY = 'fetchPatientDetail';
