@@ -25,13 +25,15 @@ export const useCreateAppointment = () => {
   // TODO(!): Estos servicios deberían venir de una base de datos (useAppointmentTypesQuery)
   const servicesCatalog = {
     [MedicalSpeciality.AUDIOLOGY]: [
-      { id: '550e8400-e29b-41d4-a716-446655440000', label: 'Audiometría Tonal' },
+      { id: '8e3677b3-b64c-4978-9271-26c15cb41988', label: 'Audiometría Tonal' },
     ],
     [MedicalSpeciality.DENTAL]: [
-      { id: 'd-1', label: 'Limpieza / Profilaxis' },
-      { id: 'd-2', label: 'Extracción' },
+      { id: '8e3677b3-b64c-4978-9271-26c15cb41988', label: 'Limpieza / Profilaxis' },
+      { id: '8e3677b3-b64c-4978-9271-26c15cb41988', label: 'Extracción' },
     ],
-    [MedicalSpeciality.GENERAL]: [{ id: 'g-1', label: 'Consulta General' }],
+    [MedicalSpeciality.GENERAL]: [
+      { id: '8e3677b3-b64c-4978-9271-26c15cb41988', label: 'Consulta General' },
+    ],
   };
 
   const availableServices = useMemo(() => {
