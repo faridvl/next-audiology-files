@@ -106,7 +106,7 @@ export const PatientSummaryHeader: React.FC<PatientHeaderProps> = ({
                     <FileText size={16} className="text-blue-500" />
                     <Typography variant={TypographyVariant.CAPTION} className="text-slate-600">
                         <span className="font-bold text-slate-800 mr-2 uppercase text-[9px] tracking-wider">Nota clínica:</span>
-                        <span className="italic">"{patient.observations}"</span>
+                        <span className="italic">{patient.observations}</span>
                     </Typography>
                 </div>
                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white px-3 py-1 rounded-full border border-slate-100">

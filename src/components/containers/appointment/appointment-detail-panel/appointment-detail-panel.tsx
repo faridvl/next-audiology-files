@@ -72,7 +72,7 @@ export const AppointmentDetailPanel: React.FC<Props> = ({ appointment, onClose }
                     <Typography variant={TypographyVariant.CAPTION} className="font-black uppercase text-[10px]">Nota de esta sesión</Typography>
                 </div>
                 <Typography variant={TypographyVariant.CAPTION} className="text-slate-600 leading-relaxed italic">
-                    "{appointment.notes || 'Sin observaciones para hoy.'}"
+                    {appointment.notes || 'Sin observaciones para hoy.'}
                 </Typography>
             </div>
 

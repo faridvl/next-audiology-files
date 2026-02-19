@@ -166,7 +166,7 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                     <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md uppercase">Consulta</span>
                                     <span className="text-[10px] text-slate-400 font-medium">10/02/2026</span>
                                 </div>
-                                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed italic">"El paciente presenta buena evolución, se recomienda continuar con el uso de auxiliares..."</p>
+                                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed italic">El paciente presenta buena evolución, se recomienda continuar con el uso de auxiliares...</p>
                                 <div className="mt-3 flex items-center text-[10px] font-bold text-slate-400 group-hover:text-blue-500 cursor-pointer">
                                     VER DETALLES <ChevronRight size={12} />
                                 </div>
