@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { Table } from '@/components/common/table/table';
-import { Input } from '@/components/common/input/input';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { usePatientList } from './use-patient-list';
 import { Edit2, Eye, Search, UserPlus } from 'lucide-react';
