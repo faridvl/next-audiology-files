@@ -20,6 +20,7 @@ export const AppointmentDetailPanel: React.FC<Props> = ({ appointment, onClose }
         isLoading
     } = useAppointmentDetail(appointment);
     const navigation = useNavigation();
+
     return (
         <div className="w-96 bg-white border border-slate-200 rounded-[32px] shadow-2xl p-6 flex flex-col gap-6 animate-in slide-in-from-right duration-300 overflow-y-auto max-h-[calc(100vh-140px)]">
 
@@ -58,7 +59,11 @@ export const AppointmentDetailPanel: React.FC<Props> = ({ appointment, onClose }
                         </div>
                     )}
                 </div>
-                <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-300 outline-none">
+                <button
+                    onClick={onClose}
+                    className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-300 outline-none"
+                    type="button"
+                >
                     <X size={20} />
                 </button>
             </div>
@@ -72,7 +77,8 @@ export const AppointmentDetailPanel: React.FC<Props> = ({ appointment, onClose }
                     <Typography variant={TypographyVariant.CAPTION} className="font-black uppercase text-[10px]">Nota de esta sesión</Typography>
                 </div>
                 <Typography variant={TypographyVariant.CAPTION} className="text-slate-600 leading-relaxed italic">
-                    {appointment.notes || 'Sin observaciones para hoy.'}
+                    {/* Se usa &quot; para evitar errores de linter en el despliegue */}
+                    &quot;{appointment.notes || 'Sin observaciones para hoy.'}&quot;
                 </Typography>
             </div>
 
@@ -84,10 +90,14 @@ export const AppointmentDetailPanel: React.FC<Props> = ({ appointment, onClose }
                     <div className="flex justify-center p-6"><Loader2 className="animate-spin text-slate-200" /></div>
                 ) : (
                     <div className="space-y-2">
-                        {historyNotes.length > 0 ? historyNotes.map((note) => (
+                        {historyNotes.length > 0 ? historyNotes.map((note: { id: string | number; date: string; text: string }) => (
                             <div key={note.id} className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-bold text-blue-400 mb-1 block">{note.date}</Typography>
-                                <Typography variant={TypographyVariant.CAPTION} className="text-slate-500 text-[11px] leading-tight line-clamp-2">{note.text}</Typography>
+                                <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-bold text-blue-400 mb-1 block">
+                                    {note.date}
+                                </Typography>
+                                <Typography variant={TypographyVariant.CAPTION} className="text-slate-500 text-[11px] leading-tight line-clamp-2">
+                                    {note.text}
+                                </Typography>
                             </div>
                         )) : (
                             <div className="text-center py-4 border-2 border-dashed border-slate-50 rounded-xl">
