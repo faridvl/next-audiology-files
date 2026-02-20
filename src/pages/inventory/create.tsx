@@ -3,18 +3,18 @@ import Head from 'next/head';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
-import { InventoryContainer } from '@/components/containers/inventory/inventory-container/inventory-container';
+import { InventoryCreateContainer } from '@/components/containers/inventory/inventory-form/inventory-form';
 
-const InventoryPage: React.FC = () => {
+const CreateProductPage: React.FC = () => {
     return (
         <>
-            <Head><title>Inventario</title></Head>
-            <DashboardLayout isMainPage contentStyle={BoxedLayoutStyle.FULL} title="Control de Inventario">
-                <InventoryContainer />
+            <Head><title>Nuevo Artículo </title></Head>
+            <DashboardLayout isMainPage={false} contentStyle={BoxedLayoutStyle.FULL} title="Agregar al Inventario">
+                <InventoryCreateContainer />
             </DashboardLayout>
         </>
     );
 };
 
 export const getServerSideProps = authorizeServerSidePage();
-export default InventoryPage;
+export default CreateProductPage;

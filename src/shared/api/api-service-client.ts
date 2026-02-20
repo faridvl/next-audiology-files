@@ -35,6 +35,8 @@ export const ApiServiceClient = (baseUrl: string) => {
       fetcher(endpoint, { method: 'POST', body: JSON.stringify(body) }),
     put: <T = any>(endpoint: string, body: any) =>
       fetcher(endpoint, { method: 'PUT', body: JSON.stringify(body) }),
+    patch: <T = any>(endpoint: string, body: any) =>
+      fetcher(endpoint, { method: 'PATCH', body: JSON.stringify(body) }),
     delete: <T = any>(endpoint: string) => fetcher(endpoint, { method: 'DELETE' }),
   };
 };

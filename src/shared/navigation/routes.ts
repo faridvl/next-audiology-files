@@ -22,7 +22,12 @@ export const routesPrivate = {
     create: (id: string | number) => `/controls/${id}`,
   },
   tests: '/tests',
-  inventory: '/inventory',
+  inventory: {
+    index: '/inventory',
+    create: '/inventory/create',
+    detail: (inventoryUUID: string | number) => `/inventory/${inventoryUUID}`,
+    manage: (inventoryUUID: string | number) => `/inventory/manage/${inventoryUUID}`,
+  },
   settings: '/settings',
   documents: '/documents',
   profile: '/profile',

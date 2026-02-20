@@ -45,7 +45,7 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
     default: false,
     icon: Archive,
     labelKey: 'Inventario',
-    route: routesPrivate.inventory,
+    route: routesPrivate.inventory.index,
   },
   {
     menuKey: 'users',
