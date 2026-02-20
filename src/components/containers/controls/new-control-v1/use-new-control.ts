@@ -25,6 +25,7 @@ export const useNewControl = (patientUUID: string, appointmentUUID?: string | nu
   const [showHistory, setShowHistory] = useState(true);
   const [speciality, setSpeciality] = useState<MedicalSpeciality>(MedicalSpeciality.AUDIOLOGY);
   const [diagnosis, setDiagnosis] = useState('');
+  const [showAudiogram, setShowAudiogram] = useState(false); // <--- NUEVO ESTADO
 
   const [findings, setFindings] = useState(INITIAL_FINDINGS[MedicalSpeciality.AUDIOLOGY]);
 
@@ -38,10 +39,13 @@ export const useNewControl = (patientUUID: string, appointmentUUID?: string | nu
     setFindings((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleChangeSpeciality = (newSpec: MedicalSpeciality) => {
-    setSpeciality(newSpec);
-    setFindings(INITIAL_FINDINGS[newSpec] || {});
-  };
+const handleChangeSpeciality = (newSpec: MedicalSpeciality) => {
+  setSpeciality(newSpec);
+  setFindings(INITIAL_FINDINGS[newSpec] || {});
+  if (newSpec !== MedicalSpeciality.AUDIOLOGY) {
+    setShowAudiogram(false); 
+  }
+};
 
   const handleSave = async () => {
     if (!diagnosis.trim()) {
@@ -73,8 +77,8 @@ export const useNewControl = (patientUUID: string, appointmentUUID?: string | nu
   };
 
   return {
-    states: { speciality, diagnosis, findings, followUp, showHistory, isPending },
-    setters: { setDiagnosis, setFindings, setFollowUp, setShowHistory },
+    states: { speciality, diagnosis, findings, followUp, showHistory, isPending, showAudiogram },
+    setters: { setDiagnosis, setFindings, setFollowUp, setShowHistory, setShowAudiogram },
     methods: { updateFinding, handleSave, handleChangeSpeciality },
   };
 };

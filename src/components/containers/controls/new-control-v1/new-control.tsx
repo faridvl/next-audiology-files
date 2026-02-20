@@ -10,6 +10,7 @@ import { MedicalSpeciality } from '@/types/medical-controls/medical-control.type
 import { useMedicalControlsQuery } from '@/shared/api/querys/medical-controls-query';
 import { useNavigation } from '@/hooks/use-navigation';
 import { MedicalHistorySidebar } from '../control-history/control-history';
+import { AudiometryCapture } from '../../audiogram-capture/audiogram-capture';
 
 
 // --- CONTENEDOR PRINCIPAL ---
@@ -18,7 +19,7 @@ export const NewControlContainer: React.FC<{ patientId: string; appointmentId?: 
     appointmentId
 }) => {
     const { states, setters, methods } = useNewControl(patientId, appointmentId);
-    const { speciality, diagnosis, findings, followUp, showHistory, isPending } = states;
+    const { speciality, diagnosis, findings, followUp, showHistory, isPending, showAudiogram } = states;
 
     return (
         <div className="flex gap-10 max-w-[1700px] mx-auto pb-20 px-8 items-start">
@@ -51,8 +52,10 @@ export const NewControlContainer: React.FC<{ patientId: string; appointmentId?: 
                         </div>
                     </section>
 
+
+
                     {/* Exploración Clínica */}
-                    <section className="space-y-6 pt-2">
+                    {/* <section className="space-y-6 pt-2">
                         <div className="flex items-center gap-3">
                             <Activity size={20} className="text-blue-600" />
                             <Typography variant={TypographyVariant.BODY_BOLD} className="uppercase tracking-widest text-sm text-slate-700">Exploración Clínica</Typography>
@@ -94,6 +97,82 @@ export const NewControlContainer: React.FC<{ patientId: string; appointmentId?: 
                                     </div>
                                 </>
                             ) : (
+                                <textarea
+                                    className="col-span-2 w-full p-6 rounded-[2rem] border border-slate-100 bg-slate-50/30 text-sm min-h-[150px] outline-none focus:bg-white transition-all shadow-inner"
+                                    placeholder={`Hallazgos clínicos de ${speciality}...`}
+                                    value={findings.generalNotes || ''}
+                                    onChange={(e) => methods.updateFinding('generalNotes', e.target.value)}
+                                />
+                            )}
+                        </div>
+                    </section> */}
+
+                    <section className="space-y-6 pt-2">
+                        <div className="flex items-center justify-between pr-4"> {/* Justify between para el botón */}
+                            <div className="flex items-center gap-3">
+                                <Activity size={20} className="text-blue-600" />
+                                <Typography variant={TypographyVariant.BODY_BOLD} className="uppercase tracking-widest text-sm text-slate-700">
+                                    Exploración Clínica
+                                </Typography>
+                            </div>
+
+                            {/* BOTÓN DE AUDIOMETRÍA */}
+                            {speciality === MedicalSpeciality.AUDIOLOGY && (
+                                <button
+                                    type="button"
+                                    onClick={() => setters.setShowAudiogram(!showAudiogram)}
+                                    className={`text-[10px] font-black uppercase px-4 py-2 rounded-xl border transition-all ${showAudiogram
+                                        ? 'bg-red-50 text-red-500 border-red-100 hover:bg-red-100'
+                                        : 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100'
+                                        }`}
+                                >
+                                    {showAudiogram ? '✕ Quitar Audiometría' : '+ Añadir Audiometría'}
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {speciality === MedicalSpeciality.AUDIOLOGY ? (
+                                <>
+                                    {/* Inputs de Otoscopia */}
+                                    <div className="space-y-2">
+                                        <Typography variant={TypographyVariant.CAPTION} className="ml-4 font-black text-slate-400 uppercase text-[9px]">Oído Derecho</Typography>
+                                        <textarea
+                                            placeholder="Otoscopia y hallazgos..."
+                                            value={findings.otoscopyRight}
+                                            onChange={(e) => methods.updateFinding('otoscopyRight', e.target.value)}
+                                            className="w-full p-5 rounded-[1.5rem] border border-slate-100 bg-slate-50/30 text-sm min-h-[110px] outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/5 transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Typography variant={TypographyVariant.CAPTION} className="ml-4 font-black text-slate-400 uppercase text-[9px]">Oído Izquierdo</Typography>
+                                        <textarea
+                                            placeholder="Otoscopia y hallazgos..."
+                                            value={findings.otoscopyLeft}
+                                            onChange={(e) => methods.updateFinding('otoscopyLeft', e.target.value)}
+                                            className="w-full p-5 rounded-[1.5rem] border border-slate-100 bg-slate-50/30 text-sm min-h-[110px] outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/5 transition-all"
+                                        />
+                                    </div>
+
+                                    {/* RENDER CONDICIONAL DEL CAPTURADOR DE AUDIOMETRÍA */}
+                                    {showAudiogram && (
+                                        <div className="col-span-2 pt-4 animate-in fade-in zoom-in-95 duration-300">
+                                            <div className="p-1 bg-slate-100 rounded-[2.5rem]">
+                                                {/* Aquí va tu componente de captura */}
+                                                <AudiometryCapture
+                                                    onChange={() => { }}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Checkboxes de Audiología */}
+                                    <div className="col-span-2 flex flex-wrap gap-6 px-6 py-4 bg-slate-50/50 rounded-2xl border border-slate-100">
+                                        {/* ... tus labels de cleaningPerformed, etc */}
+                                    </div>
+                                </>
+                            ) : (
+                                /* Medicina General / Otros */
                                 <textarea
                                     className="col-span-2 w-full p-6 rounded-[2rem] border border-slate-100 bg-slate-50/30 text-sm min-h-[150px] outline-none focus:bg-white transition-all shadow-inner"
                                     placeholder={`Hallazgos clínicos de ${speciality}...`}
