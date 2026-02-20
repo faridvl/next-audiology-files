@@ -34,13 +34,6 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
     route: routesPrivate.appointments.index,
   },
   {
-    menuKey: 'tests',
-    default: false,
-    icon: Activity,
-    labelKey: 'Pruebas',
-    route: routesPrivate.tests,
-  },
-  {
     menuKey: 'inventory',
     default: false,
     icon: Archive,
