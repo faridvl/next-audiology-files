@@ -112,7 +112,7 @@ export function useDashboard() {
       createPatient: () => nav.patients.create(),
       createAppointment: () => nav.appointments.create(),
       goTests: () => nav.tests(),
-      goInventory: () => nav.inventory(),
+      goInventory: () => nav.inventory.create(),
       manageAppointment: (id: string) => nav.appointments.manage(id),
     },
   };
