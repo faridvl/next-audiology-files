@@ -23,7 +23,7 @@ export const AppointmentsView: React.FC = () => {
     const {
         viewMode, setViewMode, weekRangeLabel, moveWeek, daysOfCurrentWeek,
         appointments, searchTerm, setSearchTerm, statusFilter, setStatusFilter,
-        selectedAppointment, setSelectedAppointment, loading
+        selectedAppointment, setSelectedAppointment, isLoading
     } = useAppointmentsContainer();
 
     return (
@@ -94,7 +94,7 @@ export const AppointmentsView: React.FC = () => {
 
             {/* CONTENIDO PRINCIPAL */}
             <div className="flex-1 flex gap-4 overflow-hidden">
-                <div className={`flex-1 bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden flex flex-col ${loading ? 'opacity-60 cursor-wait' : ''}`}>
+                <div className={`flex-1 bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden flex flex-col ${isLoading ? 'opacity-60 cursor-wait' : ''}`}>
                     {viewMode === ViewMode.WEEKLY ? (
                         <div className="grid grid-cols-7 h-full divide-x divide-slate-100 overflow-y-auto scrollbar-hide">
                             {daysOfCurrentWeek.map((day, i) => (

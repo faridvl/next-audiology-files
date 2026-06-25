@@ -2,12 +2,22 @@
 
 ## 🎯 SESIÓN ACTIVA — retomar aquí
 
-**Branch activo:** `fix/p0-appointment-display-fields`  
-**Etapa actual:** Iniciando — branch creado desde main (post-merge de P0-2/3/4/5).  
-**Próximo paso:** P0-1 — investigar shape real de `GET /appointments` para corregir tiempos `--:--` y "Paciente no identificado".
+**Branch activo:** `fix/p0-1-appointment-times-patient-name`  
+**Etapa actual:** Completada — 3 bugs corregidos, pendiente PR.  
+**Próximo paso:** Crear PR de este branch y decidir qué sigue (P1-1 manage appointment o P0-6 WhatsApp phone).
 
 **Cola de esta etapa:**
-1. ⬜ P0-1 — investigar shape de `GET /appointments` (API + Site) y corregir campos de display
+1. ✅ P0-1 — corregidos los 3 bugs de display de citas
+
+**Cambios de esta etapa:**
+
+| Archivo | Repo | Cambio |
+|---------|------|--------|
+| `packages/medical-records/src/infrastructure/adapters/appointmentsRepository/appointments.storage.ts` | API | Filtro `date` exacto → rango en `startTime` (`gte`/`lt`) |
+| `src/components/containers/appointment/appointment-list/use-appointment-list-container.ts` | Site | `raw.patient?.uuid` → `raw.patientUUID`; `loading` → `isLoading` |
+| `src/components/containers/appointment/appointment-list/appointment-list-container.tsx` | Site | `loading` → `isLoading` |
+| `src/components/containers/appointment/add-appointment/use-add-appointment.ts` | Site | `date` ahora es medianoche UTC; `loading` → `isLoading` |
+| `src/components/containers/appointment/add-appointment/add-appointment.tsx` | Site | `loading` → `isLoading` |
 
 **Estándares activos (ver `.claude/PATTERNS.md` reglas 7-12):**
 - Sin abreviaciones en variables
@@ -22,6 +32,7 @@
 
 ## ✅ COMPLETADO
 
+- **P0-1 — Tiempos `--:--` y "Paciente no identificado"**: Filtro de fecha en API cambiado a rango en `startTime`; `raw.patientUUID` corregido en site; `date` del create separado de `startTime` (ahora medianoche UTC).
 - Auth (login, register, cookie session, `authorizeServerSidePage` guard)
 - Patients CRUD: list, create, detail
 - Medical controls: create (v1), list by patient, detail view (control-detail)

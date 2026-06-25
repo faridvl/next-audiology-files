@@ -1,59 +1,123 @@
-### next-audiology-files
+# Zynka — next-audiology-files
 
-**Proyecto de expedientes para clínicas de audiología**
+**SaaS frontend para gestión de clínicas médicas (caso de uso primario: audiología)**
 
-Este proyecto utiliza Next.js, TypeScript, y Tailwind CSS para gestionar expedientes en clínicas de audiología.
+Next.js 14 · TypeScript · Tailwind CSS · TanStack React Query · i18next
 
-### Instalación
+---
 
-1. Clonar el repositorio:
+## Instalación
 
-    ```bash
-    git clone https://github.com/faridvl/next-audiology-files
-    ```
+```bash
+git clone https://github.com/faridvl/next-audiology-files
+yarn
+cp .env.local.example .env.local   # configurar URLs de la API
+yarn dev                            # :3000
+```
 
-2. Instalar dependencias:
+Variables requeridas en `.env.local`:
 
-    ```bash
-    npm install
-    # or
-    yarn install
-    ```
+```env
+NEXT_PUBLIC_IDENTITY_API_URL=http://localhost:7170
+NEXT_PUBLIC_MEDICAL_RECORDS_API_URL=http://localhost:7071
+```
 
-### Uso
+---
 
-1. Iniciar el servidor de desarrollo:
+## Roadmap
 
-    ```bash
-    npm run dev
-    # or
-    yarn dev
-    ```
+> Actualizado al cierre de cada etapa de desarrollo.  
+> Detalle completo en [`.claude/PENDING.md`](.claude/PENDING.md) y [`.claude/CHANGES.md`](.claude/CHANGES.md).
 
-2. Abrir [http://localhost:3000](http://localhost:3000) en el navegador para ver el resultado.
+### 🔴 P0 — Bugs críticos
 
-### Estructura del Proyecto
+| Estado | # | Descripción |
+|--------|---|-------------|
+| ✅ | P0-1 | Tiempos `--:--` y "Paciente no identificado" en agenda y dashboard |
+| ✅ | P0-2 | `GET /appointments` no enviaba `page`, `limit`, `date` al API |
+| ✅ | P0-3 | "Tipos de Citas" en sidebar llevaba a 404 |
+| ✅ | P0-4 | `report-template/create` sin auth guard (página pública) |
+| ✅ | P0-5 | `users/[id]` sin auth guard |
+| ⬜ | P0-6 | WhatsApp abre con número hardcodeado `88165808` en vez del teléfono del paciente |
+| 🔗 | P0-7 | Nueva cita envía UUID falso como `typeUUID` — bloqueado hasta P1-3 |
 
-- **public/**: Archivos estáticos.
-- **src/**: Código fuente.
-  - **pages/**: Páginas del proyecto.
-  - **components/**: Componentes reutilizables.
-  - **styles/**: Estilos globales y Tailwind CSS.
+### 🟠 P1 — MVP (flujo clínico completo)
 
-<!-- ### Despliegue
+**Citas**
 
-Desplegar en [Vercel](https://vercel.com) siguiendo la [documentación de Next.js](https://nextjs.org/docs/deployment). -->
+| Estado | # | Descripción |
+|--------|---|-------------|
+| ⬜ | P1-1 | Manage appointment: cargar datos reales y confirmar/reagendar |
+| ⬜ | P1-2 | Flujo post-control: tentativa → llamada → confirmada/pendiente |
+| ⬜ | P1-3 | AppointmentTypes CRUD (`GET/POST /appointment-types` en API + conexión en site) |
+| ⬜ | P1-4 | Filtrar citas por estado + cambio de estado |
+| ⬜ | P1-5 | Registro de intentos de llamada en notas de la cita |
+| ⬜ | P1-6 | Reagendar automáticamente al siguiente mes si no contesta |
 
-### Contribuir
+**Controles médicos**
 
-1. Hacer un fork del proyecto.
-2. Crear una nueva rama (`git checkout -b feature-nueva-funcionalidad`).
-3. Realizar los cambios y hacer commit (`git commit -m 'Añadir nueva funcionalidad'`).
-4. Hacer push a la rama (`git push origin feature-nueva-funcionalidad`).
-5. Abrir un Pull Request.
+| Estado | # | Descripción |
+|--------|---|-------------|
+| ⬜ | P1-7 | Conectar form de nuevo control al API (`POST /medical-controls`) |
+| ⬜ | P1-8 | Ver última audiometría en detalle de paciente |
+| ⬜ | P1-9 | Persistir campo `followUp` en API (solo descomentar bloque) |
 
-### Licencia
+**Pacientes**
 
-Este proyecto está bajo la licencia MIT.
+| Estado | # | Descripción |
+|--------|---|-------------|
+| ⬜ | P1-10 | Verificar y corregir payload del form de creación de paciente |
+| ⬜ | P1-11 | Vista detalle de paciente completa (última visita, diagnóstico) |
+| ⬜ | P1-12 | Habilitar `DELETE /appointments/:uuid` en API (solo descomentar) |
 
-Para más detalles, consulta el [repositorio en GitHub](https://github.com/faridvl/next-audiology-files).
+**Usuarios y perfil**
+
+| Estado | # | Descripción |
+|--------|---|-------------|
+| ⬜ | P1-13 | Perfil del médico: cargar datos reales desde `GET /auth/me` |
+| ⬜ | P1-14 | `PATCH /users/:uuid` en API + conectar form de perfil y edición |
+
+### 🟡 P2 — Post-MVP
+
+- Archivos adjuntos (garantías, recibos, pruebas externas) — requiere infraestructura de storage
+- Reportes PDF de consulta y ficha técnica del paciente
+- Vista médico: próxima cita, vencimiento de garantía, pacientes inactivos
+- Vincular citas a Google Calendar / Apple Calendar
+- i18n completo (eliminar texto hardcodeado en JSX)
+- Gestión de datos del tenant (settings)
+
+### ⚪ P3 — Nice-to-have
+
+- Consolidar `AppointmentStatus` enum (duplicado en 3 archivos)
+- Paginación global integrada al contexto
+- Fix pre-commit hook en API (shebang, `precommit:check`, 73 errores de lint)
+- Historial clínico configurable por clínica
+- Trabajo interdisciplinario entre especialidades
+- Tenant initialization event (EventBridge)
+
+---
+
+## Estructura del proyecto
+
+```
+src/
+├── pages/              # Next.js Pages Router
+├── components/
+│   ├── common/         # UI primitivos (Button, Table, Input, Sidebar…)
+│   └── containers/     # Feature containers: {feature}.tsx + use-{feature}.ts
+├── shared/
+│   ├── api/            # ApiServiceClient, queries, mutations
+│   ├── navigation/     # routes.ts + useNavigation()
+│   └── i18n/           # setup de i18next
+├── hooks/              # useSession, useNavigation, useLogout
+├── types/              # Tipos por dominio (appointments, patients, users…)
+└── static/texts/       # es.json (todas las traducciones)
+```
+
+Documentación interna detallada en [`.claude/`](.claude/).
+
+---
+
+## Licencia
+
+MIT
