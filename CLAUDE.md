@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Inicio de sesión — OBLIGATORIO
+
+**Antes de responder cualquier tarea, leer `.claude/CHANGES.md`.**  
+Contiene el branch activo, el próximo paso y la cola de trabajo pendiente.  
+Sin leerlo, es imposible saber dónde se quedó la sesión anterior.
+
 ## What is this project
 
 **Zynka** — Next.js SaaS frontend for a multi-tenant medical management system (primary use case: audiology clinics). Connects to a NestJS API monorepo (`standard-saas-api`) that provides two services: Identity (port 7170) and Medical Records (port 7071).
