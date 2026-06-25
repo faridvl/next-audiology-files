@@ -14,7 +14,7 @@ export const AppointmentService = {
       date,
     });
 
-    return await ApiServiceClient(APPOINTMENTS_URL).get<any>(`/appointments`);
+    return await ApiServiceClient(APPOINTMENTS_URL).get<any>(`/appointments?${params.toString()}`);
   },
 };
 
