@@ -4,9 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Inicio de sesión — OBLIGATORIO
 
-**Antes de responder cualquier tarea, leer `.claude/CHANGES.md`.**  
-Contiene el branch activo, el próximo paso y la cola de trabajo pendiente.  
-Sin leerlo, es imposible saber dónde se quedó la sesión anterior.
+**Leer todos estos archivos antes de responder cualquier tarea:**
+
+1. `.claude/CHANGES.md` — branch activo, próximo paso, cola de trabajo
+2. `.claude/PENDING.md` — todos los pendientes con prioridad y esfuerzo
+3. `.claude/PATTERNS.md` — convenciones de código que aplican a cada cambio
+4. `.claude/ARCHITECTURE.md` — estructura de carpetas, routing, auth guard
+5. `.claude/API_CONTRACT.md` — endpoints disponibles, inconsistencias conocidas
+6. `.claude/MOCKS.md` — qué datos están hardcodeados y cuál es su estado
+
+Sin leer estos archivos no es posible saber el estado del proyecto, qué está roto, qué convenciones seguir ni qué endpoints existen.
 
 ## What is this project
 
