@@ -82,6 +82,14 @@ Both vars are consumed in `src/shared/api/config.ts`. There is no fallback — m
 Read `.claude/API_CONTRACT.md` before consuming any endpoint.  
 Do not implement anything in the site that depends on an endpoint that does not yet exist in the API.
 
+## Regla de cierre de etapa — OBLIGATORIO antes de cada push
+
+Al finalizar cada etapa (antes de `git push`):
+
+1. Actualizar `CHANGES.md` — sección `🎯 SESIÓN ACTIVA` con el próximo paso y mover lo terminado a `✅ COMPLETADO`.
+2. Actualizar `PENDING.md` — marcar con `~~tachado~~` y ✅ los ítems resueltos.
+3. **Actualizar `README.md`** — cambiar ⬜ → ✅ en los ítems del Roadmap que se completaron en esta etapa.
+
 ## Regla de features cross-repo
 
 Cuando implementes un endpoint nuevo o lo modifiques:
