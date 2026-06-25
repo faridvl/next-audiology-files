@@ -34,6 +34,13 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
     route: routesPrivate.appointments.index,
   },
   {
+    menuKey: 'report-template',
+    default: false,
+    icon: Activity,
+    labelKey: 'Plantillas',
+    route: routesPrivate.reportTemplate.create,
+  },
+  {
     menuKey: 'inventory',
     default: false,
     icon: Archive,
@@ -52,6 +59,6 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
     default: false,
     icon: ClipboardList,
     labelKey: 'Tipos de Citas',
-    route: routesPrivate.appointmentType.index,
+    route: routesPrivate.reportTemplate.index,
   },
 ];

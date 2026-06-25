@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn*)",
+      "Bash(npm*)",
+      "Bash(node*)",
+      "Bash(npx*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git status*)",
+      "Bash(git stash*)",
+      "Bash(git branch*)"
+    ],
+    "deny": []
+  }
+}

@@ -55,5 +55,9 @@ export const useNavigation = () => {
       list: () => router.push(routesPrivate.appointmentType.index),
       create: () => router.push(routesPrivate.appointmentType.create),
     },
+    reportTemplate: {
+      list: () => router.push(routesPrivate.reportTemplate.index),
+      create: () => router.push(routesPrivate.reportTemplate.create),
+    },
   };
 };

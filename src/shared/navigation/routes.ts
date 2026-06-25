@@ -32,6 +32,7 @@ export const routesPrivate = {
   documents: '/documents',
   profile: '/profile',
   appointmentType: { index: '/appointment-type', create: '/appointment-type/create' },
+  reportTemplate: { index: '/report-template', create: '/report-template/create' },
 };
 
 export const routesPublic = {
