@@ -108,7 +108,8 @@
 | P3-1 | **Tenant initialization event (EventBridge / llamada interna)** | XL | API | Cuando Identity crea un Tenant, emitir evento para que Medical Records inicialice datos por defecto (AppointmentTypes base, etc.). Arquitectura event-driven. |
 | P3-2 | **Trabajo interdisciplinario** | XL | API + Site | Paciente compartido entre doctores de diferentes especialidades. Requiere diseño de permisos y modelo de datos. |
 | P3-3 | **Historial clínico configurable por clínica** | XL | API + Site | La clínica define su propia plantilla de historia clínica. "TBD" según el cliente. Muy complejo — evaluar si entra en el producto. |
-| P3-4 | **Consolidar `AppointmentStatus` enum** | XS | Site | Está duplicado en 3 archivos. Centralizar en `src/types/appointments/appointment.ts`. |
+| P3-4 | **Fix pre-commit hook en API** | XS | API | Hook `.husky/pre-commit` no tiene shebang (falla en Windows). `precommit:check` no existe en `package.json`. ESLint tiene 73 errores pre-existentes (`no-explicit-any`, `explicit-module-boundary-types`). Solución: añadir shebang al hook, agregar script `precommit:check` o eliminarlo, y resolver errores de lint en toda la codebase. Por ahora se commitea con `--no-verify`. |
+| P3-5 | **Consolidar `AppointmentStatus` enum** | XS | Site | Está duplicado en 3 archivos. Centralizar en `src/types/appointments/appointment.ts`. |
 | P3-5 | **Paginación global integrada al contexto** | M | Site | `pagination.tsx` tiene TODO. Cada lista maneja su propia paginación de forma inconsistente. |
 | P3-6 | **`tenant.plan` en `GET /auth/me`** | S | API | El type `TenantDomain` del site define `plan: FREE\|PREMIUM\|ENTERPRISE` pero la tabla `Tenant` no tiene esa columna. Siempre es `undefined`. |
 | P3-7 | **`gender` y `bloodType` en modelo Patient** | M | API | Requiere migración de DB. El site los necesita en control-detail y patient summary. |
