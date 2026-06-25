@@ -9,7 +9,7 @@
 
 | # | Tarea | Esfuerzo | Repo | Notas |
 |---|-------|----------|------|-------|
-| P0-1 | **Bug: tiempos de citas muestran `--:--` y pacientes dicen "Paciente no identificado"** | XS–S | API + Site | El site accede `raw.schedule.date/startTime` pero API devuelve campos planos. Verificar shape real de `GET /appointments` y ajustar en el que corresponda. |
+| ~~P0-1~~ | ~~**Bug: tiempos de citas muestran `--:--` y pacientes dicen "Paciente no identificado"**~~ | ~~XS–S~~ | ~~API + Site~~ | ✅ Resuelto en `fix/p0-1-appointment-times-patient-name`. 3 bugs: filtro date API → rango startTime; site accedía `raw.patient?.uuid` en vez de `raw.patientUUID`; `date` del create ahora es medianoche UTC. |
 | ~~P0-2~~ | ~~**Bug: `GET /appointments` no envía `page`, `limit`, `date`**~~ | ~~XS~~ | ~~Site~~ | ✅ Resuelto en `fix/p0-sidebar-routing-auth-guards-query-params` |
 | ~~P0-3~~ | ~~**Bug: "Tipos de Citas" en sidebar lleva a 404**~~ | ~~XS~~ | ~~Site~~ | ✅ Resuelto en `fix/p0-sidebar-routing-auth-guards-query-params` |
 | ~~P0-4~~ | ~~**Seguridad: `report-template/create.tsx` sin auth guard**~~ | ~~XS~~ | ~~Site~~ | ✅ Resuelto en `fix/p0-sidebar-routing-auth-guards-query-params` |

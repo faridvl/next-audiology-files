@@ -72,7 +72,7 @@ export const useCreateAppointment = () => {
       typeUUID: formData.typeId,
       speciality: formData.speciality,
       status: AppointmentStatus.PENDING,
-      date: startDateTime.toISOString(),
+      date: new Date(`${formData.date}T00:00:00.000Z`).toISOString(),
       startTime: startDateTime.toISOString(),
       endTime: endDateTime.toISOString(),
       notes: formData.notes,
@@ -84,7 +84,7 @@ export const useCreateAppointment = () => {
   return {
     formData,
     setFormData,
-    loading: isPending || isLoadingPatients,
+    isLoading: isPending || isLoadingPatients,
     handleSubmit,
     navigation,
     patients: patientsData?.data || [],

@@ -79,11 +79,13 @@ Note: `AppointmentType` table exists in the DB schema (`DATABASE.md`) but has no
 
 ## Inconsistencies between site expectations and API reality
 
-### 1. Appointment response shape — `schedule` nesting (CRITICAL)
-The frontend accesses `raw.schedule.date`, `raw.schedule.startTime`, `raw.schedule.endTime` on every appointment list render (dashboard, appointments list, appointment detail panel). The API DB model stores these as flat fields (`date`, `startTime`, `endTime`) on the `Appointment` entity. If the API does not transform the response to nest them under a `schedule` object, all appointment rendering will silently fail (times show as `--:--`).
+### 1. ~~Appointment response shape — `schedule` nesting~~ ✅ RESUELTO
+`mapToDomain` en `appointments.storage.ts` ya nesta `date/startTime/endTime` bajo `schedule` y construye `patientName` desde `patient.firstName + lastName`. El site accede correctamente `raw.schedule.startTime` y `raw.patientName`.
 
-### 2. Appointment `patientName` field
-Frontend accesses `raw.patientName` on appointments. The API's `GET /appointments` endpoint is documented as returning "paginated appointments list" without specifying the exact shape. If the API doesn't join and include `patientName`, all patient names show as "Paciente no identificado".
+**Problema real descubierto (fix/p0-1):** El filtro de fecha usaba igualdad exacta (`date: new Date(date)`) pero las citas se almacenan con hora en el campo `date`. Fix: filtrar por rango en `startTime` (`gte`/`lt`). El campo `date` en el create del site ahora se envía como medianoche UTC separado de `startTime`.
+
+### 2. ~~Appointment `patientName` field~~ ✅ RESUELTO
+`mapToDomain` incluye `patientName`. El site accedía `raw.patient?.uuid` para el patientUUID pero la API devuelve `raw.patientUUID` (campo plano). Fix en `use-appointment-list-container.ts`.
 
 ### 3. `GET /appointments` query params not sent (BUG)
 `src/shared/api/querys/appointments-query.ts` line 17 builds `URLSearchParams` with `page`, `limit`, `date` but then calls:

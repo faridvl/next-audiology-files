@@ -104,7 +104,7 @@ export const useAppointmentsContainer = () => {
       return {
         id: raw.id || raw.uuid,
         patient: raw.patientName || 'Paciente no identificado',
-        patientUUID: raw.patient?.uuid || '',
+        patientUUID: raw.patientUUID || '',
         phone: raw.patient?.phone || 'N/A',
         date: parseISO(raw.schedule.date),
         time: raw.schedule?.startTime ? format(parseISO(raw.schedule.startTime), 'HH:mm') : '--:--',
@@ -138,7 +138,7 @@ export const useAppointmentsContainer = () => {
     setStatusFilter,
     selectedAppointment,
     setSelectedAppointment,
-    loading: isLoading,
+    isLoading,
     appointments: filteredAppointments,
     weekRangeLabel: useMemo(() => {
       const start = startOfWeek(currentDate, { weekStartsOn: 1 });

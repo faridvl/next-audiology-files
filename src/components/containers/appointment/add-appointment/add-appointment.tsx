@@ -11,7 +11,7 @@ import { MedicalSpeciality } from '@/types/medical-controls/medical-control.type
 
 export const CreateAppointmentContainer: React.FC = () => {
     const {
-        formData, setFormData, loading, handleSubmit,
+        formData, setFormData, isLoading, handleSubmit,
         navigation, patients, availableServices
     } = useCreateAppointment();
 
@@ -28,7 +28,7 @@ export const CreateAppointmentContainer: React.FC = () => {
             </button>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                <div className={`bg-white border border-slate-100 rounded-[40px] p-10 shadow-sm space-y-10 transition-all ${loading ? 'opacity-60 pointer-events-none scale-[0.99]' : ''}`}>
+                <div className={`bg-white border border-slate-100 rounded-[40px] p-10 shadow-sm space-y-10 transition-all ${isLoading ? 'opacity-60 pointer-events-none scale-[0.99]' : ''}`}>
 
                     {/* SECCIÓN: PACIENTE */}
                     <div className="space-y-6">
@@ -40,7 +40,7 @@ export const CreateAppointmentContainer: React.FC = () => {
                         <div className="grid grid-cols-1 gap-2">
                             <select
                                 required
-                                disabled={loading}
+                                disabled={isLoading}
                                 className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 appearance-none cursor-pointer"
                                 value={formData.patientUuid}
                                 onChange={(e) => setFormData({ ...formData, patientUuid: e.target.value })}
@@ -54,7 +54,7 @@ export const CreateAppointmentContainer: React.FC = () => {
                             </select>
 
                             <div
-                                onClick={() => !loading && navigation.patients.create()}
+                                onClick={() => !isLoading && navigation.patients.create()}
                                 className="mt-2 flex items-center gap-2 text-blue-600 cursor-pointer hover:underline w-fit"
                             >
                                 <Plus size={14} />
@@ -74,7 +74,7 @@ export const CreateAppointmentContainer: React.FC = () => {
                             <div>
                                 <Typography variant={TypographyVariant.OVERLINE} className="ml-1 mb-2 block text-slate-400 font-bold">Área Médica</Typography>
                                 <select
-                                    disabled={loading}
+                                    disabled={isLoading}
                                     className="w-full p-4 bg-white border-2 border-slate-100 rounded-2xl text-sm font-bold text-blue-600 outline-none focus:border-blue-500 transition-all cursor-pointer"
                                     value={formData.speciality}
                                     onChange={(e) => setFormData({ ...formData, speciality: e.target.value as MedicalSpeciality, typeId: '' })}
@@ -89,7 +89,7 @@ export const CreateAppointmentContainer: React.FC = () => {
                                 <Typography variant={TypographyVariant.OVERLINE} className="ml-1 mb-2 block text-slate-400 font-bold">Servicio</Typography>
                                 <select
                                     required
-                                    disabled={loading}
+                                    disabled={isLoading}
                                     className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
                                     value={formData.typeId}
                                     onChange={(e) => setFormData({ ...formData, typeId: e.target.value })}
@@ -112,7 +112,7 @@ export const CreateAppointmentContainer: React.FC = () => {
                                 <input
                                     required
                                     type="date"
-                                    disabled={loading}
+                                    disabled={isLoading}
                                     value={formData.date}
                                     className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
                                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
@@ -126,7 +126,7 @@ export const CreateAppointmentContainer: React.FC = () => {
                                 <input
                                     required
                                     type="time"
-                                    disabled={loading}
+                                    disabled={isLoading}
                                     value={formData.startTime}
                                     className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
                                     onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
@@ -140,7 +140,7 @@ export const CreateAppointmentContainer: React.FC = () => {
                         <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-slate-400 font-bold">Notas Adicionales</Typography>
                         <textarea
                             rows={3}
-                            disabled={loading}
+                            disabled={isLoading}
                             className="w-full p-5 bg-slate-50 border border-slate-100 rounded-3xl text-sm outline-none resize-none focus:ring-2 focus:ring-blue-500/10"
                             placeholder="Escribe aquí cualquier observación relevante..."
                             value={formData.notes}
@@ -155,17 +155,17 @@ export const CreateAppointmentContainer: React.FC = () => {
                         type="button"
                         variant={ButtonVariant.CANCEL}
                         text="Cancelar"
-                        onClick={() => !loading && navigation.appointments.list()}
-                        disabled={loading}
+                        onClick={() => !isLoading && navigation.appointments.list()}
+                        disabled={isLoading}
                     />
                     <Button
                         type="submit"
                         variant={ButtonVariant.PRIMARY}
                         className="rounded-2xl px-10 py-4 h-auto shadow-lg shadow-blue-500/20"
-                        disabled={loading}
+                        disabled={isLoading}
                     >
                         <div className="flex items-center gap-2">
-                            {loading ? (
+                            {isLoading ? (
                                 <>
                                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                     <Typography variant={TypographyVariant.BODY_BOLD} className="text-white">Procesando...</Typography>
