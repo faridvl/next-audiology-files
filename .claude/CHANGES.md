@@ -2,15 +2,12 @@
 
 ## 🎯 SESIÓN ACTIVA — retomar aquí
 
-**Branch activo:** `fix/p0-sidebar-routing-auth-guards-query-params`  
-**Etapa actual:** ✅ Todos los P0 site-only completados — listo para PR.  
-**Próximo paso:** Revisar lint, hacer commit y abrir PR a `main`.
+**Branch activo:** `fix/p0-appointment-display-fields`  
+**Etapa actual:** Iniciando — branch creado desde main (post-merge de P0-2/3/4/5).  
+**Próximo paso:** P0-1 — investigar shape real de `GET /appointments` para corregir tiempos `--:--` y "Paciente no identificado".
 
-**Cola de esta etapa (P0 site-only, sin necesidad de API):**
-1. ✅ P0-3 — `sidebar.ts` "Tipos de Citas" corregido a `routesPrivate.appointmentType.index`
-2. ✅ P0-4 — `report-template/create.tsx` auth guard descomentado
-3. ✅ P0-5 — `users/[id]/index.tsx` auth guard agregado
-4. ✅ P0-2 — `appointments-query.ts` ahora envía `?page&limit&date` correctamente
+**Cola de esta etapa:**
+1. ⬜ P0-1 — investigar shape de `GET /appointments` (API + Site) y corregir campos de display
 
 **Estándares activos (ver `.claude/PATTERNS.md` reglas 7-12):**
 - Sin abreviaciones en variables

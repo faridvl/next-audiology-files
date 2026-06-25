@@ -10,10 +10,10 @@
 | # | Tarea | Esfuerzo | Repo | Notas |
 |---|-------|----------|------|-------|
 | P0-1 | **Bug: tiempos de citas muestran `--:--` y pacientes dicen "Paciente no identificado"** | XS–S | API + Site | El site accede `raw.schedule.date/startTime` pero API devuelve campos planos. Verificar shape real de `GET /appointments` y ajustar en el que corresponda. |
-| P0-2 | **Bug: `GET /appointments` no envía `page`, `limit`, `date`** | XS | Site | `appointments-query.ts:17` — falta `?${params}` en la URL. Sin esto el dashboard y la agenda cargan todas las citas sin filtro. |
-| P0-3 | **Bug: "Tipos de Citas" en sidebar lleva a 404** | XS | Site | `sidebar.ts:61` apunta a `routesPrivate.reportTemplate.index` en vez de `routesPrivate.appointmentType.index`. |
-| P0-4 | **Seguridad: `report-template/create.tsx` sin auth guard** | XS | Site | `getServerSideProps` está comentado. Página pública sin login. |
-| P0-5 | **Seguridad: `users/[id]/index.tsx` sin auth guard** | XS | Site | No exporta `getServerSideProps`. Cualquier UUID en la URL es accesible sin sesión. |
+| ~~P0-2~~ | ~~**Bug: `GET /appointments` no envía `page`, `limit`, `date`**~~ | ~~XS~~ | ~~Site~~ | ✅ Resuelto en `fix/p0-sidebar-routing-auth-guards-query-params` |
+| ~~P0-3~~ | ~~**Bug: "Tipos de Citas" en sidebar lleva a 404**~~ | ~~XS~~ | ~~Site~~ | ✅ Resuelto en `fix/p0-sidebar-routing-auth-guards-query-params` |
+| ~~P0-4~~ | ~~**Seguridad: `report-template/create.tsx` sin auth guard**~~ | ~~XS~~ | ~~Site~~ | ✅ Resuelto en `fix/p0-sidebar-routing-auth-guards-query-params` |
+| ~~P0-5~~ | ~~**Seguridad: `users/[id]/index.tsx` sin auth guard**~~ | ~~XS~~ | ~~Site~~ | ✅ Resuelto en `fix/p0-sidebar-routing-auth-guards-query-params` |
 | P0-6 | **Bug: WhatsApp envía mensajes al número `88165808` en vez del paciente** | S | Site + API | `GET /appointments/patient/:uuid` solo retorna `{ uuid, name }` sin `phone`. Site usa número hardcodeado como fallback. Requiere que el API incluya `phone` en esa respuesta. |
 | P0-7 | **Bug: form de nueva cita envía UUID falso `8e3677b3-...` como `typeUUID`** | — | Site | No tiene fix posible hasta que existan los endpoints de `AppointmentType` en el API. Documentado para no olvidar. Ver P1-3. |
 
