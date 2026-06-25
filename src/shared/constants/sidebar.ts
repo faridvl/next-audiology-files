@@ -59,6 +59,6 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
     default: false,
     icon: ClipboardList,
     labelKey: 'Tipos de Citas',
-    route: routesPrivate.reportTemplate.index,
+    route: routesPrivate.appointmentType.index,
   },
 ];

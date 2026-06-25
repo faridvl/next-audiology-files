@@ -16,5 +16,5 @@ const CreateReportTemplatePage: React.FC = () => {
     );
 };
 
-// export const getServerSideProps = authorizeServerSidePage();
+export const getServerSideProps = authorizeServerSidePage();
 export default CreateReportTemplatePage;

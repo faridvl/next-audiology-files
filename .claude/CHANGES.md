@@ -3,14 +3,14 @@
 ## 🎯 SESIÓN ACTIVA — retomar aquí
 
 **Branch activo:** `fix/p0-sidebar-routing-auth-guards-query-params`  
-**Etapa actual:** Iniciando — branch recién creado desde main.  
-**Próximo paso:** P0-3 — corregir `sidebar.ts:62` para que "Tipos de Citas" apunte a `routesPrivate.appointmentType.index` en vez de `routesPrivate.reportTemplate.index`.
+**Etapa actual:** ✅ Todos los P0 site-only completados — listo para PR.  
+**Próximo paso:** Revisar lint, hacer commit y abrir PR a `main`.
 
 **Cola de esta etapa (P0 site-only, sin necesidad de API):**
-1. ⬜ P0-3 — `sidebar.ts` "Tipos de Citas" apunta a ruta incorrecta
-2. ⬜ P0-4 — `report-template/create.tsx` sin auth guard (descomentar `getServerSideProps`)
-3. ⬜ P0-5 — `users/[id]/index.tsx` sin auth guard (agregar `getServerSideProps`)
-4. ⬜ P0-2 — `appointments-query.ts:17` no envía `?page&limit&date` en la URL
+1. ✅ P0-3 — `sidebar.ts` "Tipos de Citas" corregido a `routesPrivate.appointmentType.index`
+2. ✅ P0-4 — `report-template/create.tsx` auth guard descomentado
+3. ✅ P0-5 — `users/[id]/index.tsx` auth guard agregado
+4. ✅ P0-2 — `appointments-query.ts` ahora envía `?page&limit&date` correctamente
 
 **Estándares activos (ver `.claude/PATTERNS.md` reglas 7-12):**
 - Sin abreviaciones en variables
@@ -59,15 +59,13 @@
   Archivo: `src/components/containers/appointment/manage-appointment/use-manage-appointment.tsx`  
   APIs: disponibles en API, solo falta conexión.
 
-- **[BUG] Appointments query params no enviados** — `appointments-query.ts` line 17 ignora los params construidos (`page`, `limit`, `date`).  
-  Fix: cambiar `.get('/appointments')` a `.get('/appointments?' + params.toString())`
+- ~~**[BUG] Appointments query params no enviados**~~ — ✅ Corregido en `fix/p0-sidebar-routing-auth-guards-query-params`
 
 - **[MOCK] New medical control form** — conectar `handleSave` en `use-new-control.ts` a `POST /medical-controls` usando `medical-control-mutation.ts`.
 
-- **[BUG] Sidebar "Tipos de Citas"** — apunta a `routesPrivate.reportTemplate.index` (`/report-template`) que no existe. Debe apuntar a `routesPrivate.appointmentType.index` (`/appointment-type`).  
-  Archivo: `src/shared/constants/sidebar.ts:61`
+- ~~**[BUG] Sidebar "Tipos de Citas"**~~ — ✅ Corregido en `fix/p0-sidebar-routing-auth-guards-query-params`
 
-- **[SEGURIDAD] Report template sin auth** — `src/pages/report-template/create.tsx` tiene `getServerSideProps` comentado. Cualquiera puede acceder.
+- ~~**[SEGURIDAD] Report template sin auth**~~ — ✅ Corregido en `fix/p0-sidebar-routing-auth-guards-query-params`
 
 ### Media prioridad
 
