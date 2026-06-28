@@ -47,7 +47,6 @@ export const PdfDownloadButton: React.FC<Props> = ({ controlUuid, patientUuid })
 
   const fileName = `control-${pdfProps.patient.fullName.replace(/\s+/g, '-').toLowerCase()}-${pdfProps.controlNumber}.pdf`;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renderButton = ({ loading }: { loading: boolean }) => (
     <button
       className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold uppercase tracking-widest transition-colors disabled:opacity-60"
