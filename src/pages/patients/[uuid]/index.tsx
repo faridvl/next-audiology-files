@@ -8,7 +8,7 @@ import { PatientDetailContainer } from '@/components/containers/patients/patient
 
 const PatientDetailPage: React.FC = () => {
     const router = useRouter();
-    const { id } = router.query;
+    const { uuid } = router.query;
     return (
         <>
             <Head>
@@ -20,7 +20,7 @@ const PatientDetailPage: React.FC = () => {
                 contentStyle={BoxedLayoutStyle.FULL}
                 title="Expediente del Paciente"
             >
-                <PatientDetailContainer id={id as string} />
+                <PatientDetailContainer id={uuid as string} />
             </DashboardLayout>
         </>
     );
