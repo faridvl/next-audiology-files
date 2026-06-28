@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
 import { authorizeServerSidePage } from '@/hocs/auth';
-import { NewControlContainer } from '@/components/containers/controls/new-control-v1/new-control';
+import { NewControlContainer } from '@/components/containers/controls/new-control/new-control-container';
 import Head from 'next/head';
 
 const NewControlPage = () => {

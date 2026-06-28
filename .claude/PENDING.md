@@ -14,7 +14,7 @@
 | ~~P0-3~~ | ~~**Bug: "Tipos de Citas" en sidebar lleva a 404**~~ | ~~XS~~ | ~~Site~~ | ✅ Resuelto en `fix/p0-sidebar-routing-auth-guards-query-params` |
 | ~~P0-4~~ | ~~**Seguridad: `report-template/create.tsx` sin auth guard**~~ | ~~XS~~ | ~~Site~~ | ✅ Resuelto en `fix/p0-sidebar-routing-auth-guards-query-params` |
 | ~~P0-5~~ | ~~**Seguridad: `users/[id]/index.tsx` sin auth guard**~~ | ~~XS~~ | ~~Site~~ | ✅ Resuelto en `fix/p0-sidebar-routing-auth-guards-query-params` |
-| P0-6 | **Bug: WhatsApp envía mensajes al número `88165808` en vez del paciente** | S | Site + API | `GET /appointments/patient/:uuid` solo retorna `{ uuid, name }` sin `phone`. Site usa número hardcodeado como fallback. Requiere que el API incluya `phone` en esa respuesta. |
+| ~~P0-6~~ | ~~**Bug: WhatsApp envía mensajes al número `88165808` en vez del paciente**~~ | ~~S~~ | ~~Site + API~~ | ✅ API ahora retorna `phone` y `email` del paciente en `GET /appointments/patient/:uuid`. |
 | P0-7 | **Bug: form de nueva cita envía UUID falso `8e3677b3-...` como `typeUUID`** | — | Site | No tiene fix posible hasta que existan los endpoints de `AppointmentType` en el API. Documentado para no olvidar. Ver P1-3. |
 
 ---
@@ -25,20 +25,20 @@
 
 | # | Tarea | Esfuerzo | Repo | Notas |
 |---|-------|----------|------|-------|
-| P1-1 | **Manage appointment: cargar datos reales + confirmar/reagendar** | M | Site | Conectar `GET /appointments/:uuid` y `PATCH /appointments/:uuid`. Endpoints ya existen. Solo falta conexión en `use-manage-appointment.tsx`. |
-| P1-2 | **Flujo post-control: cita tentativa → llamada → confirmada/pendiente** | M | Site | El flujo ya está diseñado en `use-manage-appointment.tsx` (handleNoAnswer, handleConfirm) pero sin API real. Depende de P1-1. |
+| ~~P1-1~~ | ~~**Manage appointment: cargar datos reales + confirmar/reagendar**~~ | ~~M~~ | ~~Site~~ | ✅ Conectado a `GET /appointments/:uuid` y `PATCH /appointments/:uuid`. |
+| ~~P1-2~~ | ~~**Flujo post-control: cita tentativa → llamada → confirmada/pendiente**~~ | ~~M~~ | ~~Site~~ | ✅ handleNoAnswer y handleConfirm conectados al PATCH real. |
 | P1-3 | **AppointmentTypes CRUD: `GET/POST /appointment-types`** | L | API → Site | Tabla en DB ya existe. Implementar endpoints en API, luego conectar lista + form en site + selector en nueva cita. Desbloquea P0-7. |
 | P1-4 | **Cambiar estado de citas en lote / filtrar por estado** | S | Site | El filtro por estado ya existe en la UI (`statusFilter`). Falta: acción de cambio masivo de estado. Puede ser solo front si se hace cita por cita. |
 | P1-5 | **Registro de intentos de llamada en cita** | M | API + Site | Al hacer "No contestó" → guardar en `notes` con timestamp + contador. API: `PATCH /appointments/:uuid` ya acepta `notes`. Solo es convención de formato. |
-| P1-6 | **Cambio automático de mes si no contesta** | S | Site | Lógica en `handleNoAnswer`: sumar 1 mes + status PENDING. Ya hay código esqueleto, solo falta conectar al PATCH real. Depende de P1-1. |
+| ~~P1-6~~ | ~~**Cambio automático de mes si no contesta**~~ | ~~S~~ | ~~Site~~ | ✅ Implementado en `handleNoAnswer`: suma 1 mes + PENDING + nota de sistema + PATCH real. |
 
 ### Controles médicos
 
 | # | Tarea | Esfuerzo | Repo | Notas |
 |---|-------|----------|------|-------|
-| P1-7 | **Conectar form de nuevo control (v2) al API** | M | Site | `use-new-control.ts handleSave` → solo `console.log`. Mutation `medical-control-mutation.ts` ya existe pero no está importada. Los textareas tampoco tienen `value`/`onChange` — hay que vincular estado del form. |
+| ~~P1-7~~ | ~~**Conectar form de nuevo control (v2) al API**~~ | ~~M~~ | ~~Site~~ | ✅ `handleSave` conectado a mutation; todos los textareas vinculados; página usa v2. |
 | P1-8 | **Ver última audiometría en detalle de paciente** | S | Site | Usar `GET /medical-controls/patient/:uuid` (existe) + filtrar el más reciente con `speciality = AUDIOLOGY`. Mostrar datos del audiograma. |
-| P1-9 | **`followUp`: persistir en API** | XS | API | Solo descomentar el bloque de storage en el controlador de `POST /medical-controls`. El site ya lo envía. |
+| ~~P1-9~~ | ~~**`followUp`: persistir en API**~~ | ~~XS~~ | ~~API~~ | ✅ Columna `followUp Json?` en schema + migración SQL creada. Storage y use case actualizados. Aplicar migración con `prisma migrate deploy`. |
 
 ### Pacientes
 
@@ -46,13 +46,13 @@
 |---|-------|----------|------|-------|
 | P1-10 | **Verificar y corregir form de creación de paciente** | S | Site | El form tiene campos `name`, `id`, `nationality`, `employmentArea`. API espera `firstName`, `lastName`, `birthDate`, `address`. Hay mismatch probable — verificar `use-patient-form.ts` y el payload real que se envía. |
 | P1-11 | **Vista detalle de paciente completa** | M | Site | Completar `patient-detail-container.tsx`: mostrar datos reales, última visita, último diagnóstico (de `GET /medical-controls/patient/:uuid`). Hoy tiene datos hardcodeados en patient summary. |
-| P1-12 | **`DELETE /appointments/:uuid` — descomentar en API** | XS | API | `DeleteAppointmentUseCase` ya existe importado. Solo descomentar la entrada en el constructor del controlador. Habilita cancelar citas. |
+| ~~P1-12~~ | ~~**`DELETE /appointments/:uuid` — descomentar en API**~~ | ~~XS~~ | ~~API~~ | ✅ Use case creado, controlador y módulo actualizados. |
 
 ### Usuarios y perfil
 
 | # | Tarea | Esfuerzo | Repo | Notas |
 |---|-------|----------|------|-------|
-| P1-13 | **Perfil del médico: cargar datos reales** | S | Site | `GET /auth/me` ya existe y retorna datos del usuario. Conectar al form de perfil para pre-llenar. El guardado espera `PATCH /users/:uuid`. |
+| ~~P1-13~~ | ~~**Perfil del médico: cargar datos reales**~~ | ~~S~~ | ~~Site~~ | ✅ `useSession()` pre-llena nombre, email y rol. Guardado sigue pendiente hasta P1-14. |
 | P1-14 | **`PATCH /users/:uuid` — nuevo endpoint** | M | API → Site | Permite que el médico edite sus datos desde el perfil. Luego conectar form de perfil y user edit page. |
 
 ---
