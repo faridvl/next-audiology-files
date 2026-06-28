@@ -41,3 +41,14 @@ export interface Appointment {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface CreateAppointmentPayload {
+  patientUUID: string;
+  typeUUID: string;
+  speciality: MedicalSpeciality;
+  status: AppointmentStatus;
+  date: string;
+  startTime: string;
+  endTime: string;
+  notes: string;
+}

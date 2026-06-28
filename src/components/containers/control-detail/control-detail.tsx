@@ -59,7 +59,7 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
             if (audiologyFindings.usesAuxiliaries) parts.push('Usa auxiliares auditivos.');
             return parts.join(' ') || '—';
         }
-        const generalFindings = data.control.findings as Record<string, unknown>;
+        const generalFindings = data.control.findings as unknown as Record<string, unknown>;
         return String(generalFindings.generalFindings ?? '—');
     };
 

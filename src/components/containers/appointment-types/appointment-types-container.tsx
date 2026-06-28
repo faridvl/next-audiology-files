@@ -77,7 +77,7 @@ export const AppointmentTypesContainer: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {filtered.map((type) => {
+          {filtered.map((type: AppointmentType) => {
             const colorClass = type.color ? (COLOR_CLASSES[type.color] ?? DEFAULT_COLOR) : DEFAULT_COLOR;
             return (
               <div

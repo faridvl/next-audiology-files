@@ -2,7 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
-import { ControlDetailContainer } from '@/components/containers/control-detail/control-detail-v1';
+import { ControlDetailContainer } from '@/components/containers/control-detail/control-detail';
 import Head from 'next/head';
 
 const ControlDetailPage = () => {

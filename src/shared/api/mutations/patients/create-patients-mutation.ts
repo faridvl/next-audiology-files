@@ -1,17 +1,9 @@
 import { ApiServiceClient } from '../../api-service-client';
 import { env } from '../../config';
 import { useApiMutation } from '../use-api-mutation';
+import { CreatePatientPayload } from '@/types/patients/patient';
 
-//TODO(!): MOVER ESTO A UN TYPE
-export type PatientApiPayload = {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  birthDate: string;
-  email: string;
-  documentId: string;
-  gender: string;
-};
+export type { CreatePatientPayload };
 
 export function useCreatePatientMutation() {
   const {
@@ -22,7 +14,7 @@ export function useCreatePatientMutation() {
     reset,
   } = useApiMutation({
     mutationKey: ['createPatient'],
-    mutationFn: (payload: PatientApiPayload) =>
+    mutationFn: (payload: CreatePatientPayload) =>
       ApiServiceClient(env.API.MEDICAL_RECORDS_URL).post('/patients', payload),
   });
 

@@ -1,6 +1,6 @@
 import { useControlDetailQuery } from '@/shared/api/querys/get-medical-controls-query';
 import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
-import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+import { AudiologyFindings, MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
 
 const calculateAge = (birthDate?: string): string => {
   if (!birthDate) return '---';
@@ -45,12 +45,14 @@ export function useControlDetail(patientId: string, controlId: string) {
               year: 'numeric',
             }),
             speciality: controlRaw.header.speciality as MedicalSpeciality,
-            findings: controlRaw.clinicalData.findings as Record<string, unknown>,
+            findings: controlRaw.clinicalData.findings as unknown as AudiologyFindings,
             diagnosis: controlRaw.clinicalData.diagnosis.toUpperCase(),
             plan: [
               'CONTINUAR CON CUIDADOS HABITUALES.',
               'CONSULTAR EN CASO DE MOLESTIAS O RECURRENCIA.',
             ],
+            institution: '',
+            specialistName: '',
           },
         }
       : null;

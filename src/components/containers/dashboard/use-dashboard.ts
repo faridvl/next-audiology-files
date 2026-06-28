@@ -5,30 +5,48 @@ import { useAppointmentsQuery } from '@/shared/api/querys/appointments-query';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+import { AppointmentStatus } from '@/types/appointments/appointment';
+import { DashboardAppointment } from '@/types/appointments/dashboard-appointment.types';
 
-export enum AppointmentStatus {
-  TENTATIVE = 'TENTATIVE',
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  WAITING = 'WAITING',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
-  EXPIRED = 'EXPIRED',
-}
+const specialityLabels: Record<MedicalSpeciality, string> = {
+  [MedicalSpeciality.AUDIOLOGY]: 'Audiología',
+  [MedicalSpeciality.DENTAL]: 'Odontología',
+  [MedicalSpeciality.GENERAL]: 'Consulta General',
+};
 
-export interface DashboardAppointment {
-  id: string;
-  time: string;
-  endTime: string;
-  patient: string;
-  desc: string;
-  status: AppointmentStatus;
-  statusLabel: string;
-  statusColor: string;
-}
+const statusConfig: Record<AppointmentStatus, { label: string; color: string }> = {
+  [AppointmentStatus.TENTATIVE]: {
+    label: 'Por confirmar',
+    color: 'bg-amber-50 text-amber-600 border-amber-100',
+  },
+  [AppointmentStatus.PENDING]: {
+    label: 'Pendiente',
+    color: 'bg-slate-50 text-slate-500 border-slate-100',
+  },
+  [AppointmentStatus.CONFIRMED]: {
+    label: 'Confirmada',
+    color: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+  },
+  [AppointmentStatus.WAITING]: {
+    label: 'En espera',
+    color: 'bg-blue-50 text-blue-600 border-blue-100',
+  },
+  [AppointmentStatus.COMPLETED]: {
+    label: 'Finalizada',
+    color: 'bg-indigo-50 text-indigo-600 border-indigo-100',
+  },
+  [AppointmentStatus.CANCELLED]: {
+    label: 'Cancelada',
+    color: 'bg-red-50 text-red-600 border-red-100',
+  },
+  [AppointmentStatus.EXPIRED]: {
+    label: 'Vencida',
+    color: 'bg-slate-100 text-slate-400 border-slate-200',
+  },
+};
 
 export function useDashboard() {
-  const nav = useNavigation();
+  const navigation = useNavigation();
   const { user, isLoading: sessionLoading } = useSession();
   const [isMounted, setIsMounted] = useState(false);
 
@@ -38,63 +56,28 @@ export function useDashboard() {
 
   const { data, isLoading: appointmentsLoading } = useAppointmentsQuery(1, 5, new Date());
 
-  // Mapeo de Especialidades
-  const specialityMap: Record<string, string> = {
-    [MedicalSpeciality.AUDIOLOGY]: 'Audiología',
-    [MedicalSpeciality.DENTAL]: 'Odontología',
-    [MedicalSpeciality.GENERAL]: 'Consulta General',
-  };
-
-  const statusConfig: Record<AppointmentStatus, { label: string; color: string }> = {
-    [AppointmentStatus.TENTATIVE]: {
-      label: 'Por confirmar',
-      color: 'bg-amber-50 text-amber-600 border-amber-100',
-    },
-    [AppointmentStatus.PENDING]: {
-      label: 'Pendiente',
-      color: 'bg-slate-50 text-slate-500 border-slate-100',
-    },
-    [AppointmentStatus.CONFIRMED]: {
-      label: 'Confirmada',
-      color: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-    },
-    [AppointmentStatus.WAITING]: {
-      label: 'En espera',
-      color: 'bg-blue-50 text-blue-600 border-blue-100',
-    },
-    [AppointmentStatus.COMPLETED]: {
-      label: 'Finalizada',
-      color: 'bg-indigo-50 text-indigo-600 border-indigo-100',
-    },
-    [AppointmentStatus.CANCELLED]: {
-      label: 'Cancelada',
-      color: 'bg-red-50 text-red-600 border-red-100',
-    },
-    [AppointmentStatus.EXPIRED]: {
-      label: 'Vencida',
-      color: 'bg-slate-100 text-slate-400 border-slate-200',
-    },
-  };
-
   const appointments = useMemo<DashboardAppointment[]>(() => {
     const rawList = Array.isArray(data) ? data : data?.data || [];
 
-    return rawList.slice(0, 5).map((app: any) => {
-      const status = (app.status as AppointmentStatus) || AppointmentStatus.PENDING;
-      const startTimeStr = app.schedule?.startTime || app.schedule?.date;
-      const endTimeStr = app.schedule?.endTime;
+    return rawList.slice(0, 5).map((rawAppointment: Record<string, unknown>) => {
+      const status = (rawAppointment.status as AppointmentStatus) || AppointmentStatus.PENDING;
+      const schedule = rawAppointment.schedule as Record<string, string> | undefined;
+      const service = rawAppointment.service as Record<string, string> | undefined;
+      const startTimeStr = schedule?.startTime || schedule?.date;
+      const endTimeStr = schedule?.endTime;
 
-      // Lógica de descripción: Prioriza nombre del servicio > Especialidad mapeada > Especialidad cruda > Genérico
       const displaySpeciality =
-        specialityMap[app.speciality as MedicalSpeciality] || app.speciality || 'Consulta Médica';
-      const description = app.service?.name || displaySpeciality;
+        specialityLabels[rawAppointment.speciality as MedicalSpeciality] ||
+        (rawAppointment.speciality as string) ||
+        'Consulta Médica';
+      const description = service?.name || displaySpeciality;
 
       return {
-        id: app.id || app.uuid,
+        id: (rawAppointment.id || rawAppointment.uuid) as string,
         time: startTimeStr ? format(parseISO(startTimeStr), 'HH:mm') : '--:--',
         endTime: endTimeStr ? format(parseISO(endTimeStr), 'HH:mm') : '',
-        patient: app.patientName || 'Paciente no identificado',
-        desc: description,
+        patient: (rawAppointment.patientName as string) || 'Paciente no identificado',
+        description,
         status,
         statusLabel: statusConfig[status].label,
         statusColor: statusConfig[status].color,
@@ -108,12 +91,12 @@ export function useDashboard() {
     appointments,
     isLoading: sessionLoading || !isMounted || appointmentsLoading,
     actions: {
-      viewAgenda: () => nav.appointments.list(),
-      createPatient: () => nav.patients.create(),
-      createAppointment: () => nav.appointments.create(),
-      goTests: () => nav.tests(),
-      goInventory: () => nav.inventory.create(),
-      manageAppointment: (id: string) => nav.appointments.manage(id),
+      viewAgenda: () => navigation.appointments.list(),
+      createPatient: () => navigation.patients.create(),
+      createAppointment: () => navigation.appointments.create(),
+      goTests: () => navigation.tests(),
+      goInventory: () => navigation.inventory.create(),
+      manageAppointment: (id: string) => navigation.appointments.manage(id),
     },
   };
 }

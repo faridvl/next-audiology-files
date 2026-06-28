@@ -11,7 +11,7 @@ import { authorizeServerSidePage } from '@/hocs/auth';
 const EditUserPage = () => {
     const router = useRouter();
     const { id } = router.query;
-    const nav = useNavigation();
+    const navigation = useNavigation();
 
     const [formData, setFormData] = useState({
         name: '',
@@ -37,8 +37,8 @@ const EditUserPage = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Actualizando usuario:", id, formData);
-        nav.users.list();
+        // TODO(!): Conectar a PATCH /users/:uuid cuando el endpoint esté disponible (P1-14)
+        navigation.users.list();
     };
 
     if (loading) {
@@ -54,7 +54,7 @@ const EditUserPage = () => {
             <div className="max-w-3xl mx-auto px-6">
 
                 <button
-                    onClick={() => nav.common.back()}
+                    onClick={() => navigation.common.back()}
                     className="flex items-center gap-2 text-slate-400 hover:text-slate-600 transition-colors mb-6 font-bold text-sm group"
                 >
                     <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
@@ -137,7 +137,7 @@ const EditUserPage = () => {
                         <div className="pt-6 flex justify-end gap-3 border-t border-slate-50">
                             <Button
                                 variant={ButtonVariant.CANCEL}
-                                onClick={() => nav.common.back()}
+                                onClick={() => navigation.common.back()}
                                 type="button"
                             >
                                 Descartar Cambios

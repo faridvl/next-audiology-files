@@ -14,10 +14,10 @@ export const useAudiometryData = () => {
     }));
   };
 
-  const syncFromModal = (side: 'OI' | 'OD', points: any[]) => {
+  const syncFromModal = (side: 'OI' | 'OD', points: { hz: number; db: number }[]) => {
     const newValues = { ...auditData[side] };
-    points.forEach((p) => {
-      newValues[p.hz] = p.db.toString();
+    points.forEach((point) => {
+      newValues[point.hz] = point.db.toString();
     });
     setAuditData((prev) => ({ ...prev, [side]: newValues }));
     setModalSide(null);

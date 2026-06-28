@@ -3,8 +3,8 @@
 ## 🎯 SESIÓN ACTIVA — retomar aquí
 
 **Branch activo:** `fix/p0-1-appointment-times-patient-name`
-**Etapa actual:** Completada — Multi-especialidad: tenant businessType expuesto en API, Settings y control-detail conectados al tenant real, new-control con default por especialidad del tenant.
-**Próximo paso:** P1-4/P1-5 (filtro de estado y registro de llamadas) o P1-8 (última audiometría en detalle de paciente).
+**Etapa actual:** Completada — Form paciente corregido y validado; patient summary con datos reales; historial de llamadas acumulativo.
+**Próximo paso:** P1-4 (filtro/cambio de estado en lote de citas), P1-14 (PATCH /users/:uuid en API).
 
 **Cola de esta etapa:**
 1. ✅ P0-1 — corregidos los 3 bugs de display de citas
@@ -16,6 +16,9 @@
 7. ✅ P1-13 — Perfil pre-llena nombre/email/rol desde `GET /auth/me`
 8. ✅ P1-3 — AppointmentTypes CRUD: `GET/POST /appointment-types` en API + listado y form conectados en site + UUID hardcodeado eliminado de nueva cita
 9. ✅ MULTI-ESP — `businessType` expuesto en `GET /auth/me`; Settings lee nombre/tipo real del tenant; new-control arranca con especialidad del tenant; control-detail muestra institución y especialista reales desde sesión; renderiza findings por especialidad
+10. ✅ P1-10 — Form de creación de paciente corregido: campos separados firstName/lastName/documentId/address/birthDate; Yup con validaciones de máscara, maxLength, no-futuro; onBlur error inline; navigation via hook
+11. ✅ P1-8/P1-11 — Patient summary conectado a `GET /medical-controls/patient/:uuid`; lastVisit y mainDiagnosis vienen del control más reciente con speciality=AUDIOLOGY
+12. ✅ P1-5 — handleNoAnswer acumula `[YYYY-MM-DD HH:mm] Intento #N — No contestó` en notes; historial de llamadas visible en UI de manage-appointment
 
 **Cambios de esta etapa:**
 
@@ -50,6 +53,40 @@
 | `src/components/containers/controls/new-control/use-new-control.ts` | Site | Default de especialidad basado en `tenant.businessType`; `specialityMap` refactorizado |
 | `src/components/containers/control-detail/use-control-detail.ts` | Site | Elimina campos institution/specialistName mocked; `findings` tipado como `Record<string,unknown>` |
 | `src/components/containers/control-detail/control-detail.tsx` | Site | Conectado a `useControlDetail` + `useSession`; institución y especialista desde tenant/user; rendering condicional de findings por especialidad |
+| `src/components/containers/add-patient/use-patient-form.ts` | Site | Campos firstName/lastName/documentId/address/birthDate separados; Yup: máscara teléfono, no-futuro, maxLength, NAME_REGEX |
+| `src/components/containers/add-patient/add-patient.tsx` | Site | Form con campos corregidos; máscara teléfono vía onKeyDown; validateOnBlur; ErrorMessage inline |
+| `src/shared/api/mutations/patients/create-patients-mutation.ts` | Site | `PatientApiPayload` incluye `address` |
+| `src/components/containers/patient-summary/use-patient-summary-header.ts` | Site | `lastVisit` y `mainDiagnosis` desde `GET /medical-controls/patient/:uuid`; filtra control más reciente con AUDIOLOGY |
+| `src/components/containers/appointment/manage-appointment/use-manage-appointment.tsx` | Site | `handleNoAnswer` acumula `[YYYY-MM-DD HH:mm] Intento #N — No contestó`; `callAttempts` parseado y expuesto |
+| `src/components/containers/appointment/manage-appointment/manage-appointment.tsx` | Site | Muestra historial de intentos de llamada en UI |
+| `src/components/containers/control-detail/control-detail-v1.tsx` | Site | **ELIMINADO** — página migrada a v2 (`control-detail.tsx`) |
+| `src/pages/controls/detail/[patientUUID]/[controlUUID]/index.tsx` | Site | Importa `control-detail.tsx` en lugar de v1 |
+| `src/components/containers/report-template/form-report-template.tsx` | Site | Reemplazado con placeholder compilable (feature sin diseñar) |
+| `src/components/common/back-button/back-button.tsx` | Site | Nuevo componente compartido extraído de `users/create.tsx` |
+| `src/types/appointments/appointment.ts` | Site | Agrega `CreateAppointmentPayload` |
+| `src/types/appointments/appointment-ui.types.ts` | Site | **NUEVO** — `AppointmentUI` movido desde hook |
+| `src/types/appointments/dashboard-appointment.types.ts` | Site | **NUEVO** — `DashboardAppointment` movido desde hook |
+| `src/types/appointments/call-attempt.types.ts` | Site | **NUEVO** — `CallAttemptEntry` movido desde hook |
+| `src/types/appointments/history-note.types.ts` | Site | **NUEVO** — `HistoryNote` movido desde hook |
+| `src/types/documents/document.types.ts` | Site | **NUEVO** — `DocumentItem`, `DocumentCategory`, `DocumentFilterType` |
+| `src/types/patients/patient.ts` | Site | Agrega `CreatePatientPayload`; `email` opcional en `Patient` |
+| `src/components/containers/appointment/appointment-list/use-appointment-list-container.ts` | Site | Elimina enums duplicados; re-exporta `AppointmentUI` desde types; `rawAppointment` tipado |
+| `src/components/containers/appointment/appointment-detail-panel/use-appointment-detail-panel.ts` | Site | Importa `AppointmentUI` y `HistoryNote` desde types; elimina `any` |
+| `src/components/containers/appointment/appointment-detail-panel/appointment-detail-panel.tsx` | Site | Importa `AppointmentUI` desde types |
+| `src/components/containers/dashboard/use-dashboard.ts` | Site | Elimina `AppointmentStatus` duplicado; `nav` → `navigation`; `app` → `rawAppointment`; `desc` → `description` |
+| `src/components/containers/dashboard/dashboard.tsx` | Site | Importa `DashboardAppointment` desde types; `cita` → `appointment` |
+| `src/components/containers/documents/use-documents.tsx` | Site | Tipos a `src/types/documents/`; `search` → `searchTerm`; `filteredDocs` → `filteredDocuments`; elimina código comentado |
+| `src/components/containers/documents/documents-view.tsx` | Site | Importa tipos desde `src/types/`; `DocCategory` → `DocumentCategory`; `setSearch` → `setSearchTerm` |
+| `src/components/containers/patients/patients-list/use-patient-list.ts` | Site | Elimina `nav` sin `()`; usa `useNavigation()` correctamente |
+| `src/components/containers/patients/patients-list\patient-list-container.tsx` | Site | Elimina `console.log`; tipos explícitos en acciones |
+| `src/components/containers/users/users-list/user-list-container.tsx` | Site | `nav` → `navigation`; `console.log` → TODO(!) |
+| `src/components/containers/users-form/user-form.tsx` | Site | `nav` → `navigation` |
+| `src/pages/users/create.tsx` | Site | `nav` → `navigation`; usa `BackButton` compartido |
+| `src/pages/users/[id]/index.tsx` | Site | `nav` → `navigation` |
+| `src/pages/users/edit/[id]/index.tsx` | Site | `nav` → `navigation`; `console.log` → TODO(!) con referencia a P1-14 |
+| `src/components/containers/audiogram-capture/use-audiometry-data.ts` | Site | `(p)` → `(point)` tipado; `any[]` → `{ hz: number; db: number }[]` |
+| `src/shared/api/mutations/appointments/create-appointment-mutation.ts` | Site | Payload movido a types; TODO(!) resuelto |
+| `src/shared/api/mutations/patients/create-patients-mutation.ts` | Site | Payload movido a types; TODO(!) resuelto |
 
 **Estándares activos (ver `.claude/PATTERNS.md` reglas 7-12):**
 - Sin abreviaciones en variables

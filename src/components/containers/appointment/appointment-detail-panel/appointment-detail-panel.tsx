@@ -3,7 +3,7 @@ import { X, StickyNote, MessageSquare, CalendarCheck, ExternalLink, Mail, Finger
 import { Typography, TypographyVariant } from "@/components/common/typography/typography";
 import { Button, ButtonVariant } from "@/components/common/button/button";
 import { useAppointmentDetail } from './use-appointment-detail-panel';
-import { AppointmentUI } from '../appointment-list/use-appointment-list-container';
+import { AppointmentUI } from '@/types/appointments/appointment-ui.types';
 import { useNavigation } from '@/hooks/use-navigation';
 
 interface Props {
