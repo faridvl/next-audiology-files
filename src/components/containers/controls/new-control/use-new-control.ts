@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+import { useCreateMedicalControlMutation } from '@/shared/api/mutations/medical-control-mutation/medical-control-mutation';
+import { useNavigation } from '@/hooks/use-navigation';
+import { useSession } from '@/hooks/use-session';
 
 export enum Speciality {
   AUDIOLOGY = 'Audiología',
@@ -8,23 +11,29 @@ export enum Speciality {
   DERMA = 'Dermatología',
   GENERAL = 'Medicina General',
 }
-import { useCreateMedicalControlMutation } from '@/shared/api/mutations/medical-control-mutation/medical-control-mutation';
-import { useNavigation } from '@/hooks/use-navigation';
+
+const businessTypeToSpeciality: Record<string, Speciality> = {
+  AUDIOLOGY: Speciality.AUDIOLOGY,
+  DENTAL: Speciality.DENTAL,
+  GENERAL: Speciality.GENERAL,
+  DERMA: Speciality.DERMA,
+};
+
+const specialityToApiSpeciality: Record<Speciality, MedicalSpeciality> = {
+  [Speciality.AUDIOLOGY]: MedicalSpeciality.AUDIOLOGY,
+  [Speciality.DENTAL]: MedicalSpeciality.DENTAL,
+  [Speciality.DERMA]: MedicalSpeciality.GENERAL,
+  [Speciality.GENERAL]: MedicalSpeciality.GENERAL,
+};
 
 export const useNewControl = (patientId: string) => {
   const navigation = useNavigation();
+  const { tenant } = useSession();
   const { executeCreateControl, isPending, isSuccess, error } = useCreateMedicalControlMutation();
 
   const [showHistory, setShowHistory] = useState(true);
   const [showAudiogram, setShowAudiogram] = useState(false);
   const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
-
-  const specialityMap: Record<Speciality, MedicalSpeciality> = {
-    [Speciality.AUDIOLOGY]: MedicalSpeciality.AUDIOLOGY,
-    [Speciality.DENTAL]: MedicalSpeciality.DENTAL,
-    [Speciality.DERMA]: MedicalSpeciality.GENERAL,
-    [Speciality.GENERAL]: MedicalSpeciality.GENERAL,
-  };
 
   const [formData, setFormData] = useState({
     speciality: Speciality.AUDIOLOGY,
@@ -35,6 +44,15 @@ export const useNewControl = (patientId: string) => {
     nextMaintenanceDate: '',
     nextControlNotes: '',
   });
+
+  useEffect(() => {
+    if (tenant?.businessType && businessTypeToSpeciality[tenant.businessType]) {
+      setFormData((previous) => ({
+        ...previous,
+        speciality: businessTypeToSpeciality[tenant.businessType as string],
+      }));
+    }
+  }, [tenant?.businessType]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -59,7 +77,7 @@ export const useNewControl = (patientId: string) => {
       return;
     }
 
-    const apiSpeciality = specialityMap[formData.speciality];
+    const apiSpeciality = specialityToApiSpeciality[formData.speciality];
 
     const findings =
       formData.speciality === Speciality.AUDIOLOGY
