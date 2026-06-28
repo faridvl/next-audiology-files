@@ -15,7 +15,7 @@ import { useNavigation } from '@/hooks/use-navigation';
 const UserDetailPage = () => {
     const router = useRouter();
     const { id } = router.query;
-    const nav = useNavigation();
+    const navigation = useNavigation();
 
     // Mock de datos extendido
     const user = {
@@ -44,7 +44,7 @@ const UserDetailPage = () => {
                 {/* Navegación Superior */}
                 <div className="flex justify-between items-center mb-8">
                     <button
-                        onClick={() => nav.users.list()}
+                        onClick={() => navigation.users.list()}
                         className="flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold text-sm transition-all group"
                     >
                         <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
@@ -54,7 +54,7 @@ const UserDetailPage = () => {
                     <Button
                         variant={ButtonVariant.PRIMARY}
                         className="!rounded-2xl shadow-lg shadow-blue-100"
-                        onClick={() => nav.users.edit(1)} // Redirección a edición
+                        onClick={() => navigation.users.edit(1)} // Redirección a edición
                     >
                         <Edit size={16} className="mr-2" /> Editar Información
                     </Button>
@@ -173,7 +173,7 @@ const UserDetailPage = () => {
                                             </div>
                                         </div>
                                         <button
-                                            onClick={() => nav.patients.detail(patient.id)}
+                                            onClick={() => navigation.patients.detail(patient.id)}
                                             className="p-2 text-slate-300 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
                                         >
                                             <ExternalLink size={18} />

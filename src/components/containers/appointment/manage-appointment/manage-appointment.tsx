@@ -1,11 +1,11 @@
 import React from 'react';
-import { PhoneOff, CheckCircle2, Calendar, Clock, Save, ChevronLeft } from 'lucide-react';
+import { PhoneOff, CheckCircle2, Phone, ChevronLeft } from 'lucide-react';
 import { Typography, TypographyVariant } from "@/components/common/typography/typography";
 import { Button, ButtonVariant } from "@/components/common/button/button";
 import { useManageAppointment } from './use-manage-appointment';
 
 export const ManageAppointmentContainer: React.FC<{ id: string }> = ({ id }) => {
-    const { formData, setFormData, isLoading, isPending, handleNoAnswer, handleConfirm, navigation } = useManageAppointment(id);
+    const { formData, setFormData, isLoading, isPending, callAttempts, handleNoAnswer, handleConfirm, navigation } = useManageAppointment(id);
 
     if (isLoading) return <div className="max-w-3xl mx-auto py-6 animate-pulse h-96 bg-slate-100 rounded-[40px]" />;
 
@@ -43,6 +43,26 @@ export const ManageAppointmentContainer: React.FC<{ id: string }> = ({ id }) => 
                         </Button>
                     </div>
                 </div>
+
+                {/* HISTORIAL DE INTENTOS DE LLAMADA */}
+                {callAttempts.length > 0 && (
+                    <div className="space-y-3">
+                        <Typography variant={TypographyVariant.OVERLINE} className="font-bold flex items-center gap-2">
+                            <Phone size={14} /> Intentos de llamada ({callAttempts.length})
+                        </Typography>
+                        <div className="bg-slate-50 border border-slate-100 rounded-3xl p-4 space-y-2">
+                            {callAttempts.map((attempt) => (
+                                <div key={attempt.line} className="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 w-16 shrink-0">
+                                        #{attempt.attemptNumber}
+                                    </span>
+                                    <span className="text-xs font-mono text-slate-500">{attempt.timestamp}</span>
+                                    <span className="text-xs text-red-500 font-semibold ml-auto">No contestó</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* FORMULARIO DE EDICIÓN */}
                 <div className="grid grid-cols-2 gap-6">

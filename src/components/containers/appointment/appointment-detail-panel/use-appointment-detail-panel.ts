@@ -1,13 +1,8 @@
 import { useMemo } from 'react';
 import { format } from 'date-fns';
-import { AppointmentUI } from '../appointment-list/use-appointment-list-container';
+import { AppointmentUI } from '@/types/appointments/appointment-ui.types';
+import { HistoryNote } from '@/types/appointments/history-note.types';
 import { useAppointmentByPatientQuery } from '@/shared/api/querys/get-appoinment-by-patient-query';
-
-export interface HistoryNote {
-  id: string | number;
-  date: string;
-  text: string;
-}
 
 export const useAppointmentDetail = (appointment: AppointmentUI) => {
   const { data, isLoading } = useAppointmentByPatientQuery(appointment.patientUUID);
@@ -18,12 +13,15 @@ export const useAppointmentDetail = (appointment: AppointmentUI) => {
 
   const historyNotes = useMemo((): HistoryNote[] => {
     return rawAppointments
-      .filter((app: any) => app.id !== appointment.id)
-      .map((app: any) => ({
-        id: app.id,
-        date: app.schedule?.date ? format(new Date(app.schedule.date), 'dd MMM yyyy') : 'Fecha n/a',
-        text: app.notes || 'Sin observaciones registradas.',
-      }))
+      .filter((rawEntry: Record<string, unknown>) => rawEntry.id !== appointment.id)
+      .map((rawEntry: Record<string, unknown>) => {
+        const schedule = rawEntry.schedule as Record<string, string> | undefined;
+        return {
+          id: rawEntry.id as string,
+          date: schedule?.date ? format(new Date(schedule.date), 'dd MMM yyyy') : 'Fecha n/a',
+          text: (rawEntry.notes as string) || 'Sin observaciones registradas.',
+        };
+      })
       .slice(0, 3);
   }, [rawAppointments, appointment.id]);
 

@@ -3,11 +3,40 @@ import { addMonths, format } from 'date-fns';
 import { useNavigation } from '@/hooks/use-navigation';
 import { toast } from 'sonner';
 import { AppointmentStatus } from '@/types/appointments/appointment';
+import { CallAttemptEntry } from '@/types/appointments/call-attempt.types';
 import { useAppointmentQuery } from '@/shared/api/querys/get-appointment-query';
 import { useUpdateAppointmentMutation } from '@/shared/api/mutations/appointments/update-appointment-mutation';
 import { useQueryClient } from '@tanstack/react-query';
 import { FETCH_APPOINTMENTS_KEY } from '@/shared/api/querys/appointments-query';
 import { FETCH_APPOINTMENT_KEY } from '@/shared/api/querys/get-appointment-query';
+
+const CALL_ATTEMPT_MARKER = '— No contestó';
+
+function countCallAttempts(notes: string): number {
+  if (!notes) return 0;
+  return (notes.match(/Intento #\d+/g) ?? []).length;
+}
+
+function buildCallNote(currentNotes: string): string {
+  const attemptNumber = countCallAttempts(currentNotes) + 1;
+  const timestamp = format(new Date(), 'yyyy-MM-dd HH:mm');
+  return `[${timestamp}] Intento #${attemptNumber} ${CALL_ATTEMPT_MARKER}`;
+}
+
+function parseCallAttempts(notes: string): CallAttemptEntry[] {
+  if (!notes) return [];
+  const lines = notes.split('\n');
+  const attemptLines = lines.filter((line) => line.includes(CALL_ATTEMPT_MARKER));
+
+  return attemptLines.map((line) => {
+    const match = line.match(/\[(.+?)\] Intento #(\d+)/);
+    return {
+      timestamp: match ? match[1] : '',
+      attemptNumber: match ? parseInt(match[2], 10) : 0,
+      line,
+    };
+  });
+}
 
 export const useManageAppointment = (appointmentId: string) => {
     const navigation = useNavigation();
@@ -42,6 +71,8 @@ export const useManageAppointment = (appointmentId: string) => {
         if (error) toast.error('Error al actualizar la cita');
     }, [error]);
 
+    const callAttempts = parseCallAttempts(formData.notes);
+
     const invalidateAppointments = () => {
         queryClient.invalidateQueries({ queryKey: [FETCH_APPOINTMENTS_KEY] });
         queryClient.invalidateQueries({ queryKey: [FETCH_APPOINTMENT_KEY, appointmentId] });
@@ -53,14 +84,15 @@ export const useManageAppointment = (appointmentId: string) => {
             return;
         }
         const nextMonth = addMonths(new Date(formData.date), 1);
-        const callNote = `[${format(new Date(), 'dd/MM/yyyy HH:mm')}]: Intento de llamada fallido. Se reprograma automáticamente.`;
+        const callNote = buildCallNote(formData.notes);
+        const updatedNotes = formData.notes ? `${formData.notes}\n${callNote}` : callNote;
 
         executeUpdateAppointment(
             {
                 uuid: appointmentId,
                 date: nextMonth.toISOString(),
                 status: AppointmentStatus.PENDING,
-                notes: formData.notes ? `${formData.notes}\n${callNote}` : callNote,
+                notes: updatedNotes,
             },
             {
                 onSuccess: () => {
@@ -95,6 +127,7 @@ export const useManageAppointment = (appointmentId: string) => {
         isLoading,
         isPending,
         appointment,
+        callAttempts,
         handleNoAnswer,
         handleConfirm,
         navigation

@@ -29,7 +29,7 @@
 | ~~P1-2~~ | ~~**Flujo post-control: cita tentativa → llamada → confirmada/pendiente**~~ | ~~M~~ | ~~Site~~ | ✅ handleNoAnswer y handleConfirm conectados al PATCH real. |
 | ~~P1-3~~ | ~~**AppointmentTypes CRUD: `GET/POST /appointment-types`**~~ | ~~L~~ | ~~API → Site~~ | ✅ Entity + storage + use cases + controlador en API. Query + mutation + listado + form conectados en site. UUID hardcodeado eliminado de nueva cita. |
 | P1-4 | **Cambiar estado de citas en lote / filtrar por estado** | S | Site | El filtro por estado ya existe en la UI (`statusFilter`). Falta: acción de cambio masivo de estado. Puede ser solo front si se hace cita por cita. |
-| P1-5 | **Registro de intentos de llamada en cita** | M | API + Site | Al hacer "No contestó" → guardar en `notes` con timestamp + contador. API: `PATCH /appointments/:uuid` ya acepta `notes`. Solo es convención de formato. |
+| ~~P1-5~~ | ~~**Registro de intentos de llamada en cita**~~ | ~~M~~ | ~~Site~~ | ✅ `handleNoAnswer` acumula `[YYYY-MM-DD HH:mm] Intento #N — No contestó`; historial parseado y mostrado en UI. |
 | ~~P1-6~~ | ~~**Cambio automático de mes si no contesta**~~ | ~~S~~ | ~~Site~~ | ✅ Implementado en `handleNoAnswer`: suma 1 mes + PENDING + nota de sistema + PATCH real. |
 
 ### Controles médicos
@@ -37,15 +37,15 @@
 | # | Tarea | Esfuerzo | Repo | Notas |
 |---|-------|----------|------|-------|
 | ~~P1-7~~ | ~~**Conectar form de nuevo control (v2) al API**~~ | ~~M~~ | ~~Site~~ | ✅ `handleSave` conectado a mutation; todos los textareas vinculados; página usa v2. |
-| P1-8 | **Ver última audiometría en detalle de paciente** | S | Site | Usar `GET /medical-controls/patient/:uuid` (existe) + filtrar el más reciente con `speciality = AUDIOLOGY`. Mostrar datos del audiograma. |
+| ~~P1-8~~ | ~~**Ver última audiometría en detalle de paciente**~~ | ~~S~~ | ~~Site~~ | ✅ `use-patient-summary-header.ts` filtra el control más reciente AUDIOLOGY y expone `lastVisit`, `mainDiagnosis`. |
 | ~~P1-9~~ | ~~**`followUp`: persistir en API**~~ | ~~XS~~ | ~~API~~ | ✅ Columna `followUp Json?` en schema + migración SQL creada. Storage y use case actualizados. Aplicar migración con `prisma migrate deploy`. |
 
 ### Pacientes
 
 | # | Tarea | Esfuerzo | Repo | Notas |
 |---|-------|----------|------|-------|
-| P1-10 | **Verificar y corregir form de creación de paciente** | S | Site | El form tiene campos `name`, `id`, `nationality`, `employmentArea`. API espera `firstName`, `lastName`, `birthDate`, `address`. Hay mismatch probable — verificar `use-patient-form.ts` y el payload real que se envía. |
-| P1-11 | **Vista detalle de paciente completa** | M | Site | Completar `patient-detail-container.tsx`: mostrar datos reales, última visita, último diagnóstico (de `GET /medical-controls/patient/:uuid`). Hoy tiene datos hardcodeados en patient summary. |
+| ~~P1-10~~ | ~~**Verificar y corregir form de creación de paciente**~~ | ~~S~~ | ~~Site~~ | ✅ Campos corregidos a firstName/lastName/documentId/birthDate/address/phone/email/gender; Yup con NAME_REGEX, PHONE_REGEX, max fechas futuras, maxLength. |
+| ~~P1-11~~ | ~~**Vista detalle de paciente completa**~~ | ~~M~~ | ~~Site~~ | ✅ `use-patient-summary-header.ts` conectado a controles reales; `lastVisit` y `mainDiagnosis` desde API. |
 | ~~P1-12~~ | ~~**`DELETE /appointments/:uuid` — descomentar en API**~~ | ~~XS~~ | ~~API~~ | ✅ Use case creado, controlador y módulo actualizados. |
 
 ### Usuarios y perfil

@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { useCreateAppointmentMutation } from '@/shared/api/mutations/appointments/create-appointment-mutation';
 import { AppointmentStatus } from '@/types/appointments/appointment';
 import { usePatientsQuery } from '@/shared/api/querys/patients-query';
-import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
+import { useAppointmentTypesQuery, AppointmentType } from '@/shared/api/querys/appointment-types-query';
 
 export const useCreateAppointment = () => {
   const navigation = useNavigation();
@@ -24,7 +24,7 @@ export const useCreateAppointment = () => {
     notes: '',
   });
 
-  const availableServices = (appointmentTypes ?? []).map((type) => ({
+  const availableServices = (appointmentTypes as AppointmentType[] ?? []).map((type: AppointmentType) => ({
     id: type.uuid,
     label: type.name,
   }));
