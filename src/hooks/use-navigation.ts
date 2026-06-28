@@ -60,5 +60,10 @@ export const useNavigation = () => {
       list: () => router.push(routesPrivate.reportTemplate.index),
       create: () => router.push(routesPrivate.reportTemplate.create),
     },
+    clinicalTemplates: {
+      index: () => router.push(routesPrivate.clinicalTemplates.index),
+      create: () => router.push(routesPrivate.clinicalTemplates.create),
+      detail: (id: string) => router.push(routesPrivate.clinicalTemplates.detail(id)),
+    },
   };
 };

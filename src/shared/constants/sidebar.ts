@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   FileText,
   ClipboardList,
+  LayoutTemplate,
 } from 'lucide-react';
 
 export const NAVIGATION_PATHS: INavigationPath[] = [
@@ -60,5 +61,12 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
     icon: ClipboardList,
     labelKey: 'Tipos de Citas',
     route: routesPrivate.appointmentType.index,
+  },
+  {
+    menuKey: 'clinicalTemplates',
+    default: false,
+    icon: LayoutTemplate,
+    labelKey: 'Plantillas Clínicas',
+    route: routesPrivate.clinicalTemplates.index,
   },
 ];

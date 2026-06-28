@@ -79,6 +79,37 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
         );
     }
 
+    // TODO(!): P3-2-API — El API debe validar esto con un guard de especialidad en el backend
+    const userSpecialty = user?.specialty;
+    const controlSpeciality = data.control.speciality as string;
+    const hasSpecialtyMismatch =
+        userSpecialty !== undefined && userSpecialty !== controlSpeciality;
+
+    if (hasSpecialtyMismatch) {
+        return (
+            <div className="max-w-5xl mx-auto py-12 px-6">
+                <div className="flex justify-between items-center mb-8 no-print">
+                    <button
+                        onClick={() => navigation.patients.detail(patientId)}
+                        className="flex items-center gap-2 text-slate-400 hover:text-slate-900 font-medium text-xs uppercase tracking-widest transition-all"
+                    >
+                        <ArrowLeft size={14} /> Volver al Registro del Paciente
+                    </button>
+                </div>
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-10 text-center space-y-3">
+                    <p className="text-sm font-black text-amber-700 uppercase tracking-widest">
+                        Acceso restringido
+                    </p>
+                    <p className="text-xs text-amber-600">
+                        No tienes permiso para ver este control. Este registro pertenece a la especialidad{' '}
+                        <span className="font-bold">{controlSpeciality}</span> y tu especialidad es{' '}
+                        <span className="font-bold">{userSpecialty}</span>.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     const institutionName = tenant?.businessName?.toUpperCase() ?? 'INSTITUCIÓN MÉDICA';
     const specialistName = user?.fullName ? `DR. ${user.fullName.toUpperCase()}` : 'ESPECIALISTA';
     const specialityLabel = specialityLabels[data.control.speciality] ?? data.control.speciality;

@@ -22,6 +22,7 @@ import { Button, ButtonVariant } from "@/components/common/button/button";
 import { MedicalSpeciality } from "@/types/medical-controls/medical-control.types";
 import { ClinicalControl, ControlType } from "@/types/otros/clinical";
 import { DocumentsContainer } from "../../documents/documents-view";
+import { useSession } from "@/hooks/use-session";
 
 enum PatientTabs {
     HISTORY = 'history',
@@ -70,10 +71,13 @@ const TabButton = ({ label, isActive, onClick }: any) => (
 export const PatientDetailContainer = ({ id }: { id: string }) => {
     const navigation = useNavigation();
     const [activeTab, setActiveTab] = useState<PatientTabs>(PatientTabs.HISTORY);
+    // TODO(!): P3-2-API — El filtro de especialidad en el front es UX adicional.
+    // La seguridad real debe implementarse en el API con un guard de especialidad.
+    const { user } = useSession();
     const {
         patient, history, summary, isLoading, isFetching,
         hasMore, searchTerm, setSearchTerm, selectedSpec, setSelectedSpec, loadMore
-    } = usePatientDetail(id);
+    } = usePatientDetail(id, user?.specialty);
 
     if (isLoading || !patient) return <div className="p-20 text-center animate-pulse text-slate-400 font-bold uppercase tracking-widest">Cargando expediente...</div>;
 

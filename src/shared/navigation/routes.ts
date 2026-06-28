@@ -34,6 +34,11 @@ export const routesPrivate = {
   profile: '/profile',
   appointmentType: { index: '/appointment-type', create: '/appointment-type/create' },
   reportTemplate: { index: '/report-template', create: '/report-template/create' },
+  clinicalTemplates: {
+    index: '/clinical-templates',
+    create: '/clinical-templates/new',
+    detail: (id: string) => `/clinical-templates/${id}`,
+  },
 };
 
 export const routesPublic = {

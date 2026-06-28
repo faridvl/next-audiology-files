@@ -3,7 +3,8 @@ import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
 import { useMedicalControlsQuery } from '@/shared/api/querys/medical-controls-query';
 import { ClinicalControl, ControlType } from '@/types/otros/clinical';
 
-export function usePatientDetail(uuid: string) {
+// TODO(!): P3-2-API — El API debe validar esto con un guard de especialidad en el backend
+export function usePatientDetail(uuid: string, userSpecialty?: string) {
   // --- ESTADOS ---
   const [page, setPage] = useState(1);
   const [allRecords, setAllRecords] = useState<any[]>([]); // Base de datos local acumulativa
@@ -40,13 +41,17 @@ export function usePatientDetail(uuid: string) {
   const mappedHistory = useMemo(() => {
     // 1. Filtrar la lista acumulada (In-Memory)
     const filtered = allRecords.filter((item) => {
+      // TODO(!): P3-2-API — Filtro por especialidad del médico logueado (capa UX adicional).
+      // La seguridad real debe implementarse en el API con un guard de especialidad.
+      const matchesUserSpecialty =
+        userSpecialty === undefined || item.header.speciality === userSpecialty;
       const matchesSpec = selectedSpec === 'ALL' || item.header.speciality === selectedSpec;
 
       const matchesSearch =
         item.clinicalData.diagnosis.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.header.speciality.toLowerCase().includes(searchTerm.toLowerCase());
 
-      return matchesSpec && matchesSearch;
+      return matchesUserSpecialty && matchesSpec && matchesSearch;
     });
 
     // 2. Transformar al formato que espera la UI (ClinicalControl)
