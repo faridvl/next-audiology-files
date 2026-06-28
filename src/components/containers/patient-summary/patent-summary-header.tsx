@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import {
     User, History, Calendar, Phone, AlertCircle,
-    Stethoscope, Pill, FileText
+    Stethoscope, Pill, FileText, AlertTriangle
 } from 'lucide-react';
 import { usePatientSummary } from './use-patient-summary-header';
 
@@ -42,6 +42,12 @@ export const PatientSummaryHeader: React.FC<PatientHeaderProps> = ({
                             <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-md border border-slate-200">
                                 ID: {patient.id}
                             </span>
+                            {patient.isInactive && (
+                                <span className="flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-600 text-[10px] font-bold rounded-md border border-red-200">
+                                    <AlertTriangle size={10} />
+                                    Inactivo
+                                </span>
+                            )}
                         </div>
                         <div className="flex items-center gap-4 text-slate-500">
                             <Typography variant={TypographyVariant.CAPTION} className="font-medium text-slate-400">

@@ -35,11 +35,53 @@ export const useAppointmentDetail = (appointment: AppointmentUI) => {
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
-  const generateCalendarLink = (): void => {
+  const handleGoogleCalendar = (): void => {
     const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
     const title = encodeURIComponent(`Cita Médica: ${appointment.type}`);
     const details = encodeURIComponent(`Paciente: ${appointment.patient}`);
-    window.open(`${baseUrl}&text=${title}&details=${details}`, '_blank');
+
+    const appointmentDate = appointment.date instanceof Date ? appointment.date : new Date();
+    // Google Calendar uses YYYYMMDDTHHMMSSZ format
+    const startDateFormatted = format(appointmentDate, "yyyyMMdd'T'HHmmss");
+    // Default 1-hour duration if we have no endTime
+    const endDate = new Date(appointmentDate.getTime() + 60 * 60 * 1000);
+    const endDateFormatted = format(endDate, "yyyyMMdd'T'HHmmss");
+
+    window.open(
+      `${baseUrl}&text=${title}&details=${details}&dates=${startDateFormatted}/${endDateFormatted}`,
+      '_blank',
+    );
+  };
+
+  const handleAppleCalendarDownload = (): void => {
+    const appointmentDate = appointment.date instanceof Date ? appointment.date : new Date();
+    const endDate = new Date(appointmentDate.getTime() + 60 * 60 * 1000);
+
+    const formatIcsDate = (date: Date): string => format(date, "yyyyMMdd'T'HHmmss");
+
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Zynka//Medical//ES',
+      'BEGIN:VEVENT',
+      `DTSTART:${formatIcsDate(appointmentDate)}`,
+      `DTEND:${formatIcsDate(endDate)}`,
+      `SUMMARY:Cita Médica: ${appointment.type}`,
+      `DESCRIPTION:Paciente: ${appointment.patient}`,
+      `UID:${appointment.id}@zynka`,
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `cita-${appointment.id}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return {
@@ -47,6 +89,7 @@ export const useAppointmentDetail = (appointment: AppointmentUI) => {
     patientInfo,
     historyNotes,
     handleWhatsAppRedirect,
-    generateCalendarLink,
+    handleGoogleCalendar,
+    handleAppleCalendarDownload,
   };
 };

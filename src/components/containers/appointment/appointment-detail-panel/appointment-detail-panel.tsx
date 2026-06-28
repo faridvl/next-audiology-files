@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, StickyNote, MessageSquare, CalendarCheck, ExternalLink, Mail, Fingerprint, Loader2 } from 'lucide-react';
+import { X, StickyNote, MessageSquare, CalendarCheck, ExternalLink, Mail, Fingerprint, Loader2, Apple } from 'lucide-react';
 import { Typography, TypographyVariant } from "@/components/common/typography/typography";
 import { Button, ButtonVariant } from "@/components/common/button/button";
 import { useAppointmentDetail } from './use-appointment-detail-panel';
@@ -15,7 +15,8 @@ export const AppointmentDetailPanel: React.FC<Props> = ({ appointment, onClose }
     const {
         historyNotes,
         handleWhatsAppRedirect,
-        generateCalendarLink,
+        handleGoogleCalendar,
+        handleAppleCalendarDownload,
         patientInfo,
         isLoading
     } = useAppointmentDetail(appointment);
@@ -110,20 +111,27 @@ export const AppointmentDetailPanel: React.FC<Props> = ({ appointment, onClose }
 
             {/* Acciones */}
             <div className="flex flex-col gap-2 pt-4 mt-auto">
+                <Button
+                    variant={ButtonVariant.PRIMARY}
+                    className="rounded-xl py-3 w-full gap-2 bg-[#25D366] hover:bg-[#20bd5a] border-none shadow-none text-white"
+                    onClick={handleWhatsAppRedirect}
+                >
+                    <MessageSquare size={16} /> WhatsApp
+                </Button>
                 <div className="grid grid-cols-2 gap-2">
                     <Button
-                        variant={ButtonVariant.PRIMARY}
-                        className="rounded-xl py-3 flex-1 gap-2 bg-[#25D366] hover:bg-[#20bd5a] border-none shadow-none text-white"
-                        onClick={handleWhatsAppRedirect}
+                        variant={ButtonVariant.CANCEL}
+                        className="rounded-xl py-3 flex-1 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shadow-none text-[11px]"
+                        onClick={handleGoogleCalendar}
                     >
-                        <MessageSquare size={16} /> WhatsApp
+                        <CalendarCheck size={14} /> Google Cal
                     </Button>
                     <Button
                         variant={ButtonVariant.CANCEL}
-                        className="rounded-xl py-3 flex-1 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shadow-none"
-                        onClick={generateCalendarLink}
+                        className="rounded-xl py-3 flex-1 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shadow-none text-[11px]"
+                        onClick={handleAppleCalendarDownload}
                     >
-                        <CalendarCheck size={16} /> Calendario
+                        <Apple size={14} /> Apple Cal
                     </Button>
                 </div>
 

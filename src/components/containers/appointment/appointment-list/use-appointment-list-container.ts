@@ -1,10 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { addDays, startOfWeek, format, addWeeks, subWeeks, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { toast } from 'sonner';
 import { useAppointmentsQuery } from '@/shared/api/querys/appointments-query';
 import { AppointmentStatus } from '@/types/appointments/appointment';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
 import { AppointmentUI } from '@/types/appointments/appointment-ui.types';
+import { useUpdateAppointmentMutation } from '@/shared/api/mutations/appointments/update-appointment-mutation';
 
 export enum ViewMode {
   TABLE = 'TABLE',
@@ -60,8 +62,12 @@ export const useAppointmentsContainer = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>(ALL_STATUSES);
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentUI | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkTargetStatus, setBulkTargetStatus] = useState<AppointmentStatus | ''>('');
+  const [isBulkPending, setIsBulkPending] = useState(false);
 
-  const { data, isLoading } = useAppointmentsQuery(1, 100, currentDate);
+  const { data, isLoading, refetch } = useAppointmentsQuery(1, 100, currentDate);
+  const { executeUpdateAppointment } = useUpdateAppointmentMutation();
 
   const moveWeek = (direction: 'next' | 'prev') => {
     setCurrentDate((prev) => (direction === 'next' ? addWeeks(prev, 1) : subWeeks(prev, 1)));
@@ -103,6 +109,57 @@ export const useAppointmentsContainer = () => {
     });
   }, [appointments, searchTerm, statusFilter]);
 
+  const toggleSelectAppointment = useCallback((id: string) => {
+    setSelectedIds((previous) => {
+      const next = new Set(previous);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleBulkStatusChange = useCallback(async () => {
+    if (!bulkTargetStatus || selectedIds.size === 0) return;
+
+    setIsBulkPending(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    const updatePromises = Array.from(selectedIds).map(
+      (uuid) =>
+        new Promise<void>((resolve) => {
+          executeUpdateAppointment(
+            { uuid, status: bulkTargetStatus as AppointmentStatus },
+            {
+              onSuccess: () => {
+                successCount++;
+                resolve();
+              },
+              onError: () => {
+                errorCount++;
+                resolve();
+              },
+            },
+          );
+        }),
+    );
+
+    await Promise.all(updatePromises);
+    setIsBulkPending(false);
+    setSelectedIds(new Set());
+    setBulkTargetStatus('');
+    await refetch();
+
+    if (errorCount === 0) {
+      toast.success(`${successCount} cita(s) actualizadas correctamente`);
+    } else {
+      toast.error(`${successCount} actualizadas, ${errorCount} con error`);
+    }
+  }, [bulkTargetStatus, selectedIds, executeUpdateAppointment, refetch]);
+
   return {
     viewMode,
     setViewMode,
@@ -116,6 +173,12 @@ export const useAppointmentsContainer = () => {
     setSelectedAppointment,
     isLoading,
     appointments: filteredAppointments,
+    selectedIds,
+    toggleSelectAppointment,
+    bulkTargetStatus,
+    setBulkTargetStatus,
+    isBulkPending,
+    handleBulkStatusChange,
     weekRangeLabel: useMemo(() => {
       const start = startOfWeek(currentDate, { weekStartsOn: 1 });
       const end = addDays(start, 6);

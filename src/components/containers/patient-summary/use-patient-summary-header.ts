@@ -57,6 +57,13 @@ export function usePatientSummary(uuid: string) {
       ? `Control de ${latestAudiologyControl?.header?.speciality?.toLowerCase() ?? 'especialidad'} — ${mainDiagnosis}`
       : 'Sin observaciones registradas';
 
+    const INACTIVE_THRESHOLD_DAYS = 180;
+    const isInactive =
+      !latestAudiologyControl ||
+      (new Date().getTime() - new Date(latestAudiologyControl.createdAt).getTime()) /
+        (1000 * 60 * 60 * 24) >
+        INACTIVE_THRESHOLD_DAYS;
+
     return {
       name: `${patient.firstName} ${patient.lastName}`,
       id: patient.uuid.split('-')[0].toUpperCase(),
@@ -67,6 +74,7 @@ export function usePatientSummary(uuid: string) {
       mainDiagnosis,
       observations,
       latestAudiologyControl,
+      isInactive,
     };
   }, [patient, latestAudiologyControl]);
 
