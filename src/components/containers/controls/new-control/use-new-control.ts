@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+
+export enum Speciality {
+  AUDIOLOGY = 'Audiología',
+  DENTAL = 'Odontología',
+  DERMA = 'Dermatología',
+  GENERAL = 'Medicina General',
+}
 import { useCreateMedicalControlMutation } from '@/shared/api/mutations/medical-control-mutation/medical-control-mutation';
 import { useNavigation } from '@/hooks/use-navigation';
 
@@ -12,8 +19,15 @@ export const useNewControl = (patientId: string) => {
   const [showAudiogram, setShowAudiogram] = useState(false);
   const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
 
+  const specialityMap: Record<Speciality, MedicalSpeciality> = {
+    [Speciality.AUDIOLOGY]: MedicalSpeciality.AUDIOLOGY,
+    [Speciality.DENTAL]: MedicalSpeciality.DENTAL,
+    [Speciality.DERMA]: MedicalSpeciality.GENERAL,
+    [Speciality.GENERAL]: MedicalSpeciality.GENERAL,
+  };
+
   const [formData, setFormData] = useState({
-    speciality: MedicalSpeciality.AUDIOLOGY,
+    speciality: Speciality.AUDIOLOGY,
     otoscopyRight: '',
     otoscopyLeft: '',
     generalFindings: '',
@@ -45,8 +59,10 @@ export const useNewControl = (patientId: string) => {
       return;
     }
 
+    const apiSpeciality = specialityMap[formData.speciality];
+
     const findings =
-      formData.speciality === MedicalSpeciality.AUDIOLOGY
+      formData.speciality === Speciality.AUDIOLOGY
         ? {
             otoscopyRight: formData.otoscopyRight,
             otoscopyLeft: formData.otoscopyLeft,
@@ -61,7 +77,7 @@ export const useNewControl = (patientId: string) => {
     executeCreateControl({
       header: {
         patientUUID: patientId,
-        speciality: formData.speciality,
+        speciality: apiSpeciality,
         schemaVersion: 1,
       },
       clinicalData: {
