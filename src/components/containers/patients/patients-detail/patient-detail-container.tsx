@@ -106,7 +106,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                         <div className="flex flex-wrap justify-center md:justify-start gap-x-5 gap-y-1 mt-1">
                             <HeaderInfo icon={<IdentificationIcon className="h-3.5 w-3.5" />} text={patient.uuid.split('-')[0].toUpperCase()} />
                             <HeaderInfo icon={<PhoneIcon className="h-3.5 w-3.5" />} text={patient.phone} />
-                            <HeaderInfo icon={<EnvelopeIcon className="h-3.5 w-3.5" />} text="Sin correo" isWarning />
+                            <HeaderInfo icon={<EnvelopeIcon className="h-3.5 w-3.5" />} text={patient.email ?? 'Sin correo'} isWarning={!patient.email} />
                         </div>
                     </div>
                 </div>
@@ -127,9 +127,9 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
 
             {/* INDICADORES RÁPIDOS */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <StatCard title="Próxima cita" value={summary.nextAppointment} icon={<CalendarIcon className="h-5 w-5 text-blue-600" />} />
-                <StatCard title="Garantía equipo" value={summary.warrantyExpiration} icon={<ShieldCheckIcon className="h-5 w-5 text-emerald-600" />} />
-                <StatCard title="Mantenimientos" value={`${summary.pendingMaintenance.length} pendientes`} icon={<WrenchScrewdriverIcon className="h-5 w-5 text-amber-600" />} />
+                <StatCard title="Próxima cita" value={summary.nextAppointment} icon={<CalendarIcon className="h-5 w-5 text-blue-600" />} onClick={() => navigation.appointments.list()} />
+                <StatCard title="Garantía equipo" value={summary.warrantyExpiration} icon={<ShieldCheckIcon className="h-5 w-5 text-emerald-600" />} onClick={() => setActiveTab(PatientTabs.DOCUMENTS)} />
+                <StatCard title="Mantenimientos" value={`${summary.pendingMaintenance.length} pendientes`} icon={<WrenchScrewdriverIcon className="h-5 w-5 text-amber-600" />} onClick={() => setActiveTab(PatientTabs.DOCUMENTS)} />
             </div>
 
             {/* NAVEGACIÓN INTERNA */}
@@ -179,20 +179,31 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                             {history.length === 0 ? (
                                 <div className="py-16 text-center bg-white rounded-[2rem] border border-dashed border-slate-200 text-slate-400 text-xs font-bold uppercase tracking-widest">No hay registros</div>
                             ) : (
-                                history.map((record: ClinicalControl) => (
-                                    <div key={record.id} onClick={() => navigation.patients.viewControl(id, record.id)} className="bg-white p-5 rounded-[1.8rem] border border-slate-100 hover:border-blue-300 transition-all flex items-center gap-6 cursor-pointer group">
-                                        <div className="w-32 shrink-0">
-                                            <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-lg border ${getTypeStyle(record.type as ControlType)}`}>
-                                                {record.type}
-                                            </span>
-                                            <p className="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-tight">{record.date}</p>
+                                <>
+                                    {history.map((record: ClinicalControl) => (
+                                        <div key={record.id} onClick={() => navigation.patients.viewControl(id, record.id)} className="bg-white p-5 rounded-[1.8rem] border border-slate-100 hover:border-blue-300 transition-all flex items-center gap-6 cursor-pointer group">
+                                            <div className="w-32 shrink-0">
+                                                <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-lg border ${getTypeStyle(record.type as ControlType)}`}>
+                                                    {record.type}
+                                                </span>
+                                                <p className="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-tight">{record.date}</p>
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors line-clamp-1">{record.note}</p>
+                                            </div>
+                                            <ChevronRightIcon className="h-4 w-4 text-slate-300 group-hover:translate-x-1 transition-transform" />
                                         </div>
-                                        <div className="flex-1">
-                                            <p className="text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors line-clamp-1">{record.note}</p>
-                                        </div>
-                                        <ChevronRightIcon className="h-4 w-4 text-slate-300 group-hover:translate-x-1 transition-transform" />
-                                    </div>
-                                ))
+                                    ))}
+                                    {hasMore && (
+                                        <button
+                                            onClick={loadMore}
+                                            disabled={isFetching}
+                                            className="w-full py-3 text-center text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 border border-dashed border-slate-200 rounded-[1.5rem] hover:border-blue-300 transition-all disabled:opacity-50"
+                                        >
+                                            {isFetching ? 'Cargando...' : 'Cargar más registros'}
+                                        </button>
+                                    )}
+                                </>
                             )}
                         </div>
                     </div>

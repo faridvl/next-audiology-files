@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
 import { useMedicalControlsQuery } from '@/shared/api/querys/medical-controls-query';
+import { useAppointmentByPatientQuery } from '@/shared/api/querys/get-appoinment-by-patient-query';
 import { ClinicalControl, ControlType } from '@/types/otros/clinical';
 
 // TODO(!): P3-2-API — El API debe validar esto con un guard de especialidad en el backend
@@ -16,12 +17,13 @@ export function usePatientDetail(uuid: string, userSpecialty?: string) {
   // --- QUERIES ---
   const { data: patient, isLoading: isLoadingPatient, isError } = usePatientDetailQuery(uuid);
 
-  // Usamos un limit de 5 o 10 para la paginación
   const {
     data: historyData,
     isLoading: isLoadingHistory,
     isFetching,
   } = useMedicalControlsQuery(uuid, page, 10);
+
+  const { data: appointmentsData } = useAppointmentByPatientQuery(uuid);
 
   // --- EFECTO: ACUMULACIÓN ---
   // Este efecto se encarga de "unir" las páginas conforme se cargan
@@ -78,11 +80,33 @@ export function usePatientDetail(uuid: string, userSpecialty?: string) {
   }, [allRecords, searchTerm, selectedSpec, userSpecialty]);
 
   // --- RESUMEN (SUMMARY) ---
+  const appointments = appointmentsData?.appointments ?? [];
+
+  const nextAppointment = useMemo(() => {
+    const upcoming = appointments
+      .filter((appointment: { status: string; schedule: { startTime: string } }) =>
+        ['PENDING', 'CONFIRMED', 'TENTATIVE'].includes(appointment.status)
+      )
+      .sort((a: { schedule: { startTime: string } }, b: { schedule: { startTime: string } }) =>
+        new Date(a.schedule.startTime).getTime() - new Date(b.schedule.startTime).getTime()
+      );
+    if (upcoming.length === 0) return 'Sin programar';
+    const next = upcoming[0];
+    return new Date(next.schedule.startTime).toLocaleDateString('es-ES', {
+      day: '2-digit', month: 'short', year: 'numeric',
+    });
+  }, [appointments]);
+
+  const warrantyExpiration = useMemo(() => {
+    // Se calcula desde documentos WARRANTY — disponible cuando P2-2 retorne docs reales
+    return 'Consultar documentos';
+  }, []);
+
   const summary = {
-    nextAppointment: 'Sin programar',
+    nextAppointment,
     lastAppointment: mappedHistory.length > 0 ? mappedHistory[0].date : 'Sin registros',
     pendingMaintenance: [],
-    warrantyExpiration: 'Consultar equipo',
+    warrantyExpiration,
   };
 
   return {
