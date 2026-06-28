@@ -17,6 +17,7 @@ export const PatientListContainer: React.FC = () => {
         handlePageChange,
         navigateToCreate,
         navigateToDetail,
+        navigateToEdit,
         isLoading
     } = usePatientList();
 
@@ -44,8 +45,7 @@ export const PatientListContainer: React.FC = () => {
         {
             name: t(TEXT.PATIENTS.LIST.ACTIONS.EDIT),
             icon: <Edit2 size={14} />,
-            // TODO(!): Conectar a PATCH /patients/:uuid cuando el endpoint esté disponible
-            onClick: (_row: { uuid: string }) => undefined,
+            onClick: (row: { uuid: string }) => navigateToEdit(row.uuid),
         },
     ];
 

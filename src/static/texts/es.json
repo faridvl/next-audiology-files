@@ -12,6 +12,9 @@
       "save": "Guardar",
       "cancel": "Cancelar",
       "loading": "Cargando..."
+    },
+    "pagination": {
+      "showing": "Mostrando {{start}} a {{end}} de {{total}} registros"
     }
   },
   "menu": {

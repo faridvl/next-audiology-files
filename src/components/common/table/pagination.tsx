@@ -1,5 +1,7 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { CustomIcon, IconName, IconSize } from '../custom-icon/custom-icon';
+import { TEXT } from '@/static/texts/i18n';
 
 const itemsPerPage = 5;
 
@@ -12,6 +14,7 @@ type PaginationProps = {
 };
 
 export function Pagination({ currentPage, onPageChange, startIndex, endIndex, totalRows }: PaginationProps) {
+    const { t } = useTranslation();
     const totalPages = Math.ceil(totalRows / itemsPerPage);
 
     const handlePrevious = () => {
@@ -29,8 +32,7 @@ export function Pagination({ currentPage, onPageChange, startIndex, endIndex, to
     return (
         <div className="flex items-center justify-between bg-muted/40 px-4 py-3 rounded-b-lg">
             <div className="text-sm text-muted-foreground">
-                {/* TODO(!): ADD THIS TO CONTEXT */}
-                Showing {startIndex} to {endIndex} of {totalRows} entries
+                {t(TEXT.GENERAL.PAGINATION.SHOWING, { start: startIndex, end: endIndex, total: totalRows })}
             </div>
             <div className="flex items-center space-x-2">
                 <button
@@ -49,10 +51,8 @@ export function Pagination({ currentPage, onPageChange, startIndex, endIndex, to
                     className={`p-2 ${currentPage === totalPages ? 'text-gray-400' : 'text-gray-700'} hover:text-gray-900 focus:outline-none`}
                 >
                     <CustomIcon icon={IconName.CHEVRON_RIGHT_ICON} size={IconSize.XS} />
-
                 </button>
             </div>
         </div>
-
     );
 }

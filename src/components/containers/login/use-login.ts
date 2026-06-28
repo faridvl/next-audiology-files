@@ -13,7 +13,6 @@ export function useLogin() {
     CookiesManager.clearAll();
   }, []);
 
-  //TODO(!): MOVER 'FormActions'
   async function handleLoginSubmit(values: LoginCredentials, actions: FormActions) {
     executeLogin(values, {
       onSuccess: async (data) => {

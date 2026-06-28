@@ -63,7 +63,8 @@ export function UsersContainer() {
         columns,
         handleSearch,
         handleRoleChange,
-        handlePageChange
+        handlePageChange,
+        handleDeleteUser,
     } = useUsersContainer();
 
     // Formateamos los datos para que incluyan el JSX antes de pasar a la Tabla
@@ -121,8 +122,7 @@ export function UsersContainer() {
         {
             name: 'Eliminar',
             icon: <Trash2 size={14} />,
-            // TODO(!): Conectar a DELETE /users/:uuid cuando el endpoint esté disponible
-            onClick: (_row) => undefined
+            onClick: (row) => handleDeleteUser(row.uuid),
         },
     ];
 

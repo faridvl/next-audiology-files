@@ -145,8 +145,6 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                     Campos Adicionales
                 </div>
                 <div className="md:col-span-3">
-                    {/* TODO(!): P3-3 — Estos campos provienen de plantillas clínicas configurables en localStorage.
-                        Implementar GET/POST /clinical-templates en API para persistencia real. */}
                     <table className="w-full text-sm border-collapse">
                         <tbody>
                             {unknownEntries.map(([key, value]) => (

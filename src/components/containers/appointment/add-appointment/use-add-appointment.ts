@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigation } from '@/hooks/use-navigation';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
 import { toast } from 'sonner';
@@ -11,8 +11,21 @@ export const useCreateAppointment = () => {
   const navigation = useNavigation();
   const { executeCreateAppointment, isPending, isSuccess, error } = useCreateAppointmentMutation();
 
-  // TODO(!): Implementar un buscador con debounce para filtrar esta lista
-  const { data: patientsData, isLoading: isLoadingPatients } = usePatientsQuery(1, 100, '');
+  const [patientSearchTerm, setPatientSearchTerm] = useState('');
+  const [debouncedPatientSearch, setDebouncedPatientSearch] = useState('');
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedPatientSearch(patientSearchTerm);
+    }, 300);
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, [patientSearchTerm]);
+
+  const { data: patientsData, isLoading: isLoadingPatients } = usePatientsQuery(1, 100, debouncedPatientSearch);
   const { data: appointmentTypes, isLoading: isLoadingTypes } = useAppointmentTypesQuery();
 
   const [formData, setFormData] = useState({
@@ -78,5 +91,7 @@ export const useCreateAppointment = () => {
     navigation,
     patients: patientsData?.data || [],
     availableServices,
+    patientSearchTerm,
+    setPatientSearchTerm,
   };
 };

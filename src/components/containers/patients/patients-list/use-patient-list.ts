@@ -26,5 +26,6 @@ export function usePatientList() {
     handlePageChange: setPage,
     navigateToCreate: () => navigation.patients.create(),
     navigateToDetail: (uuid: string) => navigation.patients.detail(uuid),
+    navigateToEdit: (uuid: string) => navigation.patients.edit(uuid),
   };
 }

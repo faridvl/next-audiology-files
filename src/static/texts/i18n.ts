@@ -9,6 +9,9 @@ export const TEXT = {
       CANCEL: 'common.buttons.cancel',
       LOADING: 'common.buttons.loading',
     },
+    PAGINATION: {
+      SHOWING: 'common.pagination.showing',
+    },
   },
   MENU: {
     SIDEBAR: {

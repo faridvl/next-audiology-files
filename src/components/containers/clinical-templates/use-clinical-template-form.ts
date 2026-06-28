@@ -1,16 +1,17 @@
-// src/components/containers/clinical-templates/use-clinical-template-form.ts
-// TODO(!): P3-3 — Actualmente usa localStorage.
-// Implementar POST/PATCH /clinical-templates en API para persistencia real.
-
 import { useState, useEffect, useCallback } from 'react';
-import { useSession } from '@/hooks/use-session';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigation } from '@/hooks/use-navigation';
 import {
   ClinicalTemplate,
   ClinicalFieldDefinition,
   ClinicalFieldType,
 } from '@/types/clinical-template/clinical-template.types';
-import { loadTemplates, saveTemplates } from '@/shared/utils/clinical-templates-storage';
+import {
+  useClinicalTemplatesQuery,
+  FETCH_CLINICAL_TEMPLATES_KEY,
+} from '@/shared/api/querys/clinical-templates-query';
+import { useCreateClinicalTemplateMutation } from '@/shared/api/mutations/clinical-templates/create-clinical-template-mutation';
+import { useUpdateClinicalTemplateMutation } from '@/shared/api/mutations/clinical-templates/update-clinical-template-mutation';
 import { toast } from 'sonner';
 
 const FIELD_TYPES: { value: ClinicalFieldType; label: string }[] = [
@@ -72,28 +73,32 @@ export interface UseClinicalTemplateFormResult {
 export function useClinicalTemplateForm(
   templateId: string | undefined,
 ): UseClinicalTemplateFormResult {
-  const { tenant, isLoading: isLoadingSession } = useSession();
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
 
   const isEditMode = !!templateId && templateId !== 'new';
+
+  const { data: allTemplates, isLoading: isLoadingTemplates } = useClinicalTemplatesQuery();
+  const { executeCreateClinicalTemplate, isPending: isCreating } = useCreateClinicalTemplateMutation();
+  const { executeUpdateClinicalTemplate, isPending: isUpdating } = useUpdateClinicalTemplateMutation();
 
   const [templateName, setTemplateName] = useState('');
   const [templateSpeciality, setTemplateSpeciality] = useState('AUDIOLOGY');
   const [fields, setFields] = useState<ClinicalFieldDefinition[]>([]);
   const [newFieldDraft, setNewFieldDraft] = useState<NewFieldDraft>(INITIAL_FIELD_DRAFT);
-  const [isSaving, setIsSaving] = useState(false);
+
+  const isSaving = isCreating || isUpdating;
 
   // Cargar plantilla existente si estamos en modo edición
   useEffect(() => {
-    if (isLoadingSession || !tenant?.uuid || !isEditMode || !templateId) return;
-    const allTemplates = loadTemplates(tenant.uuid);
-    const existingTemplate = allTemplates.find((template) => template.id === templateId);
+    if (isLoadingTemplates || !isEditMode || !templateId || !allTemplates) return;
+    const existingTemplate = allTemplates.find((template) => template.uuid === templateId);
     if (existingTemplate) {
       setTemplateName(existingTemplate.name);
       setTemplateSpeciality(existingTemplate.speciality);
       setFields(existingTemplate.fields);
     }
-  }, [isLoadingSession, tenant?.uuid, isEditMode, templateId]);
+  }, [isLoadingTemplates, isEditMode, templateId, allTemplates]);
 
   const handleAddField = useCallback(() => {
     if (!newFieldDraft.label.trim()) {
@@ -155,41 +160,59 @@ export function useClinicalTemplateForm(
       toast.error('El nombre de la plantilla es obligatorio.');
       return;
     }
-    if (!tenant?.uuid) return;
 
-    setIsSaving(true);
+    const onSuccess = () => {
+      queryClient.invalidateQueries({ queryKey: [FETCH_CLINICAL_TEMPLATES_KEY] });
+      navigation.clinicalTemplates.index();
+    };
 
-    const allTemplates = loadTemplates(tenant.uuid);
+    const onError = () => {
+      toast.error('Error al guardar la plantilla.');
+    };
 
     if (isEditMode && templateId) {
-      const updatedTemplates = allTemplates.map((template) =>
-        template.id === templateId
-          ? {
-              ...template,
-              name: templateName.trim(),
-              speciality: templateSpeciality,
-              fields,
-            }
-          : template,
+      executeUpdateClinicalTemplate(
+        {
+          uuid: templateId,
+          name: templateName.trim(),
+          speciality: templateSpeciality,
+          fields,
+        },
+        {
+          onSuccess: () => {
+            toast.success('Plantilla actualizada correctamente.');
+            onSuccess();
+          },
+          onError,
+        },
       );
-      saveTemplates(tenant.uuid, updatedTemplates);
-      toast.success('Plantilla actualizada correctamente.');
     } else {
-      const newTemplate: ClinicalTemplate = {
-        id: `template_${Date.now()}`,
-        name: templateName.trim(),
-        speciality: templateSpeciality,
-        fields,
-        createdAt: new Date().toISOString(),
-        tenantUuid: tenant.uuid,
-      };
-      saveTemplates(tenant.uuid, [...allTemplates, newTemplate]);
-      toast.success('Plantilla creada correctamente.');
+      executeCreateClinicalTemplate(
+        {
+          name: templateName.trim(),
+          speciality: templateSpeciality,
+          fields,
+        },
+        {
+          onSuccess: () => {
+            toast.success('Plantilla creada correctamente.');
+            onSuccess();
+          },
+          onError,
+        },
+      );
     }
-
-    setIsSaving(false);
-    navigation.clinicalTemplates.index();
-  }, [templateName, templateSpeciality, fields, tenant?.uuid, isEditMode, templateId, navigation]);
+  }, [
+    templateName,
+    templateSpeciality,
+    fields,
+    isEditMode,
+    templateId,
+    navigation,
+    queryClient,
+    executeCreateClinicalTemplate,
+    executeUpdateClinicalTemplate,
+  ]);
 
   const handleCancel = useCallback(() => {
     navigation.clinicalTemplates.index();

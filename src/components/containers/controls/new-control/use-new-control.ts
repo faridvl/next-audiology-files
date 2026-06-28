@@ -1,6 +1,3 @@
-// TODO(!): P3-3 — Los campos dinámicos de plantilla se leen desde localStorage.
-// Implementar GET /clinical-templates en API para persistencia real.
-
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
@@ -8,7 +5,7 @@ import { useCreateMedicalControlMutation } from '@/shared/api/mutations/medical-
 import { useNavigation } from '@/hooks/use-navigation';
 import { useSession } from '@/hooks/use-session';
 import { ClinicalTemplate } from '@/types/clinical-template/clinical-template.types';
-import { loadTemplateBySpeciality } from '@/shared/utils/clinical-templates-storage';
+import { useClinicalTemplateBySpecialityQuery } from '@/shared/api/querys/clinical-templates-query';
 
 export enum Speciality {
   AUDIOLOGY = 'Audiología',
@@ -48,8 +45,6 @@ export const useNewControl = (patientId: string) => {
   const [showAudiogram, setShowAudiogram] = useState(false);
   const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
 
-  // Plantilla dinámica activa para la especialidad seleccionada
-  const [activeTemplate, setActiveTemplate] = useState<ClinicalTemplate | null>(null);
   // Valores de los campos dinámicos de la plantilla: { fieldId -> value }
   const [dynamicFieldValues, setDynamicFieldValues] = useState<Record<string, string | boolean | number>>({});
 
@@ -63,6 +58,11 @@ export const useNewControl = (patientId: string) => {
     nextControlNotes: '',
   });
 
+  // Plantilla dinámica activa para la especialidad seleccionada — obtenida desde el API
+  const apiSpecialityKeyForQuery = specialityToApiKey[formData.speciality];
+  const { data: activeTemplateData } = useClinicalTemplateBySpecialityQuery(apiSpecialityKeyForQuery);
+  const activeTemplate: ClinicalTemplate | null = activeTemplateData ?? null;
+
   useEffect(() => {
     if (tenant?.businessType && businessTypeToSpeciality[tenant.businessType]) {
       setFormData((previous) => ({
@@ -72,14 +72,10 @@ export const useNewControl = (patientId: string) => {
     }
   }, [tenant?.businessType]);
 
-  // Cargar plantilla cuando cambia la especialidad o el tenant
+  // Limpiar valores dinámicos al cambiar de especialidad
   useEffect(() => {
-    if (!tenant?.uuid) return;
-    const apiSpecialityKey = specialityToApiKey[formData.speciality];
-    const template = loadTemplateBySpeciality(tenant.uuid, apiSpecialityKey);
-    setActiveTemplate(template);
     setDynamicFieldValues({});
-  }, [formData.speciality, tenant?.uuid]);
+  }, [formData.speciality]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -124,9 +120,7 @@ export const useNewControl = (patientId: string) => {
       findings = { generalFindings: formData.generalFindings };
     }
 
-    // Agregar campos dinámicos de la plantilla (P3-3)
-    // TODO(!): P3-3 — Los campos dinámicos se persisten en findings como un objeto libre.
-    // Cuando el API soporte /clinical-templates, el esquema de findings será validado.
+    // Agregar campos dinámicos de la plantilla clínica al objeto findings
     if (activeTemplate && Object.keys(dynamicFieldValues).length > 0) {
       for (const field of activeTemplate.fields) {
         const value = dynamicFieldValues[field.id];

@@ -1,7 +1,5 @@
 // src/types/clinical-template/clinical-template.types.ts
 // Tipos para plantillas de historia clínica configurable (P3-3)
-// TODO(!): P3-3 — Actualmente persistido en localStorage.
-// Implementar GET/POST /clinical-templates en API para persistencia real.
 
 export type ClinicalFieldType =
   | 'text'
@@ -21,7 +19,9 @@ export interface ClinicalFieldDefinition {
 }
 
 export interface ClinicalTemplate {
-  id: string;
+  uuid: string;
+  /** @deprecated use uuid — kept for backward compat during migration */
+  id?: string;
   name: string; // "Audiología General", "Control ORL", etc.
   speciality: string;
   fields: ClinicalFieldDefinition[];
