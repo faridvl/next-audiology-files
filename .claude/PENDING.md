@@ -15,7 +15,7 @@
 | ~~P0-4~~ | ~~**Seguridad: `report-template/create.tsx` sin auth guard**~~ | ~~XS~~ | ~~Site~~ | ✅ Resuelto en `fix/p0-sidebar-routing-auth-guards-query-params` |
 | ~~P0-5~~ | ~~**Seguridad: `users/[id]/index.tsx` sin auth guard**~~ | ~~XS~~ | ~~Site~~ | ✅ Resuelto en `fix/p0-sidebar-routing-auth-guards-query-params` |
 | ~~P0-6~~ | ~~**Bug: WhatsApp envía mensajes al número `88165808` en vez del paciente**~~ | ~~S~~ | ~~Site + API~~ | ✅ API ahora retorna `phone` y `email` del paciente en `GET /appointments/patient/:uuid`. |
-| P0-7 | **Bug: form de nueva cita envía UUID falso `8e3677b3-...` como `typeUUID`** | — | Site | No tiene fix posible hasta que existan los endpoints de `AppointmentType` en el API. Documentado para no olvidar. Ver P1-3. |
+| ~~P0-7~~ | ~~**Bug: form de nueva cita envía UUID falso `8e3677b3-...` como `typeUUID`**~~ | ~~—~~ | ~~Site~~ | ✅ Resuelto junto con P1-3. El selector de tipos ahora carga desde `GET /appointment-types`. |
 
 ---
 
@@ -27,7 +27,7 @@
 |---|-------|----------|------|-------|
 | ~~P1-1~~ | ~~**Manage appointment: cargar datos reales + confirmar/reagendar**~~ | ~~M~~ | ~~Site~~ | ✅ Conectado a `GET /appointments/:uuid` y `PATCH /appointments/:uuid`. |
 | ~~P1-2~~ | ~~**Flujo post-control: cita tentativa → llamada → confirmada/pendiente**~~ | ~~M~~ | ~~Site~~ | ✅ handleNoAnswer y handleConfirm conectados al PATCH real. |
-| P1-3 | **AppointmentTypes CRUD: `GET/POST /appointment-types`** | L | API → Site | Tabla en DB ya existe. Implementar endpoints en API, luego conectar lista + form en site + selector en nueva cita. Desbloquea P0-7. |
+| ~~P1-3~~ | ~~**AppointmentTypes CRUD: `GET/POST /appointment-types`**~~ | ~~L~~ | ~~API → Site~~ | ✅ Entity + storage + use cases + controlador en API. Query + mutation + listado + form conectados en site. UUID hardcodeado eliminado de nueva cita. |
 | P1-4 | **Cambiar estado de citas en lote / filtrar por estado** | S | Site | El filtro por estado ya existe en la UI (`statusFilter`). Falta: acción de cambio masivo de estado. Puede ser solo front si se hace cita por cita. |
 | P1-5 | **Registro de intentos de llamada en cita** | M | API + Site | Al hacer "No contestó" → guardar en `notes` con timestamp + contador. API: `PATCH /appointments/:uuid` ya acepta `notes`. Solo es convención de formato. |
 | ~~P1-6~~ | ~~**Cambio automático de mes si no contesta**~~ | ~~S~~ | ~~Site~~ | ✅ Implementado en `handleNoAnswer`: suma 1 mes + PENDING + nota de sistema + PATCH real. |

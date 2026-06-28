@@ -2,9 +2,9 @@
 
 ## 🎯 SESIÓN ACTIVA — retomar aquí
 
-**Branch activo:** `fix/p0-1-appointment-times-patient-name`  
-**Etapa actual:** Completada — P0-6, P1-1/2/6, P1-7, P1-9, P1-12, P1-13 resueltos en ambos repos.  
-**Próximo paso:** Aplicar migración SQL en Neon (`add_followup_to_medical_control`), luego crear PRs y planificar AppointmentTypes (P1-3, bloqueante principal restante).
+**Branch activo:** `fix/p0-1-appointment-times-patient-name`
+**Etapa actual:** Completada — P1-3 AppointmentTypes CRUD implementado en API y conectado al site.  
+**Próximo paso:** P1-4/P1-5 (filtro de estado y registro de llamadas) o P1-8 (última audiometría en detalle de paciente).
 
 **Cola de esta etapa:**
 1. ✅ P0-1 — corregidos los 3 bugs de display de citas
@@ -14,6 +14,7 @@
 5. ✅ P1-9 — followUp persiste en columna `followUp Json?` de MedicalControl (migración pendiente de aplicar)
 6. ✅ P1-12 — `DELETE /appointments/:uuid` habilitado (use case creado + controlador + módulo)
 7. ✅ P1-13 — Perfil pre-llena nombre/email/rol desde `GET /auth/me`
+8. ✅ P1-3 — AppointmentTypes CRUD: `GET/POST /appointment-types` en API + listado y form conectados en site + UUID hardcodeado eliminado de nueva cita
 
 **Cambios de esta etapa:**
 
@@ -131,7 +132,10 @@
 | `patients-list-container.tsx:44` | `console.log('Editar', row.uuid)` — edit no implementado |
 | `use-documents.tsx` | `handleUpload` / `handleDelete` → solo `console.log` |
 | `pagination.tsx` | TODO: integrar paginación al contexto global |
-| `new-control-container.tsx` | textareas del form no tienen `name`/`value`/`onChange` — datos no capturados |
+| ~~`new-control-container.tsx`~~ | ✅ Conectado |
+| ~~`use-appointment-type-form.tsx`~~ | ✅ `handleSubmit` → mutation real |
+| ~~`appointment-types-container.tsx`~~ | ✅ Datos reales desde `GET /appointment-types` |
+| ~~`use-add-appointment.ts`~~ | ✅ UUID hardcodeado reemplazado con `useAppointmentTypesQuery` |
 
 ---
 

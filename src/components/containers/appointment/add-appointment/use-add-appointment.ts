@@ -1,10 +1,11 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigation } from '@/hooks/use-navigation';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
 import { toast } from 'sonner';
 import { useCreateAppointmentMutation } from '@/shared/api/mutations/appointments/create-appointment-mutation';
 import { AppointmentStatus } from '@/types/appointments/appointment';
 import { usePatientsQuery } from '@/shared/api/querys/patients-query';
+import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
 
 export const useCreateAppointment = () => {
   const navigation = useNavigation();
@@ -12,6 +13,7 @@ export const useCreateAppointment = () => {
 
   // TODO(!): Implementar un buscador con debounce para filtrar esta lista
   const { data: patientsData, isLoading: isLoadingPatients } = usePatientsQuery(1, 100, '');
+  const { data: appointmentTypes, isLoading: isLoadingTypes } = useAppointmentTypesQuery();
 
   const [formData, setFormData] = useState({
     patientUuid: '',
@@ -22,23 +24,10 @@ export const useCreateAppointment = () => {
     notes: '',
   });
 
-  // TODO(!): Estos servicios deberían venir de una base de datos (useAppointmentTypesQuery)
-  const servicesCatalog = {
-    [MedicalSpeciality.AUDIOLOGY]: [
-      { id: '8e3677b3-b64c-4978-9271-26c15cb41988', label: 'Audiometría Tonal' },
-    ],
-    [MedicalSpeciality.DENTAL]: [
-      { id: '8e3677b3-b64c-4978-9271-26c15cb41988', label: 'Limpieza / Profilaxis' },
-      { id: '8e3677b3-b64c-4978-9271-26c15cb41988', label: 'Extracción' },
-    ],
-    [MedicalSpeciality.GENERAL]: [
-      { id: '8e3677b3-b64c-4978-9271-26c15cb41988', label: 'Consulta General' },
-    ],
-  };
-
-  const availableServices = useMemo(() => {
-    return servicesCatalog[formData.speciality] || [];
-  }, [formData.speciality]);
+  const availableServices = (appointmentTypes ?? []).map((type) => ({
+    id: type.uuid,
+    label: type.name,
+  }));
 
   // Manejo de redirección y alertas
   useEffect(() => {
@@ -84,7 +73,7 @@ export const useCreateAppointment = () => {
   return {
     formData,
     setFormData,
-    isLoading: isPending || isLoadingPatients,
+    isLoading: isPending || isLoadingPatients || isLoadingTypes,
     handleSubmit,
     navigation,
     patients: patientsData?.data || [],
