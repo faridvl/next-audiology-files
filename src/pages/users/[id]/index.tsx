@@ -6,36 +6,42 @@ import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/box
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import {
-    ChevronLeft, Edit, Mail, Phone, MapPin,
-    Briefcase, Stethoscope, Users as UsersIcon,
-    History, CheckCircle2, Building2, ExternalLink
+    ChevronLeft, Edit, Mail, Phone,
+    Briefcase, Stethoscope,
+    Building2, Loader2
 } from 'lucide-react';
 import { useNavigation } from '@/hooks/use-navigation';
+import { useGetUserQuery } from '@/shared/api/querys/get-user-query';
 
 const UserDetailPage = () => {
     const router = useRouter();
     const { id } = router.query;
     const navigation = useNavigation();
 
-    // Mock de datos extendido
-    const user = {
-        id: id,
-        name: 'Dr. Roberto Gómez',
-        role: 'Médico Especialista',
-        email: 'roberto.g@clinica.com',
-        phone: '+52 55 1234 5678',
-        address: 'Av. Insurgentes Sur 123, Ciudad de México',
-        workplace: 'Sede Central - Consultorio 402',
-        speciality: 'Audiología Clínica y Otoneurología',
-        joinedAt: '12 de Octubre, 2023',
-        status: 'active',
-        // Historial de pacientes recientes
-        patientHistory: [
-            { id: 'p1', name: 'Juan Pérez', lastVisit: '15 Feb 2024', type: 'Audiometría' },
-            { id: 'p2', name: 'María García', lastVisit: '14 Feb 2024', type: 'Control' },
-            { id: 'p3', name: 'Ricardo Luna', lastVisit: '12 Feb 2024', type: 'Limpieza' },
-        ]
-    };
+    const userUuid = typeof id === 'string' ? id : '';
+    const { data: userDetail, isLoading } = useGetUserQuery(userUuid);
+
+    if (isLoading) {
+        return (
+            <DashboardLayout contentStyle={BoxedLayoutStyle.FULL} title="Expediente de Personal">
+                <div className="h-screen flex items-center justify-center">
+                    <Loader2 className="animate-spin text-blue-600" size={40} />
+                </div>
+            </DashboardLayout>
+        );
+    }
+
+    if (!userDetail) {
+        return (
+            <DashboardLayout contentStyle={BoxedLayoutStyle.FULL} title="Expediente de Personal">
+                <div className="max-w-[1200px] mx-auto px-6 py-20 text-center">
+                    <Typography variant={TypographyVariant.HELPER} className="text-slate-400">
+                        No se encontró información del usuario.
+                    </Typography>
+                </div>
+            </DashboardLayout>
+        );
+    }
 
     return (
         <DashboardLayout contentStyle={BoxedLayoutStyle.FULL} title="Expediente de Personal">
@@ -54,7 +60,7 @@ const UserDetailPage = () => {
                     <Button
                         variant={ButtonVariant.PRIMARY}
                         className="!rounded-2xl shadow-lg shadow-blue-100"
-                        onClick={() => navigation.users.edit(1)} // Redirección a edición
+                        onClick={() => navigation.users.edit(userUuid)}
                     >
                         <Edit size={16} className="mr-2" /> Editar Información
                     </Button>
@@ -67,12 +73,12 @@ const UserDetailPage = () => {
                         <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm">
                             <div className="text-center mb-8">
                                 <div className="h-24 w-24 rounded-[2rem] bg-gradient-to-br from-blue-600 to-blue-700 text-white text-3xl font-black flex items-center justify-center mx-auto mb-4 shadow-xl">
-                                    {user.name.charAt(0)}
+                                    {userDetail.fullName.charAt(0)}
                                 </div>
-                                <Typography variant={TypographyVariant.SUBTITLE}>{user.name}</Typography>
+                                <Typography variant={TypographyVariant.SUBTITLE}>{userDetail.fullName}</Typography>
                                 <div className="flex items-center justify-center gap-2 mt-1">
                                     <span className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
-                                        {user.role}
+                                        {userDetail.role}
                                     </span>
                                 </div>
                             </div>
@@ -89,38 +95,30 @@ const UserDetailPage = () => {
                                         </div>
                                         <div className="min-w-0">
                                             <p className="text-[10px] font-bold text-slate-400 uppercase">Email</p>
-                                            <p className="text-sm font-medium text-slate-700 truncate">{user.email}</p>
+                                            <p className="text-sm font-medium text-slate-700 truncate">{userDetail.email}</p>
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-4">
-                                        <div className="h-10 w-10 shrink-0 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
-                                            <Phone size={18} />
+                                    {userDetail.phoneNumber && (
+                                        <div className="flex gap-4">
+                                            <div className="h-10 w-10 shrink-0 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                                                <Phone size={18} />
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase">Teléfono</p>
+                                                <p className="text-sm font-medium text-slate-700">{userDetail.phoneNumber}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase">Teléfono</p>
-                                            <p className="text-sm font-medium text-slate-700">{user.phone}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex gap-4">
-                                        <div className="h-10 w-10 shrink-0 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
-                                            <MapPin size={18} />
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase">Dirección Personal</p>
-                                            <p className="text-sm font-medium text-slate-700 leading-relaxed">{user.address}</p>
-                                        </div>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* COLUMNA DERECHA: Profesional y Pacientes (8/12) */}
+                    {/* COLUMNA DERECHA: Profesional (8/12) */}
                     <div className="lg:col-span-8 space-y-6">
 
-                        {/* Card: Lugar de Trabajo y Especialidad */}
+                        {/* Card: Rol y Especialidad */}
                         <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="flex gap-4">
@@ -128,63 +126,37 @@ const UserDetailPage = () => {
                                         <Building2 size={24} />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Centro de Trabajo</p>
-                                        <p className="text-sm font-bold text-slate-800">{user.workplace}</p>
-                                        <p className="text-xs text-slate-400">Sede Principal habilitada</p>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Rol en Sistema</p>
+                                        <p className="text-sm font-bold text-slate-800">{userDetail.role}</p>
+                                        <p className="text-xs text-slate-400">
+                                            Miembro desde {new Date(userDetail.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
+                                        </p>
                                     </div>
                                 </div>
-                                <div className="flex gap-4">
-                                    <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                                        <Stethoscope size={24} />
+                                {userDetail.specialty && (
+                                    <div className="flex gap-4">
+                                        <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                            <Stethoscope size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Especialidad Médica</p>
+                                            <p className="text-sm font-bold text-slate-800">{userDetail.specialty}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Especialidad Médica</p>
-                                        <p className="text-sm font-bold text-slate-800">{user.speciality}</p>
-                                        <p className="text-xs text-slate-400">Cédula Profesional Activa</p>
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </div>
 
-                        {/* Card: Historial de Pacientes Atendidos */}
-                        <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm">
-                            <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-blue-600 rounded-lg text-white">
-                                        <UsersIcon size={18} />
-                                    </div>
-                                    <Typography variant={TypographyVariant.BODY_BOLD}>Historial de Pacientes Atendidos</Typography>
+                        {/* Card: Identificador */}
+                        <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm">
+                            <div className="flex gap-4">
+                                <div className="h-12 w-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center shrink-0">
+                                    <Briefcase size={24} />
                                 </div>
-                                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase">
-                                    Total: 142
-                                </span>
-                            </div>
-
-                            <div className="divide-y divide-slate-50">
-                                {user.patientHistory.map((patient) => (
-                                    <div key={patient.id} className="p-6 flex items-center justify-between hover:bg-slate-50/50 transition-colors group">
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs">
-                                                {patient.name.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-bold text-slate-700">{patient.name}</p>
-                                                <p className="text-[11px] text-slate-400 font-medium">{patient.type} • {patient.lastVisit}</p>
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => navigation.patients.detail(patient.id)}
-                                            className="p-2 text-slate-300 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
-                                        >
-                                            <ExternalLink size={18} />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="p-4 text-center bg-slate-50/20">
-                                <button className="text-[11px] font-bold text-slate-400 hover:text-blue-600 uppercase tracking-widest transition-colors">
-                                    Ver historial completo
-                                </button>
+                                <div>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase mb-1">UUID de Usuario</p>
+                                    <p className="text-sm font-mono text-slate-700">{userDetail.uuid}</p>
+                                </div>
                             </div>
                         </div>
                     </div>

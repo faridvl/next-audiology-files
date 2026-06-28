@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useNavigation } from '@/hooks/use-navigation';
 import { useSession } from '@/hooks/use-session';
 import { useAppointmentsQuery } from '@/shared/api/querys/appointments-query';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, subDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
 import { AppointmentStatus } from '@/types/appointments/appointment';
@@ -85,10 +85,39 @@ export function useDashboard() {
     });
   }, [data]);
 
+  // Métricas del médico
+  const doctorMetrics = useMemo(() => {
+    const allRaw: Record<string, unknown>[] = Array.isArray(data) ? data : data?.data || [];
+    const sevenDaysAgo = subDays(new Date(), 7);
+
+    const nextAppointment = appointments.find(
+      (appointment) =>
+        appointment.status === AppointmentStatus.PENDING ||
+        appointment.status === AppointmentStatus.CONFIRMED,
+    ) ?? null;
+
+    const completedThisWeek = allRaw.filter((rawAppointment) => {
+      if (rawAppointment.status !== AppointmentStatus.COMPLETED) return false;
+      const schedule = rawAppointment.schedule as Record<string, string> | undefined;
+      const startTimeStr = schedule?.startTime || schedule?.date;
+      if (!startTimeStr) return false;
+      return parseISO(startTimeStr) >= sevenDaysAgo;
+    }).length;
+
+    const pendingConfirmation = allRaw.filter(
+      (rawAppointment) =>
+        rawAppointment.status === AppointmentStatus.TENTATIVE ||
+        rawAppointment.status === AppointmentStatus.PENDING,
+    ).length;
+
+    return { nextAppointment, completedThisWeek, pendingConfirmation };
+  }, [data, appointments]);
+
   return {
     userName: user?.fullName?.split(' ')[0] || 'Usuario',
     todayFormatted: isMounted ? format(new Date(), "EEEE, d 'de' MMMM", { locale: es }) : '',
     appointments,
+    doctorMetrics,
     isLoading: sessionLoading || !isMounted || appointmentsLoading,
     actions: {
       viewAgenda: () => navigation.appointments.list(),

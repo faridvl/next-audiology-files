@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     ArrowLeft,
-    Download, Printer,
+    Printer,
 } from 'lucide-react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { useNavigation } from '@/hooks/use-navigation';
@@ -15,12 +15,47 @@ const specialityLabels: Record<MedicalSpeciality, string> = {
     [MedicalSpeciality.GENERAL]: 'Medicina General',
 };
 
+// Convierte clave camelCase a texto legible
+const formatFieldLabel = (key: string): string =>
+    key.replace(/([A-Z])/g, ' $1').replace(/^./, (char) => char.toUpperCase()).trim();
+
+// Formatea valor de findings para mostrar en UI
+const formatFieldValue = (value: unknown): string => {
+    if (typeof value === 'boolean') return value ? 'Sí' : 'No';
+    if (value === null || value === undefined || value === '') return '—';
+    return String(value);
+};
+
+// Campos conocidos de audiología — no se muestran como genéricos
+const AUDIOLOGY_KNOWN_FIELDS = new Set([
+    'otoscopyRight',
+    'otoscopyLeft',
+    'tinnitus',
+    'cleaningPerformed',
+    'usesAuxiliaries',
+]);
+
+interface HeaderCellProps {
+    label: string;
+    value: string;
+    className?: string;
+}
+
+const HeaderCell: React.FC<HeaderCellProps> = ({ label, value, className = '' }) => (
+    <div className={`p-5 border-r border-slate-100 last:border-r-0 ${className}`}>
+        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+        <p className="text-xs font-bold text-slate-900 tracking-tight uppercase">{value}</p>
+    </div>
+);
+
 interface Props {
     patientId: string;
     controlId: string;
+    /** Slot para el botón de descarga PDF (inyectado desde la página) */
+    pdfButton?: React.ReactNode;
 }
 
-export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }) => {
+export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, pdfButton }) => {
     const navigation = useNavigation();
     const { data, isLoading, isError } = useControlDetail(patientId, controlId);
     const { tenant, user } = useSession();
@@ -48,16 +83,61 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
     const specialistName = user?.fullName ? `DR. ${user.fullName.toUpperCase()}` : 'ESPECIALISTA';
     const specialityLabel = specialityLabels[data.control.speciality] ?? data.control.speciality;
 
+    const renderAudiologyFindings = () => {
+        const audiologyFindings = data.control.findings as AudiologyFindings;
+        const parts: string[] = [];
+        if (audiologyFindings.otoscopyRight) parts.push(`OD: ${audiologyFindings.otoscopyRight}`);
+        if (audiologyFindings.otoscopyLeft) parts.push(`OI: ${audiologyFindings.otoscopyLeft}`);
+        if (audiologyFindings.tinnitus) parts.push('Tinnitus presente.');
+        if (audiologyFindings.cleaningPerformed) parts.push('Se realizó limpieza.');
+        if (audiologyFindings.usesAuxiliaries) parts.push('Usa auxiliares auditivos.');
+        return parts.join(' ') || '—';
+    };
+
+    // Campos genéricos: cualquier clave no conocida de la especialidad actual
+    const renderGenericFindings = () => {
+        const findingsMap = data.control.findings as unknown as Record<string, unknown>;
+        const knownKeys =
+            data.control.speciality === MedicalSpeciality.AUDIOLOGY
+                ? AUDIOLOGY_KNOWN_FIELDS
+                : new Set<string>();
+
+        const unknownEntries = Object.entries(findingsMap).filter(
+            ([key]) => !knownKeys.has(key) && key !== 'audiogram',
+        );
+
+        if (unknownEntries.length === 0) return null;
+
+        return (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-slate-50 pt-8">
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
+                    Campos Adicionales
+                </div>
+                <div className="md:col-span-3">
+                    {/* TODO(!): P3-3 — Estos campos provienen de plantillas clínicas configurables en localStorage.
+                        Implementar GET/POST /clinical-templates en API para persistencia real. */}
+                    <table className="w-full text-sm border-collapse">
+                        <tbody>
+                            {unknownEntries.map(([key, value]) => (
+                                <tr key={key} className="border-b border-slate-50 last:border-b-0">
+                                    <td className="py-2 pr-4 font-bold text-slate-500 text-xs uppercase tracking-wide w-1/3">
+                                        {formatFieldLabel(key)}
+                                    </td>
+                                    <td className="py-2 text-slate-700">
+                                        {formatFieldValue(value)}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
+    };
+
     const renderFindings = () => {
         if (data.control.speciality === MedicalSpeciality.AUDIOLOGY) {
-            const audiologyFindings = data.control.findings as AudiologyFindings;
-            const parts: string[] = [];
-            if (audiologyFindings.otoscopyRight) parts.push(`OD: ${audiologyFindings.otoscopyRight}`);
-            if (audiologyFindings.otoscopyLeft) parts.push(`OI: ${audiologyFindings.otoscopyLeft}`);
-            if (audiologyFindings.tinnitus) parts.push('Tinnitus presente.');
-            if (audiologyFindings.cleaningPerformed) parts.push('Se realizó limpieza.');
-            if (audiologyFindings.usesAuxiliaries) parts.push('Usa auxiliares auditivos.');
-            return parts.join(' ') || '—';
+            return renderAudiologyFindings();
         }
         const generalFindings = data.control.findings as unknown as Record<string, unknown>;
         return String(generalFindings.generalFindings ?? '—');
@@ -74,9 +154,11 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
                 >
                     <ArrowLeft size={14} /> Volver al Registro del Paciente
                 </button>
-                <div className="flex gap-4">
-                    <button className="p-2 text-slate-400 hover:text-blue-600 transition-colors"><Printer size={18} /></button>
-                    <button className="p-2 text-slate-400 hover:text-blue-600 transition-colors"><Download size={18} /></button>
+                <div className="flex items-center gap-4">
+                    <button className="p-2 text-slate-400 hover:text-blue-600 transition-colors">
+                        <Printer size={18} />
+                    </button>
+                    {pdfButton}
                 </div>
             </div>
 
@@ -96,7 +178,7 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
                     </div>
                 </div>
 
-                {/* BANNER DE DATOS DEL PACIENTE (TABLA TÉCNICA) */}
+                {/* BANNER DE DATOS DEL PACIENTE */}
                 <div className="bg-white grid grid-cols-2 md:grid-cols-4 border-b border-slate-200">
                     <HeaderCell label="Paciente" value={data.patient.fullName} className="col-span-2" />
                     <HeaderCell label="Identificación" value={data.patient.documentId} />
@@ -110,7 +192,7 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
                 {/* CUERPO DEL REGISTRO */}
                 <div className="p-12 md:p-16 space-y-12">
 
-                    {/* FILA: ESPECIALISTA */}
+                    {/* ESPECIALISTA */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2">
                         <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
                             Especialista
@@ -122,7 +204,7 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
                         </div>
                     </div>
 
-                    {/* FILA: ESPECIALIDAD */}
+                    {/* ESPECIALIDAD */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2">
                         <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
                             Especialidad
@@ -134,7 +216,7 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
                         </div>
                     </div>
 
-                    {/* FILA: HALLAZGOS */}
+                    {/* HALLAZGOS */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2">
                         <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
                             Notas Clínicas
@@ -144,7 +226,10 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
                         </div>
                     </div>
 
-                    {/* FILA: DIAGNÓSTICO */}
+                    {/* CAMPOS GENÉRICOS (plantilla clínica) */}
+                    {renderGenericFindings()}
+
+                    {/* DIAGNÓSTICO */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-slate-50 pt-8">
                         <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
                             Diagnóstico
@@ -156,7 +241,7 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
                         </div>
                     </div>
 
-                    {/* FILA: PLAN */}
+                    {/* PLAN */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-slate-50 pt-8">
                         <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
                             Plan Médico
@@ -182,10 +267,3 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
         </div>
     );
 };
-
-const HeaderCell = ({ label, value, className = "" }: any) => (
-    <div className={`p-5 border-r border-slate-100 last:border-r-0 ${className}`}>
-        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-        <p className="text-xs font-bold text-slate-900 tracking-tight uppercase">{value}</p>
-    </div>
-);

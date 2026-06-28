@@ -15,7 +15,8 @@ import {
     PlusIcon,
     ShieldCheckIcon,
     FileText,
-    History
+    History,
+    ClipboardList,
 } from "lucide-react";
 import { Button, ButtonVariant } from "@/components/common/button/button";
 import { MedicalSpeciality } from "@/types/medical-controls/medical-control.types";
@@ -105,10 +106,19 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                         </div>
                     </div>
                 </div>
-                <Button variant={ButtonVariant.PRIMARY} className="rounded-xl px-5 h-10 shadow-lg shadow-blue-100" onClick={() => navigation.patients.addControl(id)}>
-                    <PlusIcon className="h-4 w-4 mr-2" />
-                    <span className="text-xs font-bold uppercase tracking-tight">Nuevo registro</span>
-                </Button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => navigation.patients.ficha(id)}
+                        className="flex items-center gap-1.5 border border-slate-200 text-slate-600 px-4 h-10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all"
+                    >
+                        <ClipboardList className="h-4 w-4" />
+                        Ver ficha completa
+                    </button>
+                    <Button variant={ButtonVariant.PRIMARY} className="rounded-xl px-5 h-10 shadow-lg shadow-blue-100" onClick={() => navigation.patients.addControl(id)}>
+                        <PlusIcon className="h-4 w-4 mr-2" />
+                        <span className="text-xs font-bold uppercase tracking-tight">Nuevo registro</span>
+                    </Button>
+                </div>
             </div>
 
             {/* INDICADORES RÁPIDOS */}

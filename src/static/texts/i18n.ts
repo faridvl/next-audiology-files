@@ -61,4 +61,119 @@ export const TEXT = {
       },
     },
   },
+  DASHBOARD: {
+    GREETING: 'dashboard.greeting',
+    METRICS: {
+      NEXT_APPOINTMENT: 'dashboard.metrics.nextAppointment',
+      NO_APPOINTMENTS: 'dashboard.metrics.noAppointments',
+      COMPLETED_THIS_WEEK: 'dashboard.metrics.completedThisWeek',
+      COMPLETED_THIS_WEEK_SUB: 'dashboard.metrics.completedThisWeekSub',
+      PENDING_CONFIRMATION: 'dashboard.metrics.pendingConfirmation',
+      PENDING_CONFIRMATION_SUB: 'dashboard.metrics.pendingConfirmationSub',
+    },
+    APPOINTMENTS: {
+      TITLE: 'dashboard.appointments.title',
+      VIEW_ALL: 'dashboard.appointments.viewAll',
+      EMPTY: 'dashboard.appointments.empty',
+    },
+    QUICK_ACTIONS: {
+      TITLE: 'dashboard.quickActions.title',
+      NEW_PATIENT: 'dashboard.quickActions.newPatient',
+      NEW_PATIENT_DESC: 'dashboard.quickActions.newPatientDesc',
+      NEW_APPOINTMENT: 'dashboard.quickActions.newAppointment',
+      NEW_APPOINTMENT_DESC: 'dashboard.quickActions.newAppointmentDesc',
+      DO_TEST: 'dashboard.quickActions.doTest',
+      DO_TEST_DESC: 'dashboard.quickActions.doTestDesc',
+      INVENTORY: 'dashboard.quickActions.inventory',
+      INVENTORY_DESC: 'dashboard.quickActions.inventoryDesc',
+    },
+  },
+  APPOINTMENTS: {
+    LIST: {
+      SEARCH_PLACEHOLDER: 'appointments.list.searchPlaceholder',
+      NEW_BUTTON: 'appointments.list.newButton',
+      COLUMNS: {
+        PATIENT: 'appointments.list.tableColumns.patient',
+        SPECIALTY: 'appointments.list.tableColumns.specialty',
+        DATE_TIME: 'appointments.list.tableColumns.dateTime',
+        STATUS: 'appointments.list.tableColumns.status',
+      },
+      BULK: {
+        SELECTED: 'appointments.list.bulkActions.selected',
+        CHANGE_STATUS: 'appointments.list.bulkActions.changeStatus',
+        APPLY: 'appointments.list.bulkActions.apply',
+      },
+    },
+    MANAGE: {
+      BACK: 'appointments.manage.back',
+      STATUS_ALERT: {
+        TITLE: 'appointments.manage.statusAlert.title',
+        SUBTITLE: 'appointments.manage.statusAlert.subtitle',
+      },
+      ACTIONS: {
+        NO_ANSWER: 'appointments.manage.actions.noAnswer',
+        CONFIRM: 'appointments.manage.actions.confirm',
+      },
+      CALL_HISTORY: {
+        TITLE: 'appointments.manage.callHistory.title',
+        NO_ANSWER_LABEL: 'appointments.manage.callHistory.noAnswerLabel',
+      },
+      FORM: {
+        ADJUST_DATE: 'appointments.manage.form.adjustDate',
+        ADJUST_TIME: 'appointments.manage.form.adjustTime',
+        FOLLOW_UP_LOG: 'appointments.manage.form.followUpLog',
+        FOLLOW_UP_LOG_PLACEHOLDER: 'appointments.manage.form.followUpLogPlaceholder',
+      },
+    },
+  },
+  PATIENTS: {
+    LIST: {
+      TITLE: 'patients.list.title',
+      NEW_BUTTON: 'patients.list.newButton',
+      SEARCH_PLACEHOLDER: 'patients.list.searchPlaceholder',
+      COLUMNS: {
+        PATIENT: 'patients.list.columns.patient',
+        PHONE: 'patients.list.columns.phone',
+        REGISTERED_AT: 'patients.list.columns.registeredAt',
+      },
+      ACTIONS: {
+        VIEW_FILE: 'patients.list.actions.viewFile',
+        EDIT: 'patients.list.actions.edit',
+      },
+    },
+  },
+  CONTROLS: {
+    NEW: {
+      FOLLOW_UP: {
+        TITLE: 'controls.new.followUp.title',
+        CONFIRM_BUTTON: 'controls.new.followUp.confirmButton',
+        NOTES_PLACEHOLDER: 'controls.new.followUp.notesPlaceholder',
+      },
+      SPECIALITY: {
+        LABEL: 'controls.new.speciality.label',
+      },
+      EXAMINATION: {
+        LABEL_PREFIX: 'controls.new.examination.labelPrefix',
+        ADD_AUDIOMETRY: 'controls.new.examination.addAudiometry',
+        REMOVE_AUDIOMETRY: 'controls.new.examination.removeAudiometry',
+        OTOSCOPY_RIGHT: 'controls.new.examination.otoscopyRight',
+        OTOSCOPY_LEFT: 'controls.new.examination.otoscopyLeft',
+      },
+      DIAGNOSIS: {
+        LABEL: 'controls.new.diagnosis.label',
+        PLACEHOLDER: 'controls.new.diagnosis.placeholder',
+      },
+      SCHEDULING: {
+        TITLE: 'controls.new.scheduling.title',
+      },
+      BUTTONS: {
+        CANCEL: 'controls.new.buttons.cancel',
+        SAVE: 'controls.new.buttons.save',
+        SAVING: 'controls.new.buttons.saving',
+      },
+      HISTORY: {
+        TITLE: 'controls.new.history.title',
+      },
+    },
+  },
 } as const;

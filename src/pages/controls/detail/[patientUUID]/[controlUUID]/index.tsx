@@ -3,7 +3,9 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
 import { ControlDetailContainer } from '@/components/containers/control-detail/control-detail';
+import { PdfDownloadButton } from '@/components/pdf/pdf-download-button';
 import Head from 'next/head';
+import { authorizeServerSidePage } from '@/hocs/auth';
 
 const ControlDetailPage = () => {
     const router = useRouter();
@@ -19,7 +21,7 @@ const ControlDetailPage = () => {
     return (
         <>
             <Head>
-                <title>Control de Paciente </title>
+                <title>Control de Paciente</title>
             </Head>
 
             <DashboardLayout
@@ -29,11 +31,17 @@ const ControlDetailPage = () => {
                 <ControlDetailContainer
                     patientId={patientUUID as string}
                     controlId={controlUUID as string}
+                    pdfButton={
+                        <PdfDownloadButton
+                            controlUuid={controlUUID as string}
+                            patientUuid={patientUUID as string}
+                        />
+                    }
                 />
             </DashboardLayout>
         </>
-
     );
 };
 
+export const getServerSideProps = authorizeServerSidePage();
 export default ControlDetailPage;

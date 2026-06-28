@@ -2,11 +2,20 @@
 
 ## 🎯 SESIÓN ACTIVA — retomar aquí
 
-**Branch activo:** `fix/p0-1-appointment-times-patient-name`
-**Etapa actual:** Completada — Form paciente corregido y validado; patient summary con datos reales; historial de llamadas acumulativo.
-**Próximo paso:** P1-4 (filtro/cambio de estado en lote de citas), P1-14 (PATCH /users/:uuid en API).
+**Branch activo:** `main`
+**Etapa actual:** Completada — P1-4 selección múltiple y cambio de estado en lote; P2-7 badge Inactivo; P2-10 Google + Apple Calendar; P2-11 notas en agenda; verificados P2-4 y P2-14/P2-15.
+**Próximo paso:** P2-6 (vencimiento garantía WARRANTY en ficha de paciente), P2-8 (recordatorios automáticos por WhatsApp/email).
 
 **Cola de esta etapa:**
+1. ✅ P1-14 — User detail/edit conectados a `GET /users/:uuid` y `PATCH /users/:uuid` (Identity)
+2. ✅ P2-13 — Profile: guardado real vía `PATCH /users/:uuid` con uuid del usuario logueado
+3. ✅ P3-8 — Settings: campos editables + `PATCH /tenants/:uuid` conectado
+4. ✅ P2-5 — Dashboard: 3 tarjetas de métricas médico (próxima cita, atendidos semana, por confirmar)
+5. ✅ P2-12 — i18n en dashboard, appointment-list, manage-appointment, patient-list, new-control
+6. ✅ P3-4 — pre-commit hook API corregido: shebang + script `precommit:check` agregado
+7. ✅ P3-5 — AppointmentStatus ya consolidado en un solo archivo; pagination integrada en Table
+
+**Cola anterior:**
 1. ✅ P0-1 — corregidos los 3 bugs de display de citas
 2. ✅ P0-6 — phone incluido en `GET /appointments/patient/:uuid` (API)
 3. ✅ P1-1/P1-2/P1-6 — Manage appointment conectado a API real (GET + PATCH)

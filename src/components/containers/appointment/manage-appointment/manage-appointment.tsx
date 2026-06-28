@@ -1,10 +1,13 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { PhoneOff, CheckCircle2, Phone, ChevronLeft } from 'lucide-react';
 import { Typography, TypographyVariant } from "@/components/common/typography/typography";
 import { Button, ButtonVariant } from "@/components/common/button/button";
 import { useManageAppointment } from './use-manage-appointment';
+import { TEXT } from '@/static/texts/i18n';
 
 export const ManageAppointmentContainer: React.FC<{ id: string }> = ({ id }) => {
+    const { t } = useTranslation();
     const { formData, setFormData, isLoading, isPending, callAttempts, handleNoAnswer, handleConfirm, navigation } = useManageAppointment(id);
 
     if (isLoading) return <div className="max-w-3xl mx-auto py-6 animate-pulse h-96 bg-slate-100 rounded-[40px]" />;
@@ -13,7 +16,7 @@ export const ManageAppointmentContainer: React.FC<{ id: string }> = ({ id }) => 
         <div className="max-w-3xl mx-auto py-6">
             <button onClick={navigation.common.back} className="flex items-center gap-2 text-slate-400 mb-8 group">
                 <ChevronLeft size={20} />
-                <Typography variant={TypographyVariant.BODY_SEMIBOLD}>Volver</Typography>
+                <Typography variant={TypographyVariant.BODY_SEMIBOLD}>{t(TEXT.APPOINTMENTS.MANAGE.BACK)}</Typography>
             </button>
 
             <div className="bg-white border border-slate-100 rounded-[40px] p-10 shadow-sm space-y-10">
@@ -21,8 +24,8 @@ export const ManageAppointmentContainer: React.FC<{ id: string }> = ({ id }) => 
                 {/* ESTADO ACTUAL - ALERTA */}
                 <div className="bg-amber-50 border border-amber-100 p-6 rounded-3xl flex items-center justify-between">
                     <div>
-                        <Typography variant={TypographyVariant.BODY_BOLD} className="text-amber-700">Estado: Tentativa</Typography>
-                        <Typography variant={TypographyVariant.CAPTION} className="text-amber-600">Pendiente de confirmar llamada con el paciente.</Typography>
+                        <Typography variant={TypographyVariant.BODY_BOLD} className="text-amber-700">{t(TEXT.APPOINTMENTS.MANAGE.STATUS_ALERT.TITLE)}</Typography>
+                        <Typography variant={TypographyVariant.CAPTION} className="text-amber-600">{t(TEXT.APPOINTMENTS.MANAGE.STATUS_ALERT.SUBTITLE)}</Typography>
                     </div>
                     <div className="flex gap-3">
                         <Button
@@ -31,7 +34,7 @@ export const ManageAppointmentContainer: React.FC<{ id: string }> = ({ id }) => 
                             onClick={handleNoAnswer}
                             disabled={isPending}
                         >
-                            <PhoneOff size={16} /> No contestó
+                            <PhoneOff size={16} /> {t(TEXT.APPOINTMENTS.MANAGE.ACTIONS.NO_ANSWER)}
                         </Button>
                         <Button
                             variant={ButtonVariant.PRIMARY}
@@ -39,7 +42,7 @@ export const ManageAppointmentContainer: React.FC<{ id: string }> = ({ id }) => 
                             onClick={handleConfirm}
                             disabled={isPending}
                         >
-                            <CheckCircle2 size={16} /> Confirmar Cita
+                            <CheckCircle2 size={16} /> {t(TEXT.APPOINTMENTS.MANAGE.ACTIONS.CONFIRM)}
                         </Button>
                     </div>
                 </div>
@@ -48,7 +51,7 @@ export const ManageAppointmentContainer: React.FC<{ id: string }> = ({ id }) => 
                 {callAttempts.length > 0 && (
                     <div className="space-y-3">
                         <Typography variant={TypographyVariant.OVERLINE} className="font-bold flex items-center gap-2">
-                            <Phone size={14} /> Intentos de llamada ({callAttempts.length})
+                            <Phone size={14} /> {t(TEXT.APPOINTMENTS.MANAGE.CALL_HISTORY.TITLE)} ({callAttempts.length})
                         </Typography>
                         <div className="bg-slate-50 border border-slate-100 rounded-3xl p-4 space-y-2">
                             {callAttempts.map((attempt) => (
@@ -57,7 +60,7 @@ export const ManageAppointmentContainer: React.FC<{ id: string }> = ({ id }) => 
                                         #{attempt.attemptNumber}
                                     </span>
                                     <span className="text-xs font-mono text-slate-500">{attempt.timestamp}</span>
-                                    <span className="text-xs text-red-500 font-semibold ml-auto">No contestó</span>
+                                    <span className="text-xs text-red-500 font-semibold ml-auto">{t(TEXT.APPOINTMENTS.MANAGE.CALL_HISTORY.NO_ANSWER_LABEL)}</span>
                                 </div>
                             ))}
                         </div>
@@ -67,33 +70,33 @@ export const ManageAppointmentContainer: React.FC<{ id: string }> = ({ id }) => 
                 {/* FORMULARIO DE EDICIÓN */}
                 <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
-                        <Typography variant={TypographyVariant.OVERLINE} className="font-bold">Ajustar Fecha</Typography>
+                        <Typography variant={TypographyVariant.OVERLINE} className="font-bold">{t(TEXT.APPOINTMENTS.MANAGE.FORM.ADJUST_DATE)}</Typography>
                         <input
                             type="date"
                             className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl"
                             value={formData.date}
-                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                            onChange={(event) => setFormData({ ...formData, date: event.target.value })}
                         />
                     </div>
                     <div className="space-y-2">
-                        <Typography variant={TypographyVariant.OVERLINE} className="font-bold">Ajustar Hora</Typography>
+                        <Typography variant={TypographyVariant.OVERLINE} className="font-bold">{t(TEXT.APPOINTMENTS.MANAGE.FORM.ADJUST_TIME)}</Typography>
                         <input
                             type="time"
                             className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl"
                             value={formData.startTime}
-                            onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                            onChange={(event) => setFormData({ ...formData, startTime: event.target.value })}
                         />
                     </div>
                 </div>
 
                 <div className="space-y-2">
-                    <Typography variant={TypographyVariant.OVERLINE} className="font-bold">Bitácora de Seguimiento</Typography>
+                    <Typography variant={TypographyVariant.OVERLINE} className="font-bold">{t(TEXT.APPOINTMENTS.MANAGE.FORM.FOLLOW_UP_LOG)}</Typography>
                     <textarea
                         rows={4}
                         className="w-full p-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none"
-                        placeholder="Ej: Se llamó 3 veces, el paciente indica que confirmará en la tarde..."
+                        placeholder={t(TEXT.APPOINTMENTS.MANAGE.FORM.FOLLOW_UP_LOG_PLACEHOLDER)}
                         value={formData.notes}
-                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                        onChange={(event) => setFormData({ ...formData, notes: event.target.value })}
                     />
                 </div>
             </div>

@@ -38,11 +38,19 @@ export type TenantDomain = {
   createdAt: string;
 };
 
+/** Especialidades médicas del usuario — debe coincidir con MedicalSpeciality del API */
+export enum UserSpecialty {
+  AUDIOLOGY = 'AUDIOLOGY',
+  DENTAL = 'DENTAL',
+  GENERAL = 'GENERAL',
+}
+
 export type UserDomain = {
   uuid: string;
   email: string;
   fullName: string;
   role: UserRole;
+  specialty?: UserSpecialty;
   tenantId: number;
   createdAt: string;
 };

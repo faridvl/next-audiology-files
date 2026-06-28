@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
 import {
     User, Mail, Lock, ShieldCheck, Briefcase,
-    Stethoscope, Camera, UploadCloud, Check, X,
-    GraduationCap, FileText
+    Camera, UploadCloud, Check, X,
+    GraduationCap, FileText, Loader2
 } from 'lucide-react';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
@@ -12,10 +12,17 @@ import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/box
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { UserRole } from '@/types/auth/auth';
 import { useSession } from '@/hooks/use-session';
+import { useUpdateUserMutation } from '@/shared/api/mutations/users/update-user-mutation';
+import { toast } from 'sonner';
 
 // --- COMPONENTES ATÓMICOS REUTILIZABLES ---
 
-const FormField = ({ label, icon: Icon, error, children }: any) => (
+const FormField = ({ label, icon: Icon, error, children }: {
+    label: string;
+    icon: React.ElementType;
+    error?: string;
+    children: React.ReactNode;
+}) => (
     <div className="flex flex-col gap-2 w-full group">
         <Typography variant={TypographyVariant.OVERLINE} className="ml-1 !text-slate-400 !text-[10px] uppercase font-bold group-focus-within:!text-[#1E3A8A] transition-colors">
             {label}
@@ -35,7 +42,12 @@ const inputStyles = "w-full pl-12 pr-5 py-3.5 bg-white border border-slate-200 r
 const ProfileSettingsPage: React.FC = () => {
     const { t } = useTranslation();
     const { user, isLoading: isSessionLoading } = useSession();
+    const { executeUpdateUser, isPending, isSuccess, error } = useUpdateUserMutation();
     const [activeTab, setActiveTab] = useState<'general' | 'medical'>('general');
+
+    const [fullName, setFullName] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [specialty, setSpecialty] = useState('');
 
     // Estados funcionales para archivos
     const [avatar, setAvatar] = useState<string | null>(null);
@@ -43,9 +55,39 @@ const ProfileSettingsPage: React.FC = () => {
     const avatarRef = useRef<HTMLInputElement>(null);
     const signatureRef = useRef<HTMLInputElement>(null);
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
-        const file = e.target.files?.[0];
+    useEffect(() => {
+        if (user) {
+            setFullName(user.fullName ?? '');
+        }
+    }, [user]);
+
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success('Perfil actualizado correctamente');
+        }
+    }, [isSuccess]);
+
+    useEffect(() => {
+        if (error) {
+            toast.error('Error al actualizar el perfil');
+        }
+    }, [error]);
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, setter: (value: string) => void) => {
+        const file = event.target.files?.[0];
         if (file) setter(URL.createObjectURL(file));
+    };
+
+    const handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        if (!user?.uuid) return;
+
+        executeUpdateUser({
+            uuid: user.uuid,
+            fullName: fullName || undefined,
+            phoneNumber: phoneNumber || undefined,
+            specialty: specialty || undefined,
+        });
     };
 
     return (
@@ -74,7 +116,7 @@ const ProfileSettingsPage: React.FC = () => {
                     <div className="bg-slate-50 border border-slate-200 rounded-[3.5rem] p-3 md:p-8">
                         <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
 
-                            <form className="p-8 md:p-12">
+                            <form className="p-8 md:p-12" onSubmit={handleSubmit}>
 
                                 {activeTab === 'general' && (
                                     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -95,7 +137,7 @@ const ProfileSettingsPage: React.FC = () => {
                                                 >
                                                     <Camera size={16} />
                                                 </button>
-                                                <input type="file" ref={avatarRef} className="hidden" onChange={(e) => handleFileChange(e, setAvatar)} />
+                                                <input type="file" ref={avatarRef} className="hidden" onChange={(event) => handleFileChange(event, setAvatar)} />
                                             </div>
                                             <div className="text-center md:text-left">
                                                 <Typography variant={TypographyVariant.ACCENT} className="!text-lg">Fotografía de Perfil</Typography>
@@ -103,24 +145,26 @@ const ProfileSettingsPage: React.FC = () => {
                                             </div>
                                         </div>
 
-                                        {/* Formulario Unificado de Usuario */}
+                                        {/* Formulario de Usuario */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                             <FormField label={t('users.create.form.fullName')} icon={User}>
                                                 <input
                                                     className={inputStyles}
                                                     placeholder={isSessionLoading ? 'Cargando...' : t('users.create.form.fullNamePlaceholder')}
-                                                    defaultValue={user?.fullName ?? ''}
-                                                    key={user?.fullName}
+                                                    value={fullName}
+                                                    onChange={(event) => setFullName(event.target.value)}
                                                 />
                                             </FormField>
 
                                             <FormField label={t('users.create.form.email')} icon={Mail}>
                                                 <input
                                                     type="email"
-                                                    className={inputStyles}
+                                                    className={`${inputStyles} cursor-not-allowed opacity-60`}
                                                     placeholder={t('users.create.form.emailPlaceholder')}
                                                     defaultValue={user?.email ?? ''}
                                                     key={user?.email}
+                                                    readOnly
+                                                    disabled
                                                 />
                                             </FormField>
 
@@ -129,7 +173,7 @@ const ProfileSettingsPage: React.FC = () => {
                                             </FormField>
 
                                             <FormField label={t('users.create.form.role')} icon={ShieldCheck}>
-                                                <select className={inputStyles} defaultValue={user?.role ?? ''} key={user?.role}>
+                                                <select className={`${inputStyles} cursor-not-allowed opacity-60`} defaultValue={user?.role ?? ''} key={user?.role} disabled>
                                                     <option value={UserRole.DOCTOR}>{t('users.create.roles.DOCTOR')}</option>
                                                     <option value={UserRole.STAFF}>{t('users.create.roles.STAFF')}</option>
                                                     <option value={UserRole.ADMIN}>{t('users.create.roles.ADMIN')}</option>
@@ -143,7 +187,12 @@ const ProfileSettingsPage: React.FC = () => {
                                     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                             <FormField label={t('users.create.form.specialty')} icon={Briefcase}>
-                                                <input className={inputStyles} placeholder={t('users.create.form.specialtyPlaceholder')} />
+                                                <input
+                                                    className={inputStyles}
+                                                    placeholder={t('users.create.form.specialtyPlaceholder')}
+                                                    value={specialty}
+                                                    onChange={(event) => setSpecialty(event.target.value)}
+                                                />
                                             </FormField>
 
                                             <FormField label="Cédula Profesional" icon={ShieldCheck}>
@@ -172,7 +221,7 @@ const ProfileSettingsPage: React.FC = () => {
                                                     <>
                                                         <img src={signature} className="h-full object-contain p-4 mix-blend-multiply" alt="Firma" />
                                                         <button
-                                                            onClick={(e) => { e.stopPropagation(); setSignature(null); }}
+                                                            onClick={(event) => { event.stopPropagation(); setSignature(null); }}
                                                             className="absolute top-4 right-4 p-2 bg-red-100 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm"
                                                         >
                                                             <X size={14} />
@@ -186,7 +235,7 @@ const ProfileSettingsPage: React.FC = () => {
                                                         <Typography variant={TypographyVariant.CAPTION} className="!text-slate-400 font-bold uppercase tracking-widest text-[10px]">Cargar archivo PNG</Typography>
                                                     </div>
                                                 )}
-                                                <input type="file" ref={signatureRef} className="hidden" accept="image/png" onChange={(e) => handleFileChange(e, setSignature)} />
+                                                <input type="file" ref={signatureRef} className="hidden" accept="image/png" onChange={(event) => handleFileChange(event, setSignature)} />
                                             </div>
                                         </div>
                                     </div>
@@ -199,9 +248,14 @@ const ProfileSettingsPage: React.FC = () => {
                                     </button>
                                     <button
                                         type="submit"
-                                        className="bg-[#1E3A8A] text-white px-10 py-4.5 rounded-[1.5rem] shadow-xl shadow-blue-200 hover:bg-[#152a63] hover:-translate-y-1 active:translate-y-0 transition-all flex items-center gap-3"
+                                        disabled={isPending || isSessionLoading}
+                                        className="bg-[#1E3A8A] text-white px-10 py-4 rounded-[1.5rem] shadow-xl shadow-blue-200 hover:bg-[#152a63] hover:-translate-y-1 active:translate-y-0 transition-all flex items-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
-                                        <Check size={18} strokeWidth={3} />
+                                        {isPending ? (
+                                            <Loader2 size={18} strokeWidth={3} className="animate-spin" />
+                                        ) : (
+                                            <Check size={18} strokeWidth={3} />
+                                        )}
                                         <span className="text-xs font-black uppercase tracking-widest">
                                             Actualizar Perfil
                                         </span>

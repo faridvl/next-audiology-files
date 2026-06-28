@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     Save, Activity, Calendar, StickyNote, Clock, X, Settings, ChevronRight
 } from 'lucide-react';
@@ -7,16 +8,18 @@ import { Button, ButtonVariant } from '@/components/common/button/button';
 import { AudiometryCapture } from '@/components/containers/audiogram-capture/audiogram-capture';
 import { PatientSummaryHeader } from '@/components/containers/patient-summary/patent-summary-header';
 import { useNewControl, Speciality } from './use-new-control';
+import { TEXT } from '@/static/texts/i18n';
 
 interface Props {
     patientId: string;
 }
 
 export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
+    const { t } = useTranslation();
     const { states, setters, methods } = useNewControl(patientId);
     const { showHistory, showAudiogram, isFollowUpModalOpen, formData, isPending } = states;
 
-    // Componente Reutilizable de Seguimiento (Original)
+    // Componente Reutilizable de Seguimiento
     const FollowUpFields = () => (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-300">
             <div className="space-y-3">
@@ -37,16 +40,16 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                     <input
                         type="date"
                         value={formData.nextMaintenanceDate}
-                        onChange={(e) => setters.setFormData({ ...formData, nextMaintenanceDate: e.target.value })}
+                        onChange={(event) => setters.setFormData({ ...formData, nextMaintenanceDate: event.target.value })}
                         className="w-full pl-12 pr-4 py-3 bg-white rounded-xl border border-slate-200 text-sm font-medium outline-none focus:border-blue-500 transition-colors"
                     />
                 </div>
             </div>
             <textarea
                 className="w-full p-4 bg-slate-50/50 rounded-xl border border-slate-200 text-sm min-h-[100px] outline-none focus:bg-white focus:border-blue-500"
-                placeholder="Instrucciones para la próxima cita..."
+                placeholder={t(TEXT.CONTROLS.NEW.FOLLOW_UP.NOTES_PLACEHOLDER)}
                 value={formData.nextControlNotes}
-                onChange={(e) => setters.setFormData({ ...formData, nextControlNotes: e.target.value })}
+                onChange={(event) => setters.setFormData({ ...formData, nextControlNotes: event.target.value })}
             />
         </div>
     );
@@ -58,11 +61,13 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/20 backdrop-blur-sm p-4">
                     <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl p-8 animate-in zoom-in-95">
                         <div className="flex justify-between items-center mb-6">
-                            <Typography variant={TypographyVariant.SUBTITLE}>Programar Seguimiento</Typography>
+                            <Typography variant={TypographyVariant.SUBTITLE}>{t(TEXT.CONTROLS.NEW.FOLLOW_UP.TITLE)}</Typography>
                             <button onClick={() => setters.setIsFollowUpModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full"><X size={20} /></button>
                         </div>
                         <FollowUpFields />
-                        <Button variant={ButtonVariant.PRIMARY} className="w-full mt-6 !h-12 !rounded-xl" onClick={() => setters.setIsFollowUpModalOpen(false)}>Confirmar Fecha</Button>
+                        <Button variant={ButtonVariant.PRIMARY} className="w-full mt-6 !h-12 !rounded-xl" onClick={() => setters.setIsFollowUpModalOpen(false)}>
+                            {t(TEXT.CONTROLS.NEW.FOLLOW_UP.CONFIRM_BUTTON)}
+                        </Button>
                     </div>
                 </div>
             )}
@@ -80,7 +85,9 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                     <div className="space-y-6 bg-white border border-slate-100 p-10 rounded-[3rem] shadow-xl shadow-slate-200/20">
                         {/* SELECTOR ESPECIALIDAD */}
                         <section className="space-y-3">
-                            <Typography variant={TypographyVariant.CAPTION} className="text-slate-400 font-bold uppercase tracking-wider ml-1">Especialidad / Motivo</Typography>
+                            <Typography variant={TypographyVariant.CAPTION} className="text-slate-400 font-bold uppercase tracking-wider ml-1">
+                                {t(TEXT.CONTROLS.NEW.SPECIALITY.LABEL)}
+                            </Typography>
                             <div className="flex flex-wrap gap-2">
                                 {Object.values(Speciality).map((spec) => (
                                     <button
@@ -100,7 +107,9 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Activity size={18} className="text-blue-600" />
-                                    <Typography variant={TypographyVariant.BODY_BOLD}>Exploración de {formData.speciality}</Typography>
+                                    <Typography variant={TypographyVariant.BODY_BOLD}>
+                                        {t(TEXT.CONTROLS.NEW.EXAMINATION.LABEL_PREFIX)} {formData.speciality}
+                                    </Typography>
                                 </div>
                                 {formData.speciality === Speciality.AUDIOLOGY && (
                                     <button
@@ -108,7 +117,7 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                         onClick={() => setters.setShowAudiogram(!showAudiogram)}
                                         className={`text-[10px] font-black uppercase px-3 py-1 rounded-lg border ${showAudiogram ? 'bg-red-50 text-red-500 border-red-100' : 'bg-blue-50 text-blue-600 border-blue-100'}`}
                                     >
-                                        {showAudiogram ? 'Quitar Audiometría' : '+ Audiometría'}
+                                        {showAudiogram ? t(TEXT.CONTROLS.NEW.EXAMINATION.REMOVE_AUDIOMETRY) : t(TEXT.CONTROLS.NEW.EXAMINATION.ADD_AUDIOMETRY)}
                                     </button>
                                 )}
                             </div>
@@ -118,25 +127,25 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                     <>
                                         <textarea
                                             className="w-full p-5 rounded-2xl border border-slate-100 bg-slate-50/30 text-sm min-h-[110px] outline-none focus:bg-white focus:border-red-200"
-                                            placeholder="Otoscopia Oído Derecho..."
+                                            placeholder={t(TEXT.CONTROLS.NEW.EXAMINATION.OTOSCOPY_RIGHT)}
                                             value={formData.otoscopyRight}
-                                            onChange={(e) => setters.setFormData({ ...formData, otoscopyRight: e.target.value })}
+                                            onChange={(event) => setters.setFormData({ ...formData, otoscopyRight: event.target.value })}
                                         />
                                         <textarea
                                             className="w-full p-5 rounded-2xl border border-slate-100 bg-slate-50/30 text-sm min-h-[110px] outline-none focus:bg-white focus:border-blue-200"
-                                            placeholder="Otoscopia Oído Izquierdo..."
+                                            placeholder={t(TEXT.CONTROLS.NEW.EXAMINATION.OTOSCOPY_LEFT)}
                                             value={formData.otoscopyLeft}
-                                            onChange={(e) => setters.setFormData({ ...formData, otoscopyLeft: e.target.value })}
+                                            onChange={(event) => setters.setFormData({ ...formData, otoscopyLeft: event.target.value })}
                                         />
                                         {showAudiogram && <div className="col-span-2 pt-2 animate-in slide-in-from-top-4"><AudiometryCapture /></div>}
                                     </>
                                 ) : (
                                     <textarea
-                                            className="col-span-2 w-full p-5 rounded-2xl border border-slate-100 bg-slate-50/30 text-sm min-h-[130px] outline-none focus:bg-white focus:border-blue-200"
-                                            placeholder={`Hallazgos clínicos de ${formData.speciality}...`}
-                                            value={formData.generalFindings}
-                                            onChange={(e) => setters.setFormData({ ...formData, generalFindings: e.target.value })}
-                                        />
+                                        className="col-span-2 w-full p-5 rounded-2xl border border-slate-100 bg-slate-50/30 text-sm min-h-[130px] outline-none focus:bg-white focus:border-blue-200"
+                                        placeholder={`${t(TEXT.CONTROLS.NEW.EXAMINATION.LABEL_PREFIX)} ${formData.speciality}...`}
+                                        value={formData.generalFindings}
+                                        onChange={(event) => setters.setFormData({ ...formData, generalFindings: event.target.value })}
+                                    />
                                 )}
                             </div>
                         </section>
@@ -145,13 +154,15 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                         <section className="space-y-3 pt-4">
                             <div className="flex items-center gap-2 text-slate-400 ml-1">
                                 <StickyNote size={16} />
-                                <Typography variant={TypographyVariant.CAPTION} className="font-bold uppercase tracking-wider">Diagnóstico y Observaciones</Typography>
+                                <Typography variant={TypographyVariant.CAPTION} className="font-bold uppercase tracking-wider">
+                                    {t(TEXT.CONTROLS.NEW.DIAGNOSIS.LABEL)}
+                                </Typography>
                             </div>
                             <textarea
                                 className="w-full p-6 rounded-[2rem] border border-slate-100 bg-slate-50/30 text-sm min-h-[150px] outline-none focus:bg-white focus:ring-4 focus:ring-slate-50 transition-all"
-                                placeholder="Escriba el plan de tratamiento o conclusiones..."
+                                placeholder={t(TEXT.CONTROLS.NEW.DIAGNOSIS.PLACEHOLDER)}
                                 value={formData.diagnosis}
-                                onChange={(e) => setters.setFormData({ ...formData, diagnosis: e.target.value })}
+                                onChange={(event) => setters.setFormData({ ...formData, diagnosis: event.target.value })}
                             />
                         </section>
 
@@ -159,15 +170,22 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                         <section className="p-8 rounded-[2.5rem] bg-blue-50/30 border border-blue-100/50 space-y-5">
                             <div className="flex items-center gap-2">
                                 <Clock size={18} className="text-blue-600" />
-                                <Typography variant={TypographyVariant.BODY_BOLD} className="text-blue-900">Programar Seguimiento</Typography>
+                                <Typography variant={TypographyVariant.BODY_BOLD} className="text-blue-900">
+                                    {t(TEXT.CONTROLS.NEW.SCHEDULING.TITLE)}
+                                </Typography>
                             </div>
                             <FollowUpFields />
                         </section>
 
                         <div className="flex justify-end gap-3 pt-6 border-t border-slate-50">
-                            <Button variant={ButtonVariant.CANCEL} text="Cancelar" />
-                            <Button onClick={methods.handleSave} variant={ButtonVariant.PRIMARY} className="!h-12 !px-10 !rounded-xl shadow-lg shadow-blue-200" disabled={isPending}>
-                                <Save size={18} /> {isPending ? 'Guardando...' : 'Guardar Consulta'}
+                            <Button variant={ButtonVariant.CANCEL} text={t(TEXT.CONTROLS.NEW.BUTTONS.CANCEL)} />
+                            <Button
+                                onClick={methods.handleSave}
+                                variant={ButtonVariant.PRIMARY}
+                                className="!h-12 !px-10 !rounded-xl shadow-lg shadow-blue-200"
+                                disabled={isPending}
+                            >
+                                <Save size={18} /> {isPending ? t(TEXT.CONTROLS.NEW.BUTTONS.SAVING) : t(TEXT.CONTROLS.NEW.BUTTONS.SAVE)}
                             </Button>
                         </div>
                     </div>
@@ -177,11 +195,11 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                 {showHistory && (
                     <div className="w-[35%] space-y-4 h-[calc(100vh-140px)] sticky top-24 overflow-y-auto pr-2">
                         <div className="flex items-center justify-between mb-4">
-                            <Typography variant={TypographyVariant.SUBTITLE}>Historial</Typography>
+                            <Typography variant={TypographyVariant.SUBTITLE}>{t(TEXT.CONTROLS.NEW.HISTORY.TITLE)}</Typography>
                             <Settings size={16} className="text-slate-300" />
                         </div>
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="p-5 bg-white rounded-2xl border border-slate-100 shadow-sm group hover:border-blue-200 transition-all">
+                        {[1, 2, 3].map(index => (
+                            <div key={index} className="p-5 bg-white rounded-2xl border border-slate-100 shadow-sm group hover:border-blue-200 transition-all">
                                 <div className="flex justify-between mb-2">
                                     <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md uppercase">Consulta</span>
                                     <span className="text-[10px] text-slate-400 font-medium">10/02/2026</span>

@@ -10,6 +10,7 @@ export const routesPrivate = {
     index: '/patients',
     create: '/patients/create',
     detail: (id: string | number) => `/patients/${id}`,
+    ficha: (uuid: string | number) => `/patients/${uuid}/ficha`,
   },
   appointments: {
     index: '/appointments',

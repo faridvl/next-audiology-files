@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { useSession } from '@/hooks/use-session';
+import { useUpdateTenantMutation } from '@/shared/api/mutations/tenants/update-tenant-mutation';
+import { toast } from 'sonner';
 import {
   Building2, CreditCard, PenTool, Check,
-  MapPin, FileText, Globe, Upload
+  MapPin, FileText, Globe, Upload, Loader2
 } from 'lucide-react';
 
 const specialityLabels: Record<string, string> = {
@@ -17,11 +19,11 @@ const specialityLabels: Record<string, string> = {
   DERMA: 'Dermatología',
 };
 
-const CompactInput = ({ label, defaultValue, placeholder, value, onChange }: {
+const CompactInput = ({ label, value, placeholder, onChange, disabled }: {
   label: string;
-  defaultValue?: string;
-  placeholder?: string;
   value?: string;
+  placeholder?: string;
+  disabled?: boolean;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) => (
   <div className="flex flex-col gap-1 w-full">
@@ -29,11 +31,11 @@ const CompactInput = ({ label, defaultValue, placeholder, value, onChange }: {
       {label}
     </Typography>
     <input
-      defaultValue={defaultValue}
+      value={value ?? ''}
       placeholder={placeholder}
-      value={value}
       onChange={onChange}
-      className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:border-[#1E3A8A] focus:bg-white transition-all text-slate-700"
+      disabled={disabled}
+      className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:border-[#1E3A8A] focus:bg-white transition-all text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
     />
   </div>
 );
@@ -49,11 +51,48 @@ const SectionHeader = ({ icon: Icon, title }: { icon: React.ElementType; title: 
 
 const BusinessSettingsPage: React.FC = () => {
   const { tenant, isLoading } = useSession();
+  const { executeUpdateTenant, isPending, isSuccess, error } = useUpdateTenantMutation();
 
-  const businessName = tenant?.businessName ?? '';
-  const businessType = tenant?.businessType ?? '';
+  const [businessName, setBusinessName] = useState('');
+  const [businessType, setBusinessType] = useState('');
+
+  useEffect(() => {
+    if (tenant) {
+      setBusinessName(tenant.businessName ?? '');
+      setBusinessType(tenant.businessType ?? '');
+    }
+  }, [tenant]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success('Configuración actualizada correctamente');
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error('Error al actualizar la configuración');
+    }
+  }, [error]);
+
   const specialityLabel = specialityLabels[businessType] ?? businessType;
   const planLabel = tenant?.plan ?? 'FREE';
+
+  const handleSave = () => {
+    if (!tenant?.uuid) return;
+    executeUpdateTenant({
+      uuid: tenant.uuid,
+      businessName: businessName || undefined,
+      businessType: businessType || undefined,
+    });
+  };
+
+  const handleDiscard = () => {
+    if (tenant) {
+      setBusinessName(tenant.businessName ?? '');
+      setBusinessType(tenant.businessType ?? '');
+    }
+  };
 
   return (
     <>
@@ -74,8 +113,10 @@ const BusinessSettingsPage: React.FC = () => {
               <div className="w-full">
                 <CompactInput
                   label="Nombre Comercial de la Clínica"
-                  defaultValue={isLoading ? '' : businessName}
+                  value={isLoading ? '' : businessName}
                   placeholder={isLoading ? 'Cargando...' : 'Nombre de la clínica'}
+                  onChange={(event) => setBusinessName(event.target.value)}
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -89,8 +130,9 @@ const BusinessSettingsPage: React.FC = () => {
               <div className="mt-4">
                 <CompactInput
                   label="Especialidad Principal"
-                  defaultValue={specialityLabel}
+                  value={specialityLabel}
                   placeholder="Especialidad de la clínica"
+                  disabled
                 />
               </div>
             )}
@@ -171,13 +213,26 @@ const BusinessSettingsPage: React.FC = () => {
 
           {/* BOTONES DE ACCIÓN */}
           <div className="flex items-center justify-end gap-4 pt-6">
-            <button className="px-6 py-2 hover:bg-slate-50 rounded-xl transition-colors">
+            <button
+              type="button"
+              onClick={handleDiscard}
+              className="px-6 py-2 hover:bg-slate-50 rounded-xl transition-colors"
+            >
               <Typography variant={TypographyVariant.OVERLINE} className="!text-slate-400">
                 Descartar
               </Typography>
             </button>
-            <button className="bg-[#1E3A8A] text-white px-10 py-3.5 rounded-2xl shadow-xl shadow-blue-200 hover:bg-[#152a63] hover:-translate-y-0.5 transition-all flex items-center gap-3">
-              <Check size={16} strokeWidth={3} />
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={isPending || isLoading}
+              className="bg-[#1E3A8A] text-white px-10 py-3.5 rounded-2xl shadow-xl shadow-blue-200 hover:bg-[#152a63] hover:-translate-y-0.5 transition-all flex items-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isPending ? (
+                <Loader2 size={16} strokeWidth={3} className="animate-spin" />
+              ) : (
+                <Check size={16} strokeWidth={3} />
+              )}
               <Typography variant={TypographyVariant.OVERLINE} className="!text-white">
                 Actualizar Clínica
               </Typography>

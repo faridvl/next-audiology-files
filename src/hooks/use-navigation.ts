@@ -30,6 +30,7 @@ export const useNavigation = () => {
       list: () => router.push(routesPrivate.patients.index),
       create: () => router.push(routesPrivate.patients.create),
       detail: (id: string | number) => router.push(routesPrivate.patients.detail(id)),
+      ficha: (uuid: string | number) => router.push(routesPrivate.patients.ficha(uuid)),
       addControl: (id: string | number) => router.push(routesPrivate.controls.create(id)),
       viewControl: (patientUUID: string | number, controlUUID: string) =>
         router.push(routesPrivate.controls.detail(patientUUID, controlUUID)),

@@ -7,23 +7,26 @@ import {
     Activity,
     Archive,
     ChevronRight,
-    CalendarDays
+    CalendarDays,
+    Clock,
+    CheckCircle2,
+    AlertCircle,
 } from 'lucide-react';
 import { useDashboard } from './use-dashboard';
-import { DashboardAppointment } from '@/types/appointments/dashboard-appointment.types';
 
 export const DashboardContainer: React.FC = () => {
-    const { userName, todayFormatted, appointments, actions, isLoading } = useDashboard();
+    const { userName, todayFormatted, appointments, doctorMetrics, actions, isLoading } = useDashboard();
 
     if (isLoading) {
         return (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-pulse">
                 <div className="lg:col-span-8 space-y-6">
                     <div className="h-12 bg-slate-100 rounded-lg w-1/3" />
+                    <div className="h-24 bg-slate-100 rounded-2xl" />
                     <div className="h-96 bg-slate-100 rounded-2xl" />
                 </div>
                 <div className="lg:col-span-4 space-y-4">
-                    {[1, 2, 3, 4].map((i) => <div key={i} className="h-24 bg-slate-100 rounded-2xl" />)}
+                    {[1, 2, 3, 4].map((index) => <div key={index} className="h-24 bg-slate-100 rounded-2xl" />)}
                 </div>
             </div>
         );
@@ -35,7 +38,7 @@ export const DashboardContainer: React.FC = () => {
             {/* COLUMNA PRINCIPAL */}
             <div className="lg:col-span-8 space-y-6">
 
-                {/* Cabecera Minimalista (Reemplaza al Banner pesado) */}
+                {/* Cabecera Minimalista */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-1">
                     <div>
                         <Typography variant={TypographyVariant.HEADER} className="text-2xl font-bold text-slate-900">
@@ -50,6 +53,71 @@ export const DashboardContainer: React.FC = () => {
                     </div>
                 </div>
 
+                {/* TARJETAS DE MÉTRICAS DEL MÉDICO */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Próxima cita */}
+                    <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm flex items-start gap-4">
+                        <div className="h-10 w-10 rounded-xl bg-blue-50 text-[#1E3A8A] flex items-center justify-center shrink-0">
+                            <Clock size={18} />
+                        </div>
+                        <div className="min-w-0">
+                            <Typography variant={TypographyVariant.CAPTION} className="text-slate-400 uppercase tracking-widest text-[9px] font-bold">
+                                Próxima cita
+                            </Typography>
+                            {doctorMetrics.nextAppointment ? (
+                                <>
+                                    <Typography variant={TypographyVariant.BODY_BOLD} className="text-slate-800 text-sm truncate">
+                                        {doctorMetrics.nextAppointment.patient}
+                                    </Typography>
+                                    <Typography variant={TypographyVariant.CAPTION} className="text-blue-600 font-bold text-xs">
+                                        {doctorMetrics.nextAppointment.time}
+                                    </Typography>
+                                </>
+                            ) : (
+                                <Typography variant={TypographyVariant.BODY_BOLD} className="text-slate-400 text-sm">
+                                    Sin citas pendientes
+                                </Typography>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Pacientes atendidos esta semana */}
+                    <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm flex items-start gap-4">
+                        <div className="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                            <CheckCircle2 size={18} />
+                        </div>
+                        <div>
+                            <Typography variant={TypographyVariant.CAPTION} className="text-slate-400 uppercase tracking-widest text-[9px] font-bold">
+                                Atendidos esta semana
+                            </Typography>
+                            <Typography variant={TypographyVariant.HEADER} className="text-2xl font-black text-slate-800">
+                                {doctorMetrics.completedThisWeek}
+                            </Typography>
+                            <Typography variant={TypographyVariant.CAPTION} className="text-emerald-600 font-medium text-[10px]">
+                                últimos 7 días
+                            </Typography>
+                        </div>
+                    </div>
+
+                    {/* Pendientes de confirmar */}
+                    <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm flex items-start gap-4">
+                        <div className="h-10 w-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                            <AlertCircle size={18} />
+                        </div>
+                        <div>
+                            <Typography variant={TypographyVariant.CAPTION} className="text-slate-400 uppercase tracking-widest text-[9px] font-bold">
+                                Por confirmar
+                            </Typography>
+                            <Typography variant={TypographyVariant.HEADER} className="text-2xl font-black text-slate-800">
+                                {doctorMetrics.pendingConfirmation}
+                            </Typography>
+                            <Typography variant={TypographyVariant.CAPTION} className="text-amber-600 font-medium text-[10px]">
+                                citas tentativas/pendientes
+                            </Typography>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Lista de Citas */}
                 <div className="space-y-4">
                     <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
@@ -58,7 +126,7 @@ export const DashboardContainer: React.FC = () => {
                                 <Activity size={18} className="text-[#1E3A8A]" />
                             </div>
                             <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="text-slate-800">
-                                Próximas appointments de hoy
+                                Próximas citas de hoy
                             </Typography>
                         </div>
                         <Button
@@ -111,7 +179,7 @@ export const DashboardContainer: React.FC = () => {
                         ) : (
                             <div className="p-16 text-center bg-slate-50/20">
                                 <Typography variant={TypographyVariant.HELPER} className="text-slate-400">
-                                    No hay appointments programadas para el resto del día.
+                                    No hay citas programadas para el resto del día.
                                 </Typography>
                             </div>
                         )}

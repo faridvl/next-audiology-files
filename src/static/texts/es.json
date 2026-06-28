@@ -38,29 +38,146 @@
         "admin": "Administrador",
         "doctor": "Doctor",
         "staff": "Staff"
+      }
+    },
+    "create": {
+      "layoutTitle": "Nuevo Miembro",
+      "title": "Información del Usuario",
+      "description": "Completa los datos para dar de alta un nuevo acceso.",
+      "form": {
+        "fullName": "Nombre Completo",
+        "fullNamePlaceholder": "Ej. Roberto Gómez",
+        "email": "Correo Electrónico",
+        "emailPlaceholder": "nombre@clinica.com",
+        "password": "Contraseña Temporal",
+        "passwordPlaceholder": "••••••••",
+        "role": "Rol de Sistema",
+        "specialty": "Especialidad / Área",
+        "specialtyPlaceholder": "Ej. Audiología Clínica",
+        "submit": "Guardar Usuario"
       },
-      "create": {
-        "layoutTitle": "Nuevo Miembro",
-        "title": "Información del Usuario",
-        "description": "Completa los datos para dar de alta un nuevo acceso.",
-        "form": {
-          "fullName": "Nombre Completo",
-          "fullNamePlaceholder": "Ej. Roberto Gómez",
-          "email": "Correo Electrónico",
-          "emailPlaceholder": "nombre@clinica.com",
-          "password": "Contraseña Temporal",
-          "passwordPlaceholder": "••••••••",
-          "role": "Rol de Sistema",
-          "specialty": "Especialidad / Área",
-          "specialtyPlaceholder": "Ej. Audiología Clínica",
-          "submit": "Guardar Usuario"
-        },
-        "roles": {
-          "OWNER": "Dueño",
-          "ADMIN": "Administrador",
-          "DOCTOR": "Médico",
-          "STAFF": "Recepcionista / Staff"
-        }
+      "roles": {
+        "OWNER": "Dueño",
+        "ADMIN": "Administrador",
+        "DOCTOR": "Médico",
+        "STAFF": "Recepcionista / Staff"
+      }
+    }
+  },
+  "dashboard": {
+    "greeting": "Buen día",
+    "metrics": {
+      "nextAppointment": "Próxima cita",
+      "noAppointments": "Sin citas pendientes",
+      "completedThisWeek": "Atendidos esta semana",
+      "completedThisWeekSub": "últimos 7 días",
+      "pendingConfirmation": "Por confirmar",
+      "pendingConfirmationSub": "citas tentativas/pendientes"
+    },
+    "appointments": {
+      "title": "Próximas citas de hoy",
+      "viewAll": "Ver agenda completa",
+      "empty": "No hay citas programadas para el resto del día.",
+      "timeEnd": "Fin:",
+      "timeStart": "Inicio"
+    },
+    "quickActions": {
+      "title": "Acciones rápidas",
+      "newPatient": "Nuevo Paciente",
+      "newPatientDesc": "Registrar ingreso al sistema",
+      "newAppointment": "Agendar Cita",
+      "newAppointmentDesc": "Asignar espacio en calendario",
+      "doTest": "Realizar Prueba",
+      "doTestDesc": "Iniciar estudio audiológico",
+      "inventory": "Inventario",
+      "inventoryDesc": "Control de stock y audífonos"
+    }
+  },
+  "appointments": {
+    "list": {
+      "searchPlaceholder": "Buscar paciente...",
+      "newButton": "Nueva Cita",
+      "tableColumns": {
+        "patient": "Paciente",
+        "specialty": "Especialidad / Servicio",
+        "dateTime": "Fecha y Hora",
+        "status": "Estado"
+      },
+      "bulkActions": {
+        "selected": "seleccionada(s)",
+        "changeStatus": "Cambiar estado a...",
+        "apply": "Aplicar"
+      }
+    },
+    "manage": {
+      "back": "Volver",
+      "statusAlert": {
+        "title": "Estado: Tentativa",
+        "subtitle": "Pendiente de confirmar llamada con el paciente."
+      },
+      "actions": {
+        "noAnswer": "No contestó",
+        "confirm": "Confirmar Cita"
+      },
+      "callHistory": {
+        "title": "Intentos de llamada",
+        "noAnswerLabel": "No contestó"
+      },
+      "form": {
+        "adjustDate": "Ajustar Fecha",
+        "adjustTime": "Ajustar Hora",
+        "followUpLog": "Bitácora de Seguimiento",
+        "followUpLogPlaceholder": "Ej: Se llamó 3 veces, el paciente indica que confirmará en la tarde..."
+      }
+    }
+  },
+  "patients": {
+    "list": {
+      "title": "Pacientes",
+      "newButton": "Nuevo Paciente",
+      "searchPlaceholder": "Buscar por nombre...",
+      "columns": {
+        "patient": "Paciente",
+        "phone": "Teléfono",
+        "registeredAt": "Fecha Registro"
+      },
+      "actions": {
+        "viewFile": "Ver Ficha",
+        "edit": "Editar"
+      }
+    }
+  },
+  "controls": {
+    "new": {
+      "followUp": {
+        "title": "Programar Seguimiento",
+        "confirmButton": "Confirmar Fecha",
+        "notesPlaceholder": "Instrucciones para la próxima cita..."
+      },
+      "speciality": {
+        "label": "Especialidad / Motivo"
+      },
+      "examination": {
+        "labelPrefix": "Exploración de",
+        "addAudiometry": "+ Audiometría",
+        "removeAudiometry": "Quitar Audiometría",
+        "otoscopyRight": "Otoscopia Oído Derecho...",
+        "otoscopyLeft": "Otoscopia Oído Izquierdo..."
+      },
+      "diagnosis": {
+        "label": "Diagnóstico y Observaciones",
+        "placeholder": "Escriba el plan de tratamiento o conclusiones..."
+      },
+      "scheduling": {
+        "title": "Programar Seguimiento"
+      },
+      "buttons": {
+        "cancel": "Cancelar",
+        "save": "Guardar Consulta",
+        "saving": "Guardando..."
+      },
+      "history": {
+        "title": "Historial"
       }
     }
   }
