@@ -11,7 +11,7 @@ import {
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { useNavigation } from '@/hooks/use-navigation';
-import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
+import { useAppointmentTypesQuery, AppointmentType } from '@/shared/api/querys/appointment-types-query';
 
 const COLOR_CLASSES: Record<string, string> = {
   blue: 'bg-blue-50 text-blue-600',
@@ -30,7 +30,7 @@ export const AppointmentTypesContainer: React.FC = () => {
   const navigation = useNavigation();
   const { data: appointmentTypes, isLoading } = useAppointmentTypesQuery();
 
-  const filtered = (appointmentTypes ?? []).filter((type) =>
+  const filtered = (appointmentTypes ?? []).filter((type: AppointmentType) =>
     type.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
