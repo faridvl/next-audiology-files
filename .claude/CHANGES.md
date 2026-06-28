@@ -3,8 +3,8 @@
 ## 🎯 SESIÓN ACTIVA — retomar aquí
 
 **Branch activo:** `main`
-**Etapa actual:** Completada — P1-4 selección múltiple y cambio de estado en lote; P2-7 badge Inactivo; P2-10 Google + Apple Calendar; P2-11 notas en agenda; verificados P2-4 y P2-14/P2-15.
-**Próximo paso:** P2-6 (vencimiento garantía WARRANTY en ficha de paciente), P2-8 (recordatorios automáticos por WhatsApp/email).
+**Etapa actual:** Completada — P2-8 reporte PDF de control médico; P3-3 historial clínico configurable con localStorage.
+**Próximo paso:** P2-6 (vencimiento garantía WARRANTY en ficha de paciente), conectar plantillas clínicas a API cuando esté disponible.
 
 **Cola de esta etapa:**
 1. ✅ P1-14 — User detail/edit conectados a `GET /users/:uuid` y `PATCH /users/:uuid` (Identity)

@@ -7,7 +7,6 @@ import {
   Activity,
   Archive,
   ShieldCheck,
-  FileText,
   ClipboardList,
   LayoutTemplate,
 } from 'lucide-react';

@@ -27,6 +27,50 @@
       "settings": "Ajustes"
     }
   },
+  "pdf": {
+    "downloadButton": "Descargar reporte PDF",
+    "generatingButton": "Generando...",
+    "preparingButton": "Preparando PDF...",
+    "notAvailable": "PDF no disponible"
+  },
+  "clinicalTemplates": {
+    "list": {
+      "title": "Plantillas de Historia Clínica",
+      "subtitle": "Define campos personalizados para cada especialidad del tenant.",
+      "newButton": "Nueva plantilla",
+      "emptyTitle": "No hay plantillas creadas aún.",
+      "emptySubtitle": "Crea una plantilla para personalizar los campos del control médico.",
+      "fields": "campos",
+      "field": "campo"
+    },
+    "form": {
+      "createTitle": "Nueva plantilla clínica",
+      "editTitle": "Editar plantilla",
+      "subtitle": "Define los campos personalizados que aparecerán en el formulario de control médico.",
+      "nameLabel": "Nombre de la plantilla",
+      "namePlaceholder": "Ej. Audiología General",
+      "specialityLabel": "Especialidad",
+      "fieldsCount": "Campos de la plantilla",
+      "noFields": "No hay campos aún. Agrega el primero desde el panel inferior.",
+      "addField": {
+        "title": "Agregar campo",
+        "nameLabel": "Nombre del campo",
+        "namePlaceholder": "Ej. Otoscopia OD",
+        "typeLabel": "Tipo de campo",
+        "optionsLabel": "Opciones (separadas por coma)",
+        "optionsPlaceholder": "Ej. Normal, Alterado, Pendiente",
+        "requiredLabel": "Campo obligatorio",
+        "addButton": "Agregar campo"
+      },
+      "saveButton": "Guardar plantilla",
+      "savingButton": "Guardando...",
+      "cancelButton": "Cancelar",
+      "savedSuccess": "Plantilla actualizada correctamente.",
+      "createdSuccess": "Plantilla creada correctamente.",
+      "nameRequired": "El nombre de la plantilla es obligatorio.",
+      "fieldNameRequired": "El nombre del campo es obligatorio."
+    }
+  },
   "users": {
     "list": {
       "title": "Gestión de Usuarios",
