@@ -74,7 +74,7 @@ export const FormField = ({ label, icon: Icon, error, children }: FormFieldProps
 
 export function UserFormContainer() {
   const { t } = useTranslation();
-  const nav = useNavigation();
+  const navigation = useNavigation();
   const { form, onSubmit, isLoading } = useUserForm();
 
   const { register, formState: { errors } } = form;
@@ -156,7 +156,7 @@ export function UserFormContainer() {
           {/* Botón Cancelar: Te regresa a la lista sin guardar */}
           <Button
             variant={ButtonVariant.CANCEL}
-            onClick={() => nav.common.back()}
+            onClick={() => navigation.common.back()}
             type="button"
             disabled={isLoading} // Evitamos que cancelen mientras se está guardando
           >

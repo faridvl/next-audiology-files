@@ -1,20 +1,9 @@
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
-import { Appointment, AppointmentStatus } from '@/types/appointments/appointment';
-import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+import { Appointment, AppointmentStatus, CreateAppointmentPayload } from '@/types/appointments/appointment';
 import { useApiMutation } from '../use-api-mutation';
 
-// TODO(!): Mover este payload al archivo de tipos de appointments
-export type CreateAppointmentPayload = {
-  patientUUID: string;
-  typeUUID: string;
-  speciality: MedicalSpeciality;
-  status: AppointmentStatus;
-  date: string;
-  startTime: string;
-  endTime: string;
-  notes: string;
-};
+export type { CreateAppointmentPayload };
 
 const APPOINTMENTS_URL = env.API.MEDICAL_RECORDS_URL;
 

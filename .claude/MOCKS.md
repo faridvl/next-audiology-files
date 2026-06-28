@@ -115,16 +115,13 @@ const MOCK_DOCUMENTS: DocumentItem[] = [
 
 ## 9. Medical control detail — campos del paciente
 
-**Archivo:** `src/components/containers/control-detail/use-control-detail.ts:39-46`
+**Archivo:** `src/components/containers/control-detail/use-control-detail.ts`
 **Datos hardcodeados:**
 ```ts
-gender: 'MASCULINO',           // TODO: API no retorna gender en Patient
-bloodType: 'NO REGISTRADO',    // TODO: API no retorna bloodType en Patient
-institution: 'CENTRO DE SALUD DIGITAL',  // Mocked
-specialistName: 'DR. SISTEMA GEMINI',    // Mocked
+gender: 'NO REGISTRADO',   // API Patient aún no retorna gender
+bloodType: 'NO REGISTRADO', // API Patient aún no retorna bloodType
 ```
-**Endpoint que debería consumir:** `GET /patients/:uuid` (campos `gender`, `bloodType` no existen en el modelo actual) + `GET /auth/me` para nombre del especialista
-**Estado:** 🔗 parcialmente bloqueado — `gender`/`bloodType` requieren migración de DB; `institution`/`specialistName` pueden venir de `GET /auth/me` / tenant data
+**Estado:** ✅ `institution` ahora viene de `tenant.businessName` (useSession). `specialistName` viene de `user.fullName`. Solo `gender`/`bloodType` siguen como placeholder — requieren migración de DB (P3-7).
 
 ---
 
@@ -146,9 +143,7 @@ observations: 'TODO(!): pendiente de agregar',
 ## 11. Settings page (business configuration)
 
 **Archivo:** `src/pages/settings/index.tsx`
-**Datos hardcodeados:** Inputs con `defaultValue="Centro Auditivo Integral"`. Suscripción muestra "Plan Premium Pro" hardcodeado. Botón "Actualizar Clínica" no conectado.
-**Endpoint que debería consumir:** `GET /auth/me` (para datos del tenant) + endpoint de PATCH tenant (no existe en API)
-**Estado:** 🔗 bloqueado — no hay endpoint para leer/editar datos del tenant
+**Estado:** ✅ `businessName`, `businessType` y `plan` ahora se cargan desde `useSession()` → `GET /auth/me`. El botón "Actualizar Clínica" sigue sin conectar (requiere `PATCH /tenants/:uuid` — P3-8).
 
 ---
 

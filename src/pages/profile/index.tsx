@@ -11,6 +11,7 @@ import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { UserRole } from '@/types/auth/auth';
+import { useSession } from '@/hooks/use-session';
 
 // --- COMPONENTES ATÓMICOS REUTILIZABLES ---
 
@@ -33,6 +34,7 @@ const inputStyles = "w-full pl-12 pr-5 py-3.5 bg-white border border-slate-200 r
 
 const ProfileSettingsPage: React.FC = () => {
     const { t } = useTranslation();
+    const { user, isLoading: isSessionLoading } = useSession();
     const [activeTab, setActiveTab] = useState<'general' | 'medical'>('general');
 
     // Estados funcionales para archivos
@@ -104,11 +106,22 @@ const ProfileSettingsPage: React.FC = () => {
                                         {/* Formulario Unificado de Usuario */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                             <FormField label={t('users.create.form.fullName')} icon={User}>
-                                                <input className={inputStyles} placeholder={t('users.create.form.fullNamePlaceholder')} />
+                                                <input
+                                                    className={inputStyles}
+                                                    placeholder={isSessionLoading ? 'Cargando...' : t('users.create.form.fullNamePlaceholder')}
+                                                    defaultValue={user?.fullName ?? ''}
+                                                    key={user?.fullName}
+                                                />
                                             </FormField>
 
                                             <FormField label={t('users.create.form.email')} icon={Mail}>
-                                                <input type="email" className={inputStyles} placeholder={t('users.create.form.emailPlaceholder')} />
+                                                <input
+                                                    type="email"
+                                                    className={inputStyles}
+                                                    placeholder={t('users.create.form.emailPlaceholder')}
+                                                    defaultValue={user?.email ?? ''}
+                                                    key={user?.email}
+                                                />
                                             </FormField>
 
                                             <FormField label={t('users.create.form.password')} icon={Lock}>
@@ -116,7 +129,7 @@ const ProfileSettingsPage: React.FC = () => {
                                             </FormField>
 
                                             <FormField label={t('users.create.form.role')} icon={ShieldCheck}>
-                                                <select className={inputStyles}>
+                                                <select className={inputStyles} defaultValue={user?.role ?? ''} key={user?.role}>
                                                     <option value={UserRole.DOCTOR}>{t('users.create.roles.DOCTOR')}</option>
                                                     <option value={UserRole.STAFF}>{t('users.create.roles.STAFF')}</option>
                                                     <option value={UserRole.ADMIN}>{t('users.create.roles.ADMIN')}</option>

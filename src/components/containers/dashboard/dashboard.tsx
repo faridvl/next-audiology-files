@@ -9,7 +9,8 @@ import {
     ChevronRight,
     CalendarDays
 } from 'lucide-react';
-import { useDashboard, DashboardAppointment } from './use-dashboard';
+import { useDashboard } from './use-dashboard';
+import { DashboardAppointment } from '@/types/appointments/dashboard-appointment.types';
 
 export const DashboardContainer: React.FC = () => {
     const { userName, todayFormatted, appointments, actions, isLoading } = useDashboard();
@@ -57,7 +58,7 @@ export const DashboardContainer: React.FC = () => {
                                 <Activity size={18} className="text-[#1E3A8A]" />
                             </div>
                             <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="text-slate-800">
-                                Próximas citas de hoy
+                                Próximas appointments de hoy
                             </Typography>
                         </div>
                         <Button
@@ -71,35 +72,35 @@ export const DashboardContainer: React.FC = () => {
 
                     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden divide-y divide-slate-50">
                         {appointments.length > 0 ? (
-                            appointments.map((cita) => (
+                            appointments.map((appointment) => (
                                 <div
-                                    key={cita.id}
-                                    onClick={() => actions.manageAppointment(cita.id)}
+                                    key={appointment.id}
+                                    onClick={() => actions.manageAppointment(appointment.id)}
                                     className="p-6 flex items-center justify-between hover:bg-slate-50/50 transition-all cursor-pointer group"
                                 >
                                     <div className="flex items-center gap-10 flex-1">
                                         <div className="flex flex-col min-w-[85px] border-r border-slate-100">
                                             <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="text-slate-900 text-xl tracking-tight">
-                                                {cita.time}
+                                                {appointment.time}
                                             </Typography>
                                             <Typography variant={TypographyVariant.CAPTION} className="text-slate-400 font-medium">
-                                                {cita.endTime ? `Fin: ${cita.endTime}` : 'Inicio'}
+                                                {appointment.endTime ? `Fin: ${appointment.endTime}` : 'Inicio'}
                                             </Typography>
                                         </div>
 
                                         <div className="space-y-1">
                                             <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="text-slate-800 group-hover:text-[#1E3A8A] transition-colors text-lg">
-                                                {cita.patient}
+                                                {appointment.patient}
                                             </Typography>
                                             <Typography variant={TypographyVariant.CAPTION} className="text-slate-500 font-medium">
-                                                {cita.desc}
+                                                {appointment.description}
                                             </Typography>
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-6">
-                                        <span className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${cita.statusColor}`}>
-                                            {cita.statusLabel}
+                                        <span className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${appointment.statusColor}`}>
+                                            {appointment.statusLabel}
                                         </span>
                                         <div className="h-9 w-9 rounded-full flex items-center justify-center bg-slate-50 group-hover:bg-[#1E3A8A] group-hover:text-white transition-all shadow-sm">
                                             <ChevronRight size={18} />
@@ -110,7 +111,7 @@ export const DashboardContainer: React.FC = () => {
                         ) : (
                             <div className="p-16 text-center bg-slate-50/20">
                                 <Typography variant={TypographyVariant.HELPER} className="text-slate-400">
-                                    No hay citas programadas para el resto del día.
+                                    No hay appointments programadas para el resto del día.
                                 </Typography>
                             </div>
                         )}

@@ -35,13 +35,14 @@ export const PatientListContainer: React.FC = () => {
     const actions = [
         {
             name: 'Ver Ficha',
-            onClick: (row: any) => navigateToDetail(row.uuid),
+            onClick: (row: { uuid: string }) => navigateToDetail(row.uuid),
             icon: <Eye size={14} />,
         },
         {
             name: 'Editar',
             icon: <Edit2 size={14} />,
-            onClick: (row: any) => console.log('Editar', row.uuid),
+            // TODO(!): Conectar a PATCH /patients/:uuid cuando el endpoint esté disponible
+            onClick: (_row: { uuid: string }) => undefined,
         },
     ];
 

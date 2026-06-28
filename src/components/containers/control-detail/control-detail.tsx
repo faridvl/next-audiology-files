@@ -1,12 +1,19 @@
 import React from 'react';
 import {
-    ArrowLeft, User, Calendar, Activity,
-    ShieldCheck, Hash, Phone, Clock, FileText,
-    Download, Printer, Bookmark,
-    Stethoscope
+    ArrowLeft,
+    Download, Printer,
 } from 'lucide-react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { useNavigation } from '@/hooks/use-navigation';
+import { useControlDetail } from './use-control-detail';
+import { useSession } from '@/hooks/use-session';
+import { MedicalSpeciality, AudiologyFindings } from '@/types/medical-controls/medical-control.types';
+
+const specialityLabels: Record<MedicalSpeciality, string> = {
+    [MedicalSpeciality.AUDIOLOGY]: 'Audiología Clínica',
+    [MedicalSpeciality.DENTAL]: 'Odontología',
+    [MedicalSpeciality.GENERAL]: 'Medicina General',
+};
 
 interface Props {
     patientId: string;
@@ -15,33 +22,45 @@ interface Props {
 
 export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }) => {
     const navigation = useNavigation();
+    const { data, isLoading, isError } = useControlDetail(patientId, controlId);
+    const { tenant, user } = useSession();
 
-    // Data Mock
-    const data = {
-        patient: {
-            name: "CARLOS EDUARDO RODRÍGUEZ",
-            age: "45 AÑOS",
-            id: "1-1234-5678",
-            bloodType: "O POSITIVO",
-            phone: "+506 8888-8888",
-            gender: "MASCULINO"
-        },
-        control: {
-            date: '15 FEB 2026',
-            hour: '14:30',
-            speciality: 'AUDIOLOGÍA CLÍNICA',
-            specialist: 'DR. ROBERTO GÓMEZ SOLANO',
-            license: 'COD. MED-7742',
-            institution: 'CENTRO MÉDICO HOSPITALARIO',
-            findings: "Paciente refiere tinnitus leve en oído derecho tras exposición a ruido. En la otoscopia se observa conducto auditivo externo sin obstrucciones, membrana timpánica íntegra y translúcida en ambos oídos. No se observa eritema ni abombamiento.",
-            diagnosis: "HIPOACUSIA NEUROSENSORIAL BILATERAL DE PREDOMINIO DERECHO.",
-            plan: [
-                "Uso de protectores auditivos en ambientes ruidosos.",
-                "Limpieza técnica de moldes y revisión de filtros.",
-                "Reevaluación en 6 meses con nueva audiometría tonal."
-            ],
-            nextAppointment: "15 AGOSTO 2026"
+    if (isLoading) {
+        return (
+            <div className="max-w-5xl mx-auto py-12 px-6">
+                <div className="animate-pulse space-y-4">
+                    <div className="h-8 bg-slate-100 rounded w-1/3" />
+                    <div className="h-64 bg-slate-100 rounded-2xl" />
+                </div>
+            </div>
+        );
+    }
+
+    if (isError || !data) {
+        return (
+            <div className="max-w-5xl mx-auto py-12 px-6 text-center text-slate-400">
+                No se pudo cargar el control médico.
+            </div>
+        );
+    }
+
+    const institutionName = tenant?.businessName?.toUpperCase() ?? 'INSTITUCIÓN MÉDICA';
+    const specialistName = user?.fullName ? `DR. ${user.fullName.toUpperCase()}` : 'ESPECIALISTA';
+    const specialityLabel = specialityLabels[data.control.speciality] ?? data.control.speciality;
+
+    const renderFindings = () => {
+        if (data.control.speciality === MedicalSpeciality.AUDIOLOGY) {
+            const audiologyFindings = data.control.findings as AudiologyFindings;
+            const parts: string[] = [];
+            if (audiologyFindings.otoscopyRight) parts.push(`OD: ${audiologyFindings.otoscopyRight}`);
+            if (audiologyFindings.otoscopyLeft) parts.push(`OI: ${audiologyFindings.otoscopyLeft}`);
+            if (audiologyFindings.tinnitus) parts.push('Tinnitus presente.');
+            if (audiologyFindings.cleaningPerformed) parts.push('Se realizó limpieza.');
+            if (audiologyFindings.usesAuxiliaries) parts.push('Usa auxiliares auditivos.');
+            return parts.join(' ') || '—';
         }
+        const generalFindings = data.control.findings as unknown as Record<string, unknown>;
+        return String(generalFindings.generalFindings ?? '—');
     };
 
     return (
@@ -67,7 +86,7 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
                 {/* ENCABEZADO HOSPITALARIO */}
                 <div className="p-10 border-b-4 border-slate-900 flex justify-between items-start bg-slate-50">
                     <div className="space-y-1">
-                        <p className="text-xl font-black text-slate-900 tracking-tighter uppercase">{data.control.institution}</p>
+                        <p className="text-xl font-black text-slate-900 tracking-tighter uppercase">{institutionName}</p>
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Sistema de Gestión de Expedientes Digitales</p>
                     </div>
                     <div className="text-right">
@@ -79,8 +98,8 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
 
                 {/* BANNER DE DATOS DEL PACIENTE (TABLA TÉCNICA) */}
                 <div className="bg-white grid grid-cols-2 md:grid-cols-4 border-b border-slate-200">
-                    <HeaderCell label="Paciente" value={data.patient.name} className="col-span-2" />
-                    <HeaderCell label="Identificación" value={data.patient.id} />
+                    <HeaderCell label="Paciente" value={data.patient.fullName} className="col-span-2" />
+                    <HeaderCell label="Identificación" value={data.patient.documentId} />
                     <HeaderCell label="Género" value={data.patient.gender} />
                     <HeaderCell label="Edad" value={data.patient.age} />
                     <HeaderCell label="Tipo Sangre" value={data.patient.bloodType} />
@@ -91,6 +110,18 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
                 {/* CUERPO DEL REGISTRO */}
                 <div className="p-12 md:p-16 space-y-12">
 
+                    {/* FILA: ESPECIALISTA */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2">
+                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
+                            Especialista
+                        </div>
+                        <div className="md:col-span-3">
+                            <p className="text-sm font-bold text-slate-900 uppercase tracking-tight">
+                                {specialistName}
+                            </p>
+                        </div>
+                    </div>
+
                     {/* FILA: ESPECIALIDAD */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2">
                         <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
@@ -98,22 +129,22 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
                         </div>
                         <div className="md:col-span-3">
                             <p className="text-sm font-bold text-slate-900 uppercase tracking-tight">
-                                {data.control.speciality}
+                                {specialityLabel}
                             </p>
                         </div>
                     </div>
 
-                    {/* FILA: HALLAZGOS (Mismo peso que el diagnóstico) */}
+                    {/* FILA: HALLAZGOS */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2">
                         <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
                             Notas Clínicas
                         </div>
                         <div className="md:col-span-3 text-slate-600 text-sm leading-relaxed text-justify">
-                            {data.control.findings}
+                            {renderFindings()}
                         </div>
                     </div>
 
-                    {/* FILA: DIAGNÓSTICO (Sin énfasis extra, solo ordenado) */}
+                    {/* FILA: DIAGNÓSTICO */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-slate-50 pt-8">
                         <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
                             Diagnóstico
@@ -121,9 +152,6 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
                         <div className="md:col-span-3">
                             <p className="text-sm font-bold text-slate-900 leading-snug">
                                 {data.control.diagnosis}
-                            </p>
-                            <p className="text-[9px] text-slate-400 font-bold mt-1 uppercase tracking-widest">
-                                Codificación: H90.3 / Confirmado
                             </p>
                         </div>
                     </div>
@@ -135,9 +163,9 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId }
                         </div>
                         <div className="md:col-span-3">
                             <ul className="space-y-3">
-                                {data.control.plan.map((item, i) => (
-                                    <li key={i} className="text-sm text-slate-600 flex items-start gap-3">
-                                        <span className="text-[10px] font-black text-slate-300 pt-0.5">{i + 1}.</span>
+                                {data.control.plan.map((item, index) => (
+                                    <li key={index} className="text-sm text-slate-600 flex items-start gap-3">
+                                        <span className="text-[10px] font-black text-slate-300 pt-0.5">{index + 1}.</span>
                                         {item}
                                     </li>
                                 ))}

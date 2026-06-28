@@ -13,8 +13,8 @@ interface Props {
 }
 
 export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
-    const { states, setters, methods } = useNewControl();
-    const { showHistory, showAudiogram, isFollowUpModalOpen, formData } = states;
+    const { states, setters, methods } = useNewControl(patientId);
+    const { showHistory, showAudiogram, isFollowUpModalOpen, formData, isPending } = states;
 
     // Componente Reutilizable de Seguimiento (Original)
     const FollowUpFields = () => (
@@ -116,12 +116,27 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {formData.speciality === Speciality.AUDIOLOGY ? (
                                     <>
-                                        <textarea className="w-full p-5 rounded-2xl border border-slate-100 bg-slate-50/30 text-sm min-h-[110px] outline-none focus:bg-white focus:border-red-200" placeholder="Otoscopia Oído Derecho..." />
-                                        <textarea className="w-full p-5 rounded-2xl border border-slate-100 bg-slate-50/30 text-sm min-h-[110px] outline-none focus:bg-white focus:border-blue-200" placeholder="Otoscopia Oído Izquierdo..." />
+                                        <textarea
+                                            className="w-full p-5 rounded-2xl border border-slate-100 bg-slate-50/30 text-sm min-h-[110px] outline-none focus:bg-white focus:border-red-200"
+                                            placeholder="Otoscopia Oído Derecho..."
+                                            value={formData.otoscopyRight}
+                                            onChange={(e) => setters.setFormData({ ...formData, otoscopyRight: e.target.value })}
+                                        />
+                                        <textarea
+                                            className="w-full p-5 rounded-2xl border border-slate-100 bg-slate-50/30 text-sm min-h-[110px] outline-none focus:bg-white focus:border-blue-200"
+                                            placeholder="Otoscopia Oído Izquierdo..."
+                                            value={formData.otoscopyLeft}
+                                            onChange={(e) => setters.setFormData({ ...formData, otoscopyLeft: e.target.value })}
+                                        />
                                         {showAudiogram && <div className="col-span-2 pt-2 animate-in slide-in-from-top-4"><AudiometryCapture /></div>}
                                     </>
                                 ) : (
-                                    <textarea className="col-span-2 w-full p-5 rounded-2xl border border-slate-100 bg-slate-50/30 text-sm min-h-[130px] outline-none focus:bg-white focus:border-blue-200" placeholder={`Hallazgos clínicos de ${formData.speciality}...`} />
+                                    <textarea
+                                            className="col-span-2 w-full p-5 rounded-2xl border border-slate-100 bg-slate-50/30 text-sm min-h-[130px] outline-none focus:bg-white focus:border-blue-200"
+                                            placeholder={`Hallazgos clínicos de ${formData.speciality}...`}
+                                            value={formData.generalFindings}
+                                            onChange={(e) => setters.setFormData({ ...formData, generalFindings: e.target.value })}
+                                        />
                                 )}
                             </div>
                         </section>
@@ -132,7 +147,12 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                 <StickyNote size={16} />
                                 <Typography variant={TypographyVariant.CAPTION} className="font-bold uppercase tracking-wider">Diagnóstico y Observaciones</Typography>
                             </div>
-                            <textarea className="w-full p-6 rounded-[2rem] border border-slate-100 bg-slate-50/30 text-sm min-h-[150px] outline-none focus:bg-white focus:ring-4 focus:ring-slate-50 transition-all" placeholder="Escriba el plan de tratamiento o conclusiones..." />
+                            <textarea
+                                className="w-full p-6 rounded-[2rem] border border-slate-100 bg-slate-50/30 text-sm min-h-[150px] outline-none focus:bg-white focus:ring-4 focus:ring-slate-50 transition-all"
+                                placeholder="Escriba el plan de tratamiento o conclusiones..."
+                                value={formData.diagnosis}
+                                onChange={(e) => setters.setFormData({ ...formData, diagnosis: e.target.value })}
+                            />
                         </section>
 
                         {/* SEGUIMIENTO EN PANTALLA */}
@@ -146,8 +166,8 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
 
                         <div className="flex justify-end gap-3 pt-6 border-t border-slate-50">
                             <Button variant={ButtonVariant.CANCEL} text="Cancelar" />
-                            <Button onClick={methods.handleSave} variant={ButtonVariant.PRIMARY} className="!h-12 !px-10 !rounded-xl shadow-lg shadow-blue-200">
-                                <Save size={18} /> Guardar Consulta
+                            <Button onClick={methods.handleSave} variant={ButtonVariant.PRIMARY} className="!h-12 !px-10 !rounded-xl shadow-lg shadow-blue-200" disabled={isPending}>
+                                <Save size={18} /> {isPending ? 'Guardando...' : 'Guardar Consulta'}
                             </Button>
                         </div>
                     </div>

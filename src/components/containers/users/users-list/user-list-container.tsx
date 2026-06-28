@@ -51,7 +51,7 @@ export function InfoTooltip({ title, description }: InfoTooltipProps) {
 
 export function UsersContainer() {
     const { t } = useTranslation();
-    const nav = useNavigation();
+    const navigation = useNavigation();
 
     const {
         users,
@@ -116,12 +116,13 @@ export function UsersContainer() {
         {
             name: 'Editar Usuario',
             icon: <Edit size={14} />,
-            onClick: (row) => nav.users.edit(row.uuid)
+            onClick: (row) => navigation.users.edit(row.uuid)
         },
         {
             name: 'Eliminar',
             icon: <Trash2 size={14} />,
-            onClick: (row) => console.log('Eliminar:', row.uuid)
+            // TODO(!): Conectar a DELETE /users/:uuid cuando el endpoint esté disponible
+            onClick: (_row) => undefined
         },
     ];
 
@@ -139,7 +140,7 @@ export function UsersContainer() {
                     />
                 </div>
 
-                <Button variant={ButtonVariant.PRIMARY} onClick={() => nav.users.create()}>
+                <Button variant={ButtonVariant.PRIMARY} onClick={() => navigation.users.create()}>
                     <UserPlus size={18} className="mr-2" />
                     {t(TEXT.USERS.CREATE.FORM.SUBMIT)}
                 </Button>
@@ -184,7 +185,7 @@ export function UsersContainer() {
                 actions={tableActions}
                 isLoading={isLoading}
                 onPageChange={handlePageChange}
-                onRowClick={(row) => nav.users.detail(row.uuid)}
+                onRowClick={(row) => navigation.users.detail(row.uuid)}
             />
         </div>
     );

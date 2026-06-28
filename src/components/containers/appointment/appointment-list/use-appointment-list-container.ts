@@ -2,26 +2,13 @@ import { useState, useMemo } from 'react';
 import { addDays, startOfWeek, format, addWeeks, subWeeks, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useAppointmentsQuery } from '@/shared/api/querys/appointments-query';
+import { AppointmentStatus } from '@/types/appointments/appointment';
+import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+import { AppointmentUI } from '@/types/appointments/appointment-ui.types';
 
 export enum ViewMode {
   TABLE = 'TABLE',
   WEEKLY = 'WEEKLY',
-}
-
-export enum AppointmentStatus {
-  TENTATIVE = 'TENTATIVE',
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  WAITING = 'WAITING',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
-  EXPIRED = 'EXPIRED',
-}
-
-export enum MedicalSpeciality {
-  AUDIOLOGY = 'AUDIOLOGY',
-  DENTAL = 'DENTAL',
-  GENERAL = 'GENERAL',
 }
 
 export const ALL_STATUSES = 'ALL';
@@ -65,21 +52,7 @@ const specialityMap: Record<string, string> = {
   [MedicalSpeciality.GENERAL]: 'Consulta General',
 };
 
-export interface AppointmentUI {
-  id: string;
-  patient: string;
-  patientUUID: string;
-  phone: string;
-  date: Date;
-  time: string;
-  status: AppointmentStatus;
-  statusLabel: string;
-  statusColor: string;
-  type: string;
-  notes?: string;
-  monthsSinceLastVisit: number;
-  warrantyExpirationDate: string;
-}
+export type { AppointmentUI } from '@/types/appointments/appointment-ui.types';
 
 export const useAppointmentsContainer = () => {
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.WEEKLY);
@@ -97,22 +70,25 @@ export const useAppointmentsContainer = () => {
   const appointments: AppointmentUI[] = useMemo(() => {
     if (!data?.data) return [];
 
-    return data.data.map((raw: any) => {
-      const status = (raw.status as AppointmentStatus) || AppointmentStatus.PENDING;
+    return data.data.map((rawAppointment: Record<string, unknown>) => {
+      const status = (rawAppointment.status as AppointmentStatus) || AppointmentStatus.PENDING;
       const config = statusConfig[status];
+      const schedule = rawAppointment.schedule as Record<string, string>;
+      const service = rawAppointment.service as Record<string, string> | undefined;
+      const patientRecord = rawAppointment.patient as Record<string, string> | undefined;
 
       return {
-        id: raw.id || raw.uuid,
-        patient: raw.patientName || 'Paciente no identificado',
-        patientUUID: raw.patient?.uuid || '',
-        phone: raw.patient?.phone || 'N/A',
-        date: parseISO(raw.schedule.date),
-        time: raw.schedule?.startTime ? format(parseISO(raw.schedule.startTime), 'HH:mm') : '--:--',
+        id: (rawAppointment.id || rawAppointment.uuid) as string,
+        patient: (rawAppointment.patientName as string) || 'Paciente no identificado',
+        patientUUID: (rawAppointment.patientUUID as string) || '',
+        phone: patientRecord?.phone || 'N/A',
+        date: parseISO(schedule.date),
+        time: schedule?.startTime ? format(parseISO(schedule.startTime), 'HH:mm') : '--:--',
         status,
         statusLabel: config.label,
         statusColor: config.color,
-        type: raw.service?.name || specialityMap[raw.speciality] || raw.speciality || 'General',
-        notes: raw.notes,
+        type: service?.name || specialityMap[rawAppointment.speciality as string] || (rawAppointment.speciality as string) || 'General',
+        notes: rawAppointment.notes as string | undefined,
         monthsSinceLastVisit: 0,
         warrantyExpirationDate: 'N/A',
       };
@@ -120,9 +96,9 @@ export const useAppointmentsContainer = () => {
   }, [data]);
 
   const filteredAppointments = useMemo(() => {
-    return appointments.filter((app) => {
-      const matchesSearch = app.patient.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === ALL_STATUSES || app.status === statusFilter;
+    return appointments.filter((appointment) => {
+      const matchesSearch = appointment.patient.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === ALL_STATUSES || appointment.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
   }, [appointments, searchTerm, statusFilter]);
@@ -138,7 +114,7 @@ export const useAppointmentsContainer = () => {
     setStatusFilter,
     selectedAppointment,
     setSelectedAppointment,
-    loading: isLoading,
+    isLoading,
     appointments: filteredAppointments,
     weekRangeLabel: useMemo(() => {
       const start = startOfWeek(currentDate, { weekStartsOn: 1 });
