@@ -10,6 +10,7 @@ export interface Patient {
   tenantId: number;
   tenantUuid: string;
   createdAt: string;
+  linkedProductUuid?: string | null;
 }
 
 export interface CreatePatientPayload {

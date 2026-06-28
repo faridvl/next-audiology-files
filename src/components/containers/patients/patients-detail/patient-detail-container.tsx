@@ -17,12 +17,14 @@ import {
     FileText,
     History,
     ClipboardList,
+    Link,
 } from "lucide-react";
 import { Button, ButtonVariant } from "@/components/common/button/button";
 import { MedicalSpeciality } from "@/types/medical-controls/medical-control.types";
 import { ClinicalControl, ControlType } from "@/types/otros/clinical";
 import { DocumentsContainer } from "../../documents/documents-view";
 import { useSession } from "@/hooks/use-session";
+import { LinkDeviceModal } from "./link-device-modal";
 
 enum PatientTabs {
     HISTORY = 'history',
@@ -71,6 +73,7 @@ const TabButton = ({ label, isActive, onClick }: any) => (
 export const PatientDetailContainer = ({ id }: { id: string }) => {
     const navigation = useNavigation();
     const [activeTab, setActiveTab] = useState<PatientTabs>(PatientTabs.HISTORY);
+    const [isLinkDeviceOpen, setIsLinkDeviceOpen] = useState(false);
     // TODO(!): P3-2-API — El filtro de especialidad en el front es UX adicional.
     // La seguridad real debe implementarse en el API con un guard de especialidad.
     const { user } = useSession();
@@ -91,6 +94,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
     };
 
     return (
+        <>
         <div className="max-w-[1400px] mx-auto p-6 space-y-8 animate-in fade-in duration-500">
 
             {/* PERFIL PACIENTE */}
@@ -111,6 +115,13 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setIsLinkDeviceOpen(true)}
+                        className="flex items-center gap-1.5 border border-slate-200 text-slate-600 px-4 h-10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all"
+                    >
+                        <Link className="h-4 w-4" />
+                        {patient.linkedProductUuid ? 'Cambiar audífono' : 'Vincular audífono'}
+                    </button>
                     <button
                         onClick={() => navigation.patients.ficha(id)}
                         className="flex items-center gap-1.5 border border-slate-200 text-slate-600 px-4 h-10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all"
@@ -214,5 +225,15 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                 )}
             </div>
         </div>
+
+        {isLinkDeviceOpen && (
+            <LinkDeviceModal
+                patientUuid={id}
+                currentLinkedProductUuid={patient.linkedProductUuid}
+                onClose={() => setIsLinkDeviceOpen(false)}
+                onSuccess={() => setIsLinkDeviceOpen(false)}
+            />
+        )}
+    </>
     );
 };

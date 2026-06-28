@@ -1,7 +1,6 @@
 import React from 'react';
 import {
     ArrowLeft,
-    Printer,
 } from 'lucide-react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { useNavigation } from '@/hooks/use-navigation';
@@ -184,9 +183,6 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                     <ArrowLeft size={14} /> Volver al Registro del Paciente
                 </button>
                 <div className="flex items-center gap-4">
-                    <button className="p-2 text-slate-400 hover:text-blue-600 transition-colors">
-                        <Printer size={18} />
-                    </button>
                     {pdfButton}
                 </div>
             </div>

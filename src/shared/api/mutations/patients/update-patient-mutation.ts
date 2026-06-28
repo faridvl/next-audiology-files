@@ -12,6 +12,7 @@ export interface UpdatePatientPayload {
   email?: string;
   gender?: string;
   bloodType?: string;
+  linkedProductUuid?: string | null;
 }
 
 export function useUpdatePatientMutation() {

@@ -47,6 +47,7 @@ export const useNewControl = (patientId: string) => {
 
   // Valores de los campos dinámicos de la plantilla: { fieldId -> value }
   const [dynamicFieldValues, setDynamicFieldValues] = useState<Record<string, string | boolean | number>>({});
+  const [audiogramData, setAudiogramData] = useState<{ OD: Record<number, string>; OI: Record<number, string> }>({ OD: {}, OI: {} });
 
   const [formData, setFormData] = useState({
     speciality: Speciality.AUDIOLOGY,
@@ -115,6 +116,7 @@ export const useNewControl = (patientId: string) => {
         cleaningPerformed: false,
         usesAuxiliaries: false,
         tinnitus: false,
+        audiogram: audiogramData,
       };
     } else {
       findings = { generalFindings: formData.generalFindings };
@@ -166,6 +168,7 @@ export const useNewControl = (patientId: string) => {
       setIsFollowUpModalOpen,
       setFormData,
       setDynamicFieldValue,
+      setAudiogramData,
     },
     methods: { setQuickDate, handleSave },
   };

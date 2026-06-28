@@ -76,14 +76,14 @@ export const ClinicalTemplatesListContainer: React.FC = () => {
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => handleEdit(template.id)}
+                  onClick={() => handleEdit(template.id ?? '')}
                   className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                   title="Editar plantilla"
                 >
                   <Edit2 size={16} />
                 </button>
                 <button
-                  onClick={() => handleDelete(template.id)}
+                  onClick={() => handleDelete(template.id ?? '')}
                   className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                   title="Eliminar plantilla"
                 >

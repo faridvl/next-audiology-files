@@ -14,7 +14,7 @@ import {
 import { PdfReportProps } from '@/types/pdf/report.types';
 
 // Helvetica está incluida en @react-pdf/renderer por defecto
-Font.register({ family: 'Helvetica' });
+Font.register({ family: 'Helvetica', fonts: [{ src: 'Helvetica' }] });
 
 const COLORS = {
   headerBlue: '#1E3A8A',

@@ -145,7 +145,7 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                             value={formData.otoscopyLeft}
                                             onChange={(event) => setters.setFormData({ ...formData, otoscopyLeft: event.target.value })}
                                         />
-                                        {showAudiogram && <div className="col-span-2 pt-2 animate-in slide-in-from-top-4"><AudiometryCapture /></div>}
+                                        {showAudiogram && <div className="col-span-2 pt-2 animate-in slide-in-from-top-4"><AudiometryCapture onChange={setters.setAudiogramData} /></div>}
                                     </>
                                 ) : (
                                     <textarea

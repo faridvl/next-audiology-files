@@ -159,7 +159,7 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
 
               <div className="mt-12 flex gap-4">
                 <Button
-                  variant={ButtonVariant.SECONDARY}
+                  variant={ButtonVariant.CANCEL}
                   type="button"
                   onClick={handleCancel}
                   disabled={isSaving}

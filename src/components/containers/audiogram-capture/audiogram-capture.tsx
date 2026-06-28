@@ -5,8 +5,7 @@ import { AudiogramModal } from "../audiogram-modal/audiogram-modal";
 import { Typography, TypographyVariant } from "@/components/common/typography/typography";
 
 interface AudiometryCaptureProps {
-    /** Callback para comunicar los cambios de datos al formulario principal */
-    onChange?: (data: any) => void;
+    onChange?: (data: { OD: Record<number, string>; OI: Record<number, string> }) => void;
 }
 
 export const AudiometryCapture: React.FC<AudiometryCaptureProps> = ({ onChange }) => {
@@ -35,7 +34,7 @@ export const AudiometryCapture: React.FC<AudiometryCaptureProps> = ({ onChange }
                 side={modalSide || 'OD'}
                 initialPoints={auditData[modalSide || 'OD']}
                 onClose={() => setModalSide(null)}
-                onConfirm={(points: any[]) => {
+                onConfirm={(points: { hz: number; db: number }[]) => {
                     syncFromModal(modalSide!, points);
                     setModalSide(null);
                 }}
