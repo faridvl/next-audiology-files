@@ -50,20 +50,20 @@ export const PatientListContainer: React.FC = () => {
     ];
 
     return (
-        <div className="max-w-[1400px] mx-auto px-6 space-y-6">
-            <div className="flex justify-between items-center mt-8">
-                <h1 className="text-2xl font-bold text-slate-800">{t(TEXT.PATIENTS.LIST.TITLE)}</h1>
+        <div className="max-w-[1400px] mx-auto px-4 md:px-6 space-y-6">
+            <div className="flex justify-between items-center mt-6 md:mt-8">
+                <h1 className="text-xl md:text-2xl font-bold text-slate-800">{t(TEXT.PATIENTS.LIST.TITLE)}</h1>
                 <Button
                     variant={ButtonVariant.PRIMARY}
                     onClick={navigateToCreate}
                 >
-                    <UserPlus size={18} className="mr-2" />
-                    {t(TEXT.PATIENTS.LIST.NEW_BUTTON)}
+                    <UserPlus size={18} className="mr-0 md:mr-2" />
+                    <span className="hidden md:inline">{t(TEXT.PATIENTS.LIST.NEW_BUTTON)}</span>
                 </Button>
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-                <div className="relative w-full md:w-96">
+                <div className="relative w-full">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                     <input
                         type="text"

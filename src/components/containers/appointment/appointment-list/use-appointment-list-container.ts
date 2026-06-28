@@ -66,7 +66,7 @@ export const useAppointmentsContainer = () => {
   const [bulkTargetStatus, setBulkTargetStatus] = useState<AppointmentStatus | ''>('');
   const [isBulkPending, setIsBulkPending] = useState(false);
 
-  const { data, isLoading, refetch } = useAppointmentsQuery(1, 100, currentDate);
+  const { data, isLoading, refetch } = useAppointmentsQuery(1, 200);
   const { executeUpdateAppointment } = useUpdateAppointmentMutation();
 
   const moveWeek = (direction: 'next' | 'prev') => {

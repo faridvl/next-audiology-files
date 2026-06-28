@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useNavigation } from '@/hooks/use-navigation';
 import { useSession } from '@/hooks/use-session';
-import { useAppointmentsQuery } from '@/shared/api/querys/appointments-query';
+import { useAppointmentsByDateQuery } from '@/shared/api/querys/appointments-query';
 import { format, parseISO, subDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
@@ -54,7 +54,7 @@ export function useDashboard() {
     setIsMounted(true);
   }, []);
 
-  const { data, isLoading: appointmentsLoading } = useAppointmentsQuery(1, 5, new Date());
+  const { data, isLoading: appointmentsLoading } = useAppointmentsByDateQuery(1, 5, new Date());
 
   const appointments = useMemo<DashboardAppointment[]>(() => {
     const rawList = Array.isArray(data) ? data : data?.data || [];

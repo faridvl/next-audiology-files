@@ -127,9 +127,9 @@ export function UsersContainer() {
     ];
 
     return (
-        <div className="max-w-[1400px] mx-auto px-6 pb-20">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-6 pb-20">
             {/* Header */}
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex justify-between items-center mb-6 md:mb-8">
                 <div className="flex items-center gap-3">
                     <Typography variant={TypographyVariant.SUBTITLE}>
                         {t(TEXT.USERS.CREATE.LAYOUT_TITLE)}
@@ -141,14 +141,14 @@ export function UsersContainer() {
                 </div>
 
                 <Button variant={ButtonVariant.PRIMARY} onClick={() => navigation.users.create()}>
-                    <UserPlus size={18} className="mr-2" />
-                    {t(TEXT.USERS.CREATE.FORM.SUBMIT)}
+                    <UserPlus size={18} className="mr-0 md:mr-2" />
+                    <span className="hidden md:inline">{t(TEXT.USERS.CREATE.FORM.SUBMIT)}</span>
                 </Button>
             </div>
 
             {/* Filtros */}
-            <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-wrap gap-4 items-center mb-6">
-                <div className="relative flex-1 min-w-[300px]">
+            <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center mb-6">
+                <div className="relative flex-1">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                     <input
                         type="text"
@@ -159,13 +159,13 @@ export function UsersContainer() {
                     />
                 </div>
 
-                <div className="flex gap-1 bg-slate-50 p-1 rounded-xl">
+                <div className="flex gap-1 bg-slate-50 p-1 rounded-xl w-full md:w-auto">
                     {ROLES_FILTER.map(role => (
                         <button
                             key={role}
                             onClick={() => handleRoleChange(role)}
                             className={tailwind(
-                                "px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all",
+                                "flex-1 md:flex-none px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all",
                                 activeRole === role ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
                             )}
                         >

@@ -95,42 +95,44 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
 
     return (
         <>
-        <div className="max-w-[1400px] mx-auto p-6 space-y-8 animate-in fade-in duration-500">
+        <div className="max-w-[1400px] mx-auto p-4 md:p-6 space-y-6 md:space-y-8 animate-in fade-in duration-500">
 
             {/* PERFIL PACIENTE */}
-            <div className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm flex flex-col md:flex-row gap-6 items-center justify-between">
-                <div className="flex flex-col md:flex-row items-center gap-5">
-                    <div className="h-20 w-20 bg-slate-900 rounded-[1.8rem] flex items-center justify-center text-white text-2xl font-black shadow-xl shadow-slate-200">
+            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-4 md:p-6 border border-slate-100 shadow-sm flex flex-col gap-4">
+                {/* Fila superior: avatar + datos */}
+                <div className="flex items-center gap-4">
+                    <div className="h-14 w-14 md:h-20 md:w-20 bg-slate-900 rounded-[1.2rem] md:rounded-[1.8rem] flex items-center justify-center text-white text-xl md:text-2xl font-black shadow-xl shadow-slate-200 shrink-0">
                         {patient.firstName.charAt(0)}
                     </div>
-                    <div className="text-center md:text-left">
-                        <Typography variant={TypographyVariant.HEADER} className="text-2xl font-black text-slate-900 leading-tight">
+                    <div className="min-w-0 flex-1">
+                        <Typography variant={TypographyVariant.HEADER} className="text-lg md:text-2xl font-black text-slate-900 leading-tight truncate">
                             {patient.firstName} {patient.lastName}
                         </Typography>
-                        <div className="flex flex-wrap justify-center md:justify-start gap-x-5 gap-y-1 mt-1">
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
                             <HeaderInfo icon={<IdentificationIcon className="h-3.5 w-3.5" />} text={patient.uuid.split('-')[0].toUpperCase()} />
                             <HeaderInfo icon={<PhoneIcon className="h-3.5 w-3.5" />} text={patient.phone} />
                             <HeaderInfo icon={<EnvelopeIcon className="h-3.5 w-3.5" />} text={patient.email ?? 'Sin correo'} isWarning={!patient.email} />
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
+                {/* Botones — en mobile pasan a fila completa 1 columna */}
+                <div className="flex flex-col sm:flex-row gap-2">
                     <button
                         onClick={() => setIsLinkDeviceOpen(true)}
-                        className="flex items-center gap-1.5 border border-slate-200 text-slate-600 px-4 h-10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all"
+                        className="flex items-center justify-center gap-1.5 border border-slate-200 text-slate-600 px-4 h-10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all flex-1 sm:flex-none"
                     >
-                        <Link className="h-4 w-4" />
-                        {patient.linkedProductUuid ? 'Cambiar audífono' : 'Vincular audífono'}
+                        <Link className="h-4 w-4 shrink-0" />
+                        <span className="truncate">{patient.linkedProductUuid ? 'Cambiar audífono' : 'Vincular audífono'}</span>
                     </button>
                     <button
                         onClick={() => navigation.patients.ficha(id)}
-                        className="flex items-center gap-1.5 border border-slate-200 text-slate-600 px-4 h-10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all"
+                        className="flex items-center justify-center gap-1.5 border border-slate-200 text-slate-600 px-4 h-10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all flex-1 sm:flex-none"
                     >
-                        <ClipboardList className="h-4 w-4" />
-                        Ver ficha completa
+                        <ClipboardList className="h-4 w-4 shrink-0" />
+                        <span className="truncate">Ver ficha completa</span>
                     </button>
-                    <Button variant={ButtonVariant.PRIMARY} className="rounded-xl px-5 h-10 shadow-lg shadow-blue-100" onClick={() => navigation.patients.addControl(id)}>
-                        <PlusIcon className="h-4 w-4 mr-2" />
+                    <Button variant={ButtonVariant.PRIMARY} className="rounded-xl px-5 h-10 shadow-lg shadow-blue-100 flex-1 sm:flex-none" onClick={() => navigation.patients.addControl(id)}>
+                        <PlusIcon className="h-4 w-4 mr-2 shrink-0" />
                         <span className="text-xs font-bold uppercase tracking-tight">Nuevo registro</span>
                     </Button>
                 </div>
@@ -144,17 +146,17 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
             </div>
 
             {/* NAVEGACIÓN INTERNA */}
-            <div className="flex gap-1.5 p-1 bg-slate-100/80 rounded-2xl w-fit">
+            <div className="flex gap-1.5 p-1 bg-slate-100/80 rounded-2xl w-full sm:w-fit">
                 <button
                     onClick={() => setActiveTab(PatientTabs.HISTORY)}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-[1.1rem] transition-all text-xs font-black uppercase tracking-widest
+                    className={`flex items-center justify-center gap-2 flex-1 sm:flex-none px-4 md:px-6 py-2.5 rounded-[1.1rem] transition-all text-xs font-black uppercase tracking-widest
                     ${activeTab === PatientTabs.HISTORY ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                 >
                     <History size={14} /> Historial
                 </button>
                 <button
                     onClick={() => setActiveTab(PatientTabs.DOCUMENTS)}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-[1.1rem] transition-all text-xs font-black uppercase tracking-widest
+                    className={`flex items-center justify-center gap-2 flex-1 sm:flex-none px-4 md:px-6 py-2.5 rounded-[1.1rem] transition-all text-xs font-black uppercase tracking-widest
                     ${activeTab === PatientTabs.DOCUMENTS ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                 >
                     <FileText size={14} /> Documentos
@@ -166,14 +168,14 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                 {activeTab === PatientTabs.HISTORY ? (
                     <div className="space-y-6 animate-in slide-in-from-left-2 duration-300">
                         {/* Filtros Historial */}
-                        <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-4 rounded-[1.8rem] border border-slate-100 shadow-sm">
-                            <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                        <div className="flex flex-col gap-3 bg-white p-4 rounded-[1.8rem] border border-slate-100 shadow-sm">
+                            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
                                 <TabButton label="Todos" isActive={selectedSpec === 'ALL'} onClick={() => setSelectedSpec('ALL')} />
                                 {Object.values(MedicalSpeciality).map((spec) => (
                                     <TabButton key={spec} label={spec} isActive={selectedSpec === spec} onClick={() => setSelectedSpec(spec)} />
                                 ))}
                             </div>
-                            <div className="relative w-full md:w-64">
+                            <div className="relative w-full">
                                 <MagnifyingGlassIcon className="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                                 <input
                                     type="text"
@@ -192,17 +194,17 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                             ) : (
                                 <>
                                     {history.map((record: ClinicalControl) => (
-                                        <div key={record.id} onClick={() => navigation.patients.viewControl(id, record.id)} className="bg-white p-5 rounded-[1.8rem] border border-slate-100 hover:border-blue-300 transition-all flex items-center gap-6 cursor-pointer group">
-                                            <div className="w-32 shrink-0">
+                                        <div key={record.id} onClick={() => navigation.patients.viewControl(id, record.id)} className="bg-white p-4 md:p-5 rounded-[1.5rem] md:rounded-[1.8rem] border border-slate-100 hover:border-blue-300 transition-all flex items-center gap-3 md:gap-6 cursor-pointer group">
+                                            <div className="shrink-0">
                                                 <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-lg border ${getTypeStyle(record.type as ControlType)}`}>
                                                     {record.type}
                                                 </span>
-                                                <p className="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-tight">{record.date}</p>
+                                                <p className="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-tight whitespace-nowrap">{record.date}</p>
                                             </div>
-                                            <div className="flex-1">
-                                                <p className="text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors line-clamp-1">{record.note}</p>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors line-clamp-2">{record.note}</p>
                                             </div>
-                                            <ChevronRightIcon className="h-4 w-4 text-slate-300 group-hover:translate-x-1 transition-transform" />
+                                            <ChevronRightIcon className="h-4 w-4 text-slate-300 group-hover:translate-x-1 transition-transform shrink-0" />
                                         </div>
                                     ))}
                                     {hasMore && (

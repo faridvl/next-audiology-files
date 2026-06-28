@@ -75,32 +75,32 @@ export const InventoryContainer: React.FC = () => {
     const { products, lowStockCount, searchTerm, isLoading } = states;
 
     return (
-        <div className="space-y-10 p-2">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div>
-                    <Typography variant={TypographyVariant.HEADER}>Stock de Productos</Typography>
-                    <Typography variant={TypographyVariant.BODY} textColor="text-slate-400">
-                        {isLoading ? 'Cargando inventario...' :
-                            lowStockCount > 0 ? `Tienes ${lowStockCount} artículos con stock crítico` :
-                                'Todos tus artículos están en niveles óptimos'}
-                    </Typography>
+        <div className="space-y-6 md:space-y-10 p-2">
+            <div className="flex flex-col gap-4">
+                <div className="flex justify-between items-start">
+                    <div>
+                        <Typography variant={TypographyVariant.HEADER}>Stock de Productos</Typography>
+                        <Typography variant={TypographyVariant.BODY} textColor="text-slate-400">
+                            {isLoading ? 'Cargando inventario...' :
+                                lowStockCount > 0 ? `Tienes ${lowStockCount} artículos con stock crítico` :
+                                    'Todos tus artículos están en niveles óptimos'}
+                        </Typography>
+                    </div>
+                    <Button variant={ButtonVariant.PRIMARY} onClick={methods.navigateToCreate} className="py-3 px-4 md:px-8 rounded-2xl shrink-0">
+                        <Plus size={20} className="mr-0 md:mr-2" />
+                        <span className="hidden md:inline"><Typography variant={TypographyVariant.BUTTON_TEXT}>Nuevo Artículo</Typography></span>
+                    </Button>
                 </div>
 
-                <div className="flex items-center gap-4 w-full md:w-auto">
-                    <div className="relative flex-1 md:w-80">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                        <input
-                            type="text"
-                            placeholder="Buscar por código o nombre..."
-                            value={searchTerm}
-                            onChange={(e) => setters.setSearchTerm(e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-100 py-3.5 pl-12 pr-6 rounded-2xl text-sm font-medium focus:bg-white focus:ring-4 focus:ring-blue-500/5 transition-all outline-none"
-                        />
-                    </div>
-                    <Button variant={ButtonVariant.PRIMARY} onClick={methods.navigateToCreate} className="py-4 px-8 rounded-2xl">
-                        <Plus size={20} className="mr-2" />
-                        <Typography variant={TypographyVariant.BUTTON_TEXT}>Nuevo Artículo</Typography>
-                    </Button>
+                <div className="relative w-full">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <input
+                        type="text"
+                        placeholder="Buscar por código o nombre..."
+                        value={searchTerm}
+                        onChange={(e) => setters.setSearchTerm(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-100 py-3.5 pl-12 pr-6 rounded-2xl text-sm font-medium focus:bg-white focus:ring-4 focus:ring-blue-500/5 transition-all outline-none"
+                    />
                 </div>
             </div>
 

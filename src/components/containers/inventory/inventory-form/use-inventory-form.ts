@@ -1,5 +1,5 @@
 import { useState } from 'react';
-
+import { toast } from 'sonner';
 import { useNavigation } from '@/hooks/use-navigation';
 import {
   ProductApiPayload,
@@ -38,7 +38,11 @@ export function useInventoryCreate() {
   const handleSave = () => {
     executeCreateProduct(form, {
       onSuccess: () => {
+        toast.success('Producto creado correctamente.');
         common.back();
+      },
+      onError: () => {
+        toast.error('Error al crear el producto. Verifica los datos e intenta nuevamente.');
       },
     });
   };

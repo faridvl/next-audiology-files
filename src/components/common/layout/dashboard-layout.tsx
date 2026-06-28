@@ -6,6 +6,7 @@ import { BoxedLayoutStyle } from './boxed-container/boxed-container';
 import { MenuAction } from '@/types/system/type-table-actions';
 import useWindowDimensions from '@/hooks/use-windows-dimensions';
 import DesktopSidebar from '../sidebar/desktop-sidebar/desktop-sidebar';
+import MobileBottomNav from '../sidebar/mobile-bottom-nav/mobile-bottom-nav';
 import { SuccessAlert } from '../alerts/success-alert';
 
 export type UseDashboardLayoutHook = {
@@ -70,37 +71,44 @@ export function DashboardLayout({
         )}
       </div>
 
-      {/* Sidebar */}
-      <DesktopSidebar />
+      {/* Sidebar — solo en desktop */}
+      <div className="hidden md:block">
+        <DesktopSidebar />
+      </div>
 
       {/* Main Content */}
-      <div className="flex flex-col flex-1 h-full bg-slate-50 border-l">
+      <div className="flex flex-col flex-1 h-full bg-slate-50 md:border-l overflow-hidden">
 
         {/* Header */}
         <Header title={pageTitle} />
 
-        {/* Content */}
-        <DashboardLayoutContent
-          contentClassNames={contentClassNames}
-          onScroll={onScroll}
-          contentStyle={contentStyle}
-          boxClassName={boxClassName}
-        >
-          {isChildrenRenderProperty
-            ? children({
-              setPageTitle,
-              setHasBackButton,
-              setBackNavigationHandler,
-              setHeaderMenu,
-              setActionsButton,
-              setContentClassNames,
-              setDashBoardPadding,
-              setBoxClassName,
-              setShowSuccess,
-            })
-            : children}
-        </DashboardLayoutContent>
+        {/* Content — con padding-bottom en mobile para no quedar detrás del nav */}
+        <div className="flex-1 overflow-hidden pb-[64px] md:pb-0">
+          <DashboardLayoutContent
+            contentClassNames={contentClassNames}
+            onScroll={onScroll}
+            contentStyle={contentStyle}
+            boxClassName={boxClassName}
+          >
+            {isChildrenRenderProperty
+              ? children({
+                setPageTitle,
+                setHasBackButton,
+                setBackNavigationHandler,
+                setHeaderMenu,
+                setActionsButton,
+                setContentClassNames,
+                setDashBoardPadding,
+                setBoxClassName,
+                setShowSuccess,
+              })
+              : children}
+          </DashboardLayoutContent>
+        </div>
       </div>
+
+      {/* Bottom Nav — solo en mobile */}
+      <MobileBottomNav />
     </div>
   );
 }

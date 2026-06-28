@@ -3,6 +3,7 @@ import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from 'sonner';
 import '../styles/globals.scss';
 import '@/shared/i18n/i18n';
 import { DashboardContextProvider } from '@/layouts/dashboard/dashboard-context';
@@ -61,6 +62,12 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
           </DashboardContextProvider>
         </NavigationContextProvider>
 
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          duration={4000}
+        />
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </>

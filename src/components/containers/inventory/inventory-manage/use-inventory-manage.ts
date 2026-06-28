@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { useNavigation } from '@/hooks/use-navigation';
 import { useProductDetailQuery } from '@/shared/api/querys/inventory/get-product-query';
 import { useUpdateProductMutation } from '@/shared/api/mutations/inventory/inventory-mutation';
@@ -50,7 +51,13 @@ export function useInventoryManage(productId: string) {
     executeUpdateProduct(
       { uuid: productId, payload: form },
       {
-        onSuccess: () => common.back(),
+        onSuccess: () => {
+          toast.success('Producto actualizado correctamente.');
+          common.back();
+        },
+        onError: () => {
+          toast.error('Error al actualizar el producto.');
+        },
       },
     );
   };

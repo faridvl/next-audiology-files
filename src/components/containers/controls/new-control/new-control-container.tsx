@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    Save, Activity, Calendar, StickyNote, Clock, X, Settings, ChevronRight
+    Save, Activity, Calendar, StickyNote, Clock, X, ChevronRight, ArrowRight
 } from 'lucide-react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
@@ -9,6 +9,8 @@ import { AudiometryCapture } from '@/components/containers/audiogram-capture/aud
 import { PatientSummaryHeader } from '@/components/containers/patient-summary/patent-summary-header';
 import { useNewControl, Speciality } from './use-new-control';
 import { TEXT } from '@/static/texts/i18n';
+import { useMedicalControlsQuery } from '@/shared/api/querys/medical-controls-query';
+import { useNavigation } from '@/hooks/use-navigation';
 
 interface Props {
     patientId: string;
@@ -16,7 +18,9 @@ interface Props {
 
 export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
     const { t } = useTranslation();
+    const navigation = useNavigation();
     const { states, setters, methods } = useNewControl(patientId);
+    const { data: historyData } = useMedicalControlsQuery(patientId, 1, 5);
     const {
         showHistory,
         showAudiogram,
@@ -80,8 +84,8 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                 </div>
             )}
 
-            <div className="flex gap-8 max-w-[1600px] mx-auto pb-20 px-6">
-                <div className={`flex-1 transition-all duration-700 ${showHistory ? 'max-w-[65%]' : 'max-w-4xl mx-auto'}`}>
+            <div className="flex gap-4 md:gap-8 max-w-[1600px] mx-auto pb-20 px-4 md:px-6">
+                <div className={`flex-1 transition-all duration-700 min-w-0 ${showHistory ? 'md:max-w-[65%]' : 'max-w-4xl mx-auto'}`}>
 
                     <PatientSummaryHeader
                         patientId={patientId}
@@ -90,7 +94,7 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                         showHistory={showHistory}
                     />
 
-                    <div className="space-y-6 bg-white border border-slate-100 p-10 rounded-[3rem] shadow-xl shadow-slate-200/20">
+                    <div className="space-y-6 bg-white border border-slate-100 p-5 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-xl shadow-slate-200/20">
                         {/* SELECTOR ESPECIALIDAD */}
                         <section className="space-y-3">
                             <Typography variant={TypographyVariant.CAPTION} className="text-slate-400 font-bold uppercase tracking-wider ml-1">
@@ -299,25 +303,46 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                     </div>
                 </div>
 
-                {/* HISTORIAL */}
+                {/* HISTORIAL — oculto en mobile para no colapsar el layout */}
                 {showHistory && (
-                    <div className="w-[35%] space-y-4 h-[calc(100vh-140px)] sticky top-24 overflow-y-auto pr-2">
+                    <div className="hidden md:block w-[35%] space-y-4 h-[calc(100vh-140px)] sticky top-24 overflow-y-auto pr-2">
                         <div className="flex items-center justify-between mb-4">
                             <Typography variant={TypographyVariant.SUBTITLE}>{t(TEXT.CONTROLS.NEW.HISTORY.TITLE)}</Typography>
-                            <Settings size={16} className="text-slate-300" />
+                            <button
+                                onClick={() => navigation.patients.detail(patientId)}
+                                className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 hover:text-blue-600 transition-colors"
+                            >
+                                Ver todo <ArrowRight size={12} />
+                            </button>
                         </div>
-                        {[1, 2, 3].map(index => (
-                            <div key={index} className="p-5 bg-white rounded-2xl border border-slate-100 shadow-sm group hover:border-blue-200 transition-all">
-                                <div className="flex justify-between mb-2">
-                                    <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md uppercase">Consulta</span>
-                                    <span className="text-[10px] text-slate-400 font-medium">10/02/2026</span>
-                                </div>
-                                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed italic">El paciente presenta buena evolución, se recomienda continuar con el uso de auxiliares...</p>
-                                <div className="mt-3 flex items-center text-[10px] font-bold text-slate-400 group-hover:text-blue-500 cursor-pointer">
-                                    VER DETALLES <ChevronRight size={12} />
-                                </div>
+                        {!historyData?.data?.length ? (
+                            <div className="py-10 text-center text-slate-300 text-xs font-bold uppercase tracking-widest">
+                                Sin registros previos
                             </div>
-                        ))}
+                        ) : (
+                            historyData.data.map((record: any) => (
+                                <div
+                                    key={record.uuid}
+                                    onClick={() => navigation.patients.viewControl(patientId, record.uuid)}
+                                    className="p-5 bg-white rounded-2xl border border-slate-100 shadow-sm group hover:border-blue-200 transition-all cursor-pointer"
+                                >
+                                    <div className="flex justify-between mb-2">
+                                        <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md uppercase">
+                                            {record.header?.speciality ?? 'Consulta'}
+                                        </span>
+                                        <span className="text-[10px] text-slate-400 font-medium">
+                                            {new Date(record.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed italic">
+                                        {record.clinicalData?.diagnosis || 'Sin diagnóstico registrado'}
+                                    </p>
+                                    <div className="mt-3 flex items-center gap-1 text-[10px] font-bold text-slate-400 group-hover:text-blue-500 transition-colors">
+                                        Ver detalles <ChevronRight size={12} />
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 )}
             </div>

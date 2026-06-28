@@ -4,20 +4,29 @@ import Link from 'next/link';
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
 import { useHeader } from './use-header';
 import { Typography, TypographyVariant } from '../typography/typography';
+import { routesPrivate } from '@/shared/navigation/routes';
 
 export function Header({ title }: { title?: string }) {
   const { userName, userRole, initials, isLoading, handleLogout } = useHeader();
 
   return (
     <header className="h-16 border-b border-slate-100 bg-white/90 backdrop-blur-sm sticky top-0 z-40">
-      <div className="h-full px-6 flex items-center justify-between">
+      <div className="h-full px-4 md:px-6 flex items-center justify-between gap-3">
+
+        {/* Logo mobile — solo visible cuando el sidebar está oculto */}
+        <Link href={routesPrivate.dashboard} className="md:hidden flex items-center gap-2 shrink-0">
+          <div className="h-8 w-8 bg-[#1E3A8A] rounded-xl flex items-center justify-center text-white font-extrabold text-xs">
+            Z
+          </div>
+          <span className="text-sm font-black text-slate-800 tracking-tight">Zynka</span>
+        </Link>
 
         {/* Title Section */}
-        <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4 flex-1 min-w-0">
           {title && (
             <Typography
               variant={TypographyVariant.ACCENT}
-              className="text-slate-900"
+              className="text-slate-900 truncate"
             >
               {title}
             </Typography>

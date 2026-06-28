@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { toast } from 'sonner';
 import { useCreateAppointmentTypeMutation } from '@/shared/api/mutations/appointment-types/create-appointment-type-mutation';
 import { useNavigation } from '@/hooks/use-navigation';
 
@@ -27,7 +28,15 @@ export function useAppointmentTypeForm() {
   const handleSubmit = (values: AppointmentTypeFormValues) => {
     executeCreate(
       { name: values.name, duration: values.duration, color: values.color },
-      { onSuccess: () => navigation.appointmentType.list() },
+      {
+        onSuccess: () => {
+          toast.success('Tipo de cita creado correctamente.');
+          navigation.appointmentType.list();
+        },
+        onError: () => {
+          toast.error('Error al crear el tipo de cita.');
+        },
+      },
     );
   };
 

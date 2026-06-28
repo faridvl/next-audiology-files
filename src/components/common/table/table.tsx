@@ -52,7 +52,64 @@ export function Table({
     return (
         <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm overflow-hidden">
 
-            <div className="overflow-x-auto">
+            {/* VISTA MOBILE — cards */}
+            <div className="md:hidden">
+                {data.length > 0 ? (
+                    <div className="divide-y divide-slate-50">
+                        {data.map((item, rowIndex) => (
+                            <div
+                                key={item.id || rowIndex}
+                                onClick={() => onRowClick?.(item)}
+                                className={tailwind(
+                                    'p-4 space-y-2 transition-all duration-200',
+                                    onRowClick && 'cursor-pointer active:bg-slate-50'
+                                )}
+                            >
+                                {columns
+                                    .filter((column) => column.header && item[column.accessor] !== undefined && item[column.accessor] !== null)
+                                    .map((column) => (
+                                        <div key={column.accessor} className="flex items-start gap-2">
+                                            {column.header && (
+                                                <Typography
+                                                    variant={TypographyVariant.OVERLINE}
+                                                    inline
+                                                    className="text-[10px] text-slate-400 shrink-0 w-24"
+                                                >
+                                                    {column.header}
+                                                </Typography>
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                                <Typography
+                                                    variant={TypographyVariant.BODY}
+                                                    className="text-slate-700 break-words"
+                                                >
+                                                    {item[column.accessor]}
+                                                </Typography>
+                                            </div>
+                                        </div>
+                                    ))}
+                                {actions.length > 0 && (
+                                    <div
+                                        className="flex justify-end pt-2"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <ToggleMenu actions={actions} rowData={item} />
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="px-6 py-12 text-center">
+                        <Typography variant={TypographyVariant.HELPER}>
+                            No se encontraron resultados
+                        </Typography>
+                    </div>
+                )}
+            </div>
+
+            {/* VISTA DESKTOP — tabla */}
+            <div className="hidden md:block overflow-x-auto">
                 <table className="w-full border-collapse">
 
                     {/* HEADER */}

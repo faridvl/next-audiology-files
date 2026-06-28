@@ -2,6 +2,7 @@ import * as Yup from 'yup';
 import { useRouter } from 'next/router';
 import { useCreatePatientMutation } from '@/shared/api/mutations/patients/create-patients-mutation';
 import { CreatePatientPayload } from '@/types/patients/patient';
+import { toast } from 'sonner';
 
 export type PatientFormValues = {
   firstName: string;
@@ -77,9 +78,13 @@ export function usePatientForm(onSuccess?: () => void) {
 
     executeCreatePatient(payload, {
       onSuccess: () => {
+        toast.success('Paciente registrado correctamente.');
         resetForm();
         if (onSuccess) onSuccess();
         router.push('/patients');
+      },
+      onError: () => {
+        toast.error('Error al registrar el paciente. Verifica los datos e intenta nuevamente.');
       },
     });
   };

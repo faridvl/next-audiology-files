@@ -37,38 +37,44 @@ export const AppointmentsView: React.FC = () => {
         <div className="flex flex-col h-[calc(100vh-140px)] gap-4 p-2 overflow-hidden relative">
 
             {/* HEADER CON FILTROS DINÁMICOS */}
-            <div className="bg-white p-4 rounded-[24px] border border-slate-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                    <div className="flex bg-slate-100 p-1 rounded-xl shadow-inner">
-                        <button
-                            onClick={() => setViewMode(ViewMode.WEEKLY)}
-                            className={`p-2 rounded-lg transition-all ${viewMode === ViewMode.WEEKLY ? 'bg-white shadow-sm text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
-                        >
-                            <CalendarIcon size={18} />
-                        </button>
-                        <button
-                            onClick={() => setViewMode(ViewMode.TABLE)}
-                            className={`p-2 rounded-lg transition-all ${viewMode === ViewMode.TABLE ? 'bg-white shadow-sm text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
-                        >
-                            <List size={18} />
-                        </button>
-                    </div>
+            <div className="bg-white p-4 rounded-[24px] border border-slate-100 shadow-sm flex flex-col gap-3">
+                {/* Fila 1: toggle vista + navegación semana + botón nuevo */}
+                <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                        <div className="flex bg-slate-100 p-1 rounded-xl shadow-inner">
+                            <button
+                                onClick={() => setViewMode(ViewMode.WEEKLY)}
+                                className={`p-2 rounded-lg transition-all ${viewMode === ViewMode.WEEKLY ? 'bg-white shadow-sm text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                <CalendarIcon size={18} />
+                            </button>
+                            <button
+                                onClick={() => setViewMode(ViewMode.TABLE)}
+                                className={`p-2 rounded-lg transition-all ${viewMode === ViewMode.TABLE ? 'bg-white shadow-sm text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                <List size={18} />
+                            </button>
+                        </div>
 
-                    {viewMode === ViewMode.WEEKLY && (
-                        <div className="flex items-center gap-3 border-l pl-4 border-slate-100">
-                            <div className="flex gap-1">
+                        {viewMode === ViewMode.WEEKLY && (
+                            <div className="flex items-center gap-2 border-l pl-3 border-slate-100">
                                 <button onClick={() => moveWeek('prev')} className="p-1.5 hover:bg-slate-50 rounded-md text-slate-400 transition-colors"><ChevronLeft size={18} /></button>
                                 <button onClick={() => moveWeek('next')} className="p-1.5 hover:bg-slate-50 rounded-md text-slate-400 transition-colors"><ChevronRight size={18} /></button>
+                                <Typography variant={TypographyVariant.BODY_BOLD} className="text-slate-700 text-xs md:text-sm whitespace-nowrap hidden sm:block">
+                                    {weekRangeLabel}
+                                </Typography>
                             </div>
-                            <Typography variant={TypographyVariant.BODY_BOLD} className="text-slate-700 text-sm whitespace-nowrap min-w-[120px]">
-                                {weekRangeLabel}
-                            </Typography>
-                        </div>
-                    )}
+                        )}
+                    </div>
+
+                    <Button variant={ButtonVariant.PRIMARY} className="rounded-xl h-10 shadow-lg shadow-blue-500/10 shrink-0" onClick={navigation.appointments.create}>
+                        <Plus size={18} /> <span className="hidden lg:inline ml-1">{t(TEXT.APPOINTMENTS.LIST.NEW_BUTTON)}</span>
+                    </Button>
                 </div>
 
-                <div className="flex items-center gap-3 w-full md:w-auto">
-                    <div className="relative flex-1 md:w-64 group">
+                {/* Fila 2: búsqueda + filtro estado — 1 columna en mobile */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div className="relative flex-1 group">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={16} />
                         <input
                             type="text"
@@ -79,12 +85,11 @@ export const AppointmentsView: React.FC = () => {
                         />
                     </div>
 
-                    {/* SELECT DINÁMICO */}
                     <div className="relative">
                         <select
                             value={statusFilter}
                             onChange={(event) => setStatusFilter(event.target.value)}
-                            className="appearance-none pl-4 pr-10 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 outline-none cursor-pointer hover:border-blue-300 transition-colors"
+                            className="w-full sm:w-auto appearance-none pl-4 pr-10 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 outline-none cursor-pointer hover:border-blue-300 transition-colors"
                         >
                             {Object.entries(statusConfig).map(([key, value]) => (
                                 <option key={key} value={key}>{value.label}</option>
@@ -92,10 +97,6 @@ export const AppointmentsView: React.FC = () => {
                         </select>
                         <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                     </div>
-
-                    <Button variant={ButtonVariant.PRIMARY} className="rounded-xl h-10 shadow-lg shadow-blue-500/10" onClick={navigation.appointments.create}>
-                        <Plus size={18} /> <span className="hidden lg:inline ml-1">{t(TEXT.APPOINTMENTS.LIST.NEW_BUTTON)}</span>
-                    </Button>
                 </div>
             </div>
 
@@ -103,9 +104,9 @@ export const AppointmentsView: React.FC = () => {
             <div className="flex-1 flex gap-4 overflow-hidden">
                 <div className={`flex-1 bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden flex flex-col ${isLoading ? 'opacity-60 cursor-wait' : ''}`}>
                     {viewMode === ViewMode.WEEKLY ? (
-                        <div className="grid grid-cols-7 h-full divide-x divide-slate-100 overflow-y-auto scrollbar-hide">
+                        <div className="flex md:grid md:grid-cols-7 h-full divide-x divide-slate-100 overflow-x-auto overflow-y-auto scrollbar-hide">
                             {daysOfCurrentWeek.map((day, i) => (
-                                <div key={i} className={`flex flex-col min-w-[140px] ${isSameDay(day, new Date()) ? 'bg-blue-50/5' : ''}`}>
+                                <div key={i} className={`flex flex-col min-w-[120px] md:min-w-[140px] shrink-0 md:shrink ${isSameDay(day, new Date()) ? 'bg-blue-50/5' : ''}`}>
                                     <div className={`p-4 border-b border-slate-50 text-center sticky top-0 bg-white/80 backdrop-blur-sm z-10 ${isSameDay(day, new Date()) ? 'border-b-blue-100' : ''}`}>
                                         <Typography variant={TypographyVariant.CAPTION} className={`uppercase font-black text-[10px] tracking-widest ${isSameDay(day, new Date()) ? 'text-blue-500' : 'text-slate-300'}`}>
                                             {format(day, 'eee', { locale: es })}
