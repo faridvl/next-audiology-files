@@ -17,7 +17,15 @@ interface Props {
 export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
     const { t } = useTranslation();
     const { states, setters, methods } = useNewControl(patientId);
-    const { showHistory, showAudiogram, isFollowUpModalOpen, formData, isPending } = states;
+    const {
+        showHistory,
+        showAudiogram,
+        isFollowUpModalOpen,
+        formData,
+        isPending,
+        activeTemplate,
+        dynamicFieldValues,
+    } = states;
 
     // Componente Reutilizable de Seguimiento
     const FollowUpFields = () => (
@@ -149,6 +157,106 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                 )}
                             </div>
                         </section>
+
+                        {/* CAMPOS DINÁMICOS DE PLANTILLA CLÍNICA (P3-3) */}
+                        {/* TODO(!): P3-3 — Implementar GET /clinical-templates en API para persistencia real. */}
+                        {activeTemplate && activeTemplate.fields.length > 0 && (
+                            <section className="space-y-4 pt-4 border-t border-slate-50">
+                                <div className="flex items-center gap-2 ml-1">
+                                    <Typography variant={TypographyVariant.CAPTION} className="text-slate-400 font-bold uppercase tracking-wider">
+                                        {activeTemplate.name}
+                                    </Typography>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {activeTemplate.fields.map((field) => {
+                                        const currentValue = dynamicFieldValues[field.id] ?? '';
+                                        const inputBaseClass = 'w-full px-4 py-3 rounded-xl border border-slate-100 bg-slate-50/30 text-sm outline-none focus:bg-white focus:border-blue-300 transition-colors';
+                                        return (
+                                            <div key={field.id} className={field.fieldType === 'textarea' ? 'col-span-2' : ''}>
+                                                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">
+                                                    {field.label}
+                                                    {field.required && <span className="text-red-400 ml-1">*</span>}
+                                                </label>
+                                                {field.fieldType === 'textarea' && (
+                                                    <textarea
+                                                        className={`${inputBaseClass} min-h-[90px]`}
+                                                        placeholder={field.label}
+                                                        value={String(currentValue)}
+                                                        onChange={(event) =>
+                                                            setters.setDynamicFieldValue(field.id, event.target.value)
+                                                        }
+                                                    />
+                                                )}
+                                                {field.fieldType === 'text' && (
+                                                    <input
+                                                        type="text"
+                                                        className={inputBaseClass}
+                                                        placeholder={field.label}
+                                                        value={String(currentValue)}
+                                                        onChange={(event) =>
+                                                            setters.setDynamicFieldValue(field.id, event.target.value)
+                                                        }
+                                                    />
+                                                )}
+                                                {field.fieldType === 'number' && (
+                                                    <input
+                                                        type="number"
+                                                        className={inputBaseClass}
+                                                        placeholder={field.label}
+                                                        value={String(currentValue)}
+                                                        onChange={(event) =>
+                                                            setters.setDynamicFieldValue(field.id, Number(event.target.value))
+                                                        }
+                                                    />
+                                                )}
+                                                {field.fieldType === 'date' && (
+                                                    <input
+                                                        type="date"
+                                                        className={inputBaseClass}
+                                                        value={String(currentValue)}
+                                                        onChange={(event) =>
+                                                            setters.setDynamicFieldValue(field.id, event.target.value)
+                                                        }
+                                                    />
+                                                )}
+                                                {field.fieldType === 'boolean' && (
+                                                    <div className="flex items-center gap-3 py-2">
+                                                        <input
+                                                            type="checkbox"
+                                                            id={`field-${field.id}`}
+                                                            checked={Boolean(currentValue)}
+                                                            onChange={(event) =>
+                                                                setters.setDynamicFieldValue(field.id, event.target.checked)
+                                                            }
+                                                            className="w-4 h-4 rounded border-slate-300"
+                                                        />
+                                                        <label htmlFor={`field-${field.id}`} className="text-sm text-slate-600">
+                                                            {field.label}
+                                                        </label>
+                                                    </div>
+                                                )}
+                                                {field.fieldType === 'select' && field.options && (
+                                                    <select
+                                                        className={`${inputBaseClass} bg-white`}
+                                                        value={String(currentValue)}
+                                                        onChange={(event) =>
+                                                            setters.setDynamicFieldValue(field.id, event.target.value)
+                                                        }
+                                                    >
+                                                        <option value="">— Seleccionar —</option>
+                                                        {field.options.map((option) => (
+                                                            <option key={option} value={option}>
+                                                                {option}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </section>
+                        )}
 
                         {/* COMENTARIOS FINALES */}
                         <section className="space-y-3 pt-4">

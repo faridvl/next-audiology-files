@@ -75,7 +75,7 @@ export function usePatientDetail(uuid: string, userSpecialty?: string) {
         // Nota: Si createdAt no es suficiente, se puede usar el timestamp original
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     );
-  }, [allRecords, searchTerm, selectedSpec]);
+  }, [allRecords, searchTerm, selectedSpec, userSpecialty]);
 
   // --- RESUMEN (SUMMARY) ---
   const summary = {
