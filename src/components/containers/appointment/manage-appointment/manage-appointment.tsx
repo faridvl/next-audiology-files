@@ -5,7 +5,9 @@ import { Button, ButtonVariant } from "@/components/common/button/button";
 import { useManageAppointment } from './use-manage-appointment';
 
 export const ManageAppointmentContainer: React.FC<{ id: string }> = ({ id }) => {
-    const { formData, setFormData, loading, handleNoAnswer, handleConfirm, navigation } = useManageAppointment(id);
+    const { formData, setFormData, isLoading, isPending, handleNoAnswer, handleConfirm, navigation } = useManageAppointment(id);
+
+    if (isLoading) return <div className="max-w-3xl mx-auto py-6 animate-pulse h-96 bg-slate-100 rounded-[40px]" />;
 
     return (
         <div className="max-w-3xl mx-auto py-6">
@@ -27,6 +29,7 @@ export const ManageAppointmentContainer: React.FC<{ id: string }> = ({ id }) => 
                             variant={ButtonVariant.CANCEL}
                             className="bg-white text-red-500 border-red-100 gap-2"
                             onClick={handleNoAnswer}
+                            disabled={isPending}
                         >
                             <PhoneOff size={16} /> No contestó
                         </Button>
@@ -34,6 +37,7 @@ export const ManageAppointmentContainer: React.FC<{ id: string }> = ({ id }) => 
                             variant={ButtonVariant.PRIMARY}
                             className="bg-green-600 hover:bg-green-700 gap-2"
                             onClick={handleConfirm}
+                            disabled={isPending}
                         >
                             <CheckCircle2 size={16} /> Confirmar Cita
                         </Button>
