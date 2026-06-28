@@ -3,7 +3,7 @@
 ## 🎯 SESIÓN ACTIVA — retomar aquí
 
 **Branch activo:** `fix/p0-1-appointment-times-patient-name`
-**Etapa actual:** Completada — P1-3 AppointmentTypes CRUD implementado en API y conectado al site.  
+**Etapa actual:** Completada — Multi-especialidad: tenant businessType expuesto en API, Settings y control-detail conectados al tenant real, new-control con default por especialidad del tenant.
 **Próximo paso:** P1-4/P1-5 (filtro de estado y registro de llamadas) o P1-8 (última audiometría en detalle de paciente).
 
 **Cola de esta etapa:**
@@ -15,6 +15,7 @@
 6. ✅ P1-12 — `DELETE /appointments/:uuid` habilitado (use case creado + controlador + módulo)
 7. ✅ P1-13 — Perfil pre-llena nombre/email/rol desde `GET /auth/me`
 8. ✅ P1-3 — AppointmentTypes CRUD: `GET/POST /appointment-types` en API + listado y form conectados en site + UUID hardcodeado eliminado de nueva cita
+9. ✅ MULTI-ESP — `businessType` expuesto en `GET /auth/me`; Settings lee nombre/tipo real del tenant; new-control arranca con especialidad del tenant; control-detail muestra institución y especialista reales desde sesión; renderiza findings por especialidad
 
 **Cambios de esta etapa:**
 
@@ -42,6 +43,13 @@
 | `src/components/containers/controls/new-control/new-control-container.tsx` | Site | Textareas vinculados; botón con isPending |
 | `src/pages/controls/[id]/index.tsx` | Site | Usa `NewControlContainer` (v2) en lugar de v1 |
 | `src/pages/profile/index.tsx` | Site | Pre-llena nombre/email/rol desde `useSession()` |
+| `packages/identity/src/domain/types/auth.types.ts` | API | `TenantDomain` incluye `businessType?: string` |
+| `packages/identity/src/infrastructure/adapters/tenant.storage.ts` | API | `findByUuid` retorna `businessType` desde la DB |
+| `src/types/auth/auth.ts` | Site | `TenantDomain` incluye `businessType?: string` |
+| `src/pages/settings/index.tsx` | Site | Lee `businessName`, `businessType` y `plan` reales del tenant vía `useSession()` |
+| `src/components/containers/controls/new-control/use-new-control.ts` | Site | Default de especialidad basado en `tenant.businessType`; `specialityMap` refactorizado |
+| `src/components/containers/control-detail/use-control-detail.ts` | Site | Elimina campos institution/specialistName mocked; `findings` tipado como `Record<string,unknown>` |
+| `src/components/containers/control-detail/control-detail.tsx` | Site | Conectado a `useControlDetail` + `useSession`; institución y especialista desde tenant/user; rendering condicional de findings por especialidad |
 
 **Estándares activos (ver `.claude/PATTERNS.md` reglas 7-12):**
 - Sin abreviaciones en variables

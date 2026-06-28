@@ -4,12 +4,26 @@ import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { useSession } from '@/hooks/use-session';
 import {
   Building2, CreditCard, PenTool, Check,
   MapPin, FileText, Globe, Upload
 } from 'lucide-react';
 
-const CompactInput = ({ label, defaultValue, placeholder }: any) => (
+const specialityLabels: Record<string, string> = {
+  AUDIOLOGY: 'Audiología',
+  DENTAL: 'Odontología',
+  GENERAL: 'Medicina General',
+  DERMA: 'Dermatología',
+};
+
+const CompactInput = ({ label, defaultValue, placeholder, value, onChange }: {
+  label: string;
+  defaultValue?: string;
+  placeholder?: string;
+  value?: string;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}) => (
   <div className="flex flex-col gap-1 w-full">
     <Typography variant={TypographyVariant.OVERLINE} className="ml-1 !text-slate-400 !text-[9px]">
       {label}
@@ -17,12 +31,14 @@ const CompactInput = ({ label, defaultValue, placeholder }: any) => (
     <input
       defaultValue={defaultValue}
       placeholder={placeholder}
+      value={value}
+      onChange={onChange}
       className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:border-[#1E3A8A] focus:bg-white transition-all text-slate-700"
     />
   </div>
 );
 
-const SectionHeader = ({ icon: Icon, title }: any) => (
+const SectionHeader = ({ icon: Icon, title }: { icon: React.ElementType; title: string }) => (
   <div className="flex items-center gap-2 mb-6 border-b border-slate-50 pb-3">
     <Icon size={16} className="text-[#1E3A8A]" strokeWidth={2.5} />
     <Typography variant={TypographyVariant.OVERLINE} className="!text-slate-900">
@@ -32,6 +48,13 @@ const SectionHeader = ({ icon: Icon, title }: any) => (
 );
 
 const BusinessSettingsPage: React.FC = () => {
+  const { tenant, isLoading } = useSession();
+
+  const businessName = tenant?.businessName ?? '';
+  const businessType = tenant?.businessType ?? '';
+  const specialityLabel = specialityLabels[businessType] ?? businessType;
+  const planLabel = tenant?.plan ?? 'FREE';
+
   return (
     <>
       <Head><title>Configuración de Clínica | Zynka</title></Head>
@@ -49,7 +72,11 @@ const BusinessSettingsPage: React.FC = () => {
                 <Typography variant={TypographyVariant.CAPTION} className="!text-[8px] font-black uppercase mt-1">Logo</Typography>
               </div>
               <div className="w-full">
-                <CompactInput label="Nombre Comercial de la Clínica" defaultValue="Centro Auditivo Integral" />
+                <CompactInput
+                  label="Nombre Comercial de la Clínica"
+                  defaultValue={isLoading ? '' : businessName}
+                  placeholder={isLoading ? 'Cargando...' : 'Nombre de la clínica'}
+                />
               </div>
             </div>
 
@@ -57,6 +84,16 @@ const BusinessSettingsPage: React.FC = () => {
               <CompactInput label="Razón Social / Nombre Legal" placeholder="Zynka Health S.A." />
               <CompactInput label="ID Fiscal / RUC" placeholder="1790000000001" />
             </div>
+
+            {specialityLabel && (
+              <div className="mt-4">
+                <CompactInput
+                  label="Especialidad Principal"
+                  defaultValue={specialityLabel}
+                  placeholder="Especialidad de la clínica"
+                />
+              </div>
+            )}
           </div>
 
           {/* SECCIÓN 2: UBICACIÓN */}
@@ -64,7 +101,7 @@ const BusinessSettingsPage: React.FC = () => {
             <SectionHeader icon={MapPin} title="Ubicación y Contacto" />
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <CompactInput label="Ciudad" defaultValue="Quito" />
+                <CompactInput label="Ciudad" placeholder="Ciudad" />
                 <CompactInput label="Teléfono de Contacto" placeholder="+593 ..." />
               </div>
               <CompactInput label="Dirección Física" placeholder="Av. Amazonas y Naciones Unidas, Edificio Signature" />
@@ -115,7 +152,7 @@ const BusinessSettingsPage: React.FC = () => {
                 </Typography>
                 <div className="flex items-center gap-2">
                   <Typography variant={TypographyVariant.BODY_BOLD} className="!text-slate-800">
-                    Plan Premium Pro
+                    {isLoading ? 'Cargando...' : `Plan ${planLabel}`}
                   </Typography>
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <Typography variant={TypographyVariant.CAPTION} className="!text-emerald-500 font-black uppercase">

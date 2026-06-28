@@ -33,6 +33,7 @@ export enum UserRole {
 export type TenantDomain = {
   uuid: string;
   businessName: string;
+  businessType?: string;
   plan: TenantPlan;
   createdAt: string;
 };
