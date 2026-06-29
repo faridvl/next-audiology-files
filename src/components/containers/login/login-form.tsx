@@ -133,7 +133,7 @@ export const LoginForm: React.FC<{ onSubmit: (values: { email: string; password:
                             )}
 
                             <Formik
-                                initialValues={{ email: '', password: '' }}
+                                initialValues={{ email: 'admin@audioflow.com', password: 'Password1' }}
                                 validationSchema={loginSchema}
                                 onSubmit={onSubmit}
                             >
