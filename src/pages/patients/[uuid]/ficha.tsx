@@ -8,6 +8,8 @@ import { useMedicalControlsQuery } from '@/shared/api/querys/medical-controls-qu
 import { useAppointmentByPatientQuery } from '@/shared/api/querys/get-appoinment-by-patient-query';
 import { useNavigation } from '@/hooks/use-navigation';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+import { usePatientBackgroundQuery } from '@/shared/api/querys/patient-background-query';
+import { PatientBackgroundEntity } from '@/types/patients/patient-background.types';
 
 const specialityLabels: Record<string, string> = {
   [MedicalSpeciality.AUDIOLOGY]: 'Audiología',
@@ -25,6 +27,7 @@ const FichaPage: React.FC = () => {
   const { data: patient, isLoading: isLoadingPatient } = usePatientDetailQuery(patientUuid);
   const { data: controlsData, isLoading: isLoadingControls } = useMedicalControlsQuery(patientUuid, 1, 50);
   const { data: appointmentsData, isLoading: isLoadingAppointments } = useAppointmentByPatientQuery(patientUuid);
+  const { data: background } = usePatientBackgroundQuery(patientUuid);
 
   const isLoading = isLoadingPatient || isLoadingControls || isLoadingAppointments;
 
@@ -203,12 +206,68 @@ const FichaPage: React.FC = () => {
           )}
         </section>
 
+        {/* SECCIÓN 4: ANTECEDENTES MÉDICOS */}
+        <section className="mb-10">
+          <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 border-b border-slate-100 pb-2">
+            4. Antecedentes Médicos
+          </h2>
+          {!background ? (
+            <p className="text-xs text-slate-400 italic">Sin antecedentes registrados.</p>
+          ) : (
+            <BackgroundSection background={background} />
+          )}
+        </section>
+
         {/* PIE */}
         <div className="border-t border-slate-200 pt-6 text-center text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">
           Documento confidencial — Propiedad privada del paciente — Ley de Protección de Datos
         </div>
       </div>
     </>
+  );
+};
+
+const BACKGROUND_LABELS: Record<keyof Omit<PatientBackgroundEntity, 'uuid' | 'patientUuid' | 'updatedAt' | 'notes'>, string> = {
+  earInfections: 'Infecciones de oído',
+  nasalSurgery: 'Cirugía nasal',
+  throatSurgery: 'Cirugía de garganta',
+  earSurgery: 'Cirugía de oído',
+  diabetes: 'Diabetes',
+  cholesterol: 'Colesterol alto',
+  highPressure: 'Presión alta',
+  allergies: 'Alergias',
+  rhinitis: 'Rinitis',
+  vertigo: 'Vértigo',
+  tinnitus: 'Tinnitus',
+  headacheNoise: 'Dolor de cabeza / ruido',
+  cloggedEar: 'Oído tapado',
+};
+
+const BackgroundSection: React.FC<{ background: PatientBackgroundEntity }> = ({ background }) => {
+  const positiveKeys = (Object.keys(BACKGROUND_LABELS) as Array<keyof typeof BACKGROUND_LABELS>).filter(
+    (key) => background[key],
+  );
+
+  return (
+    <div className="space-y-3">
+      {positiveKeys.length === 0 ? (
+        <p className="text-xs text-slate-400 italic">Sin antecedentes positivos.</p>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {positiveKeys.map((key) => (
+            <span key={key} className="px-3 py-1 bg-red-50 text-red-700 border border-red-100 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+              {BACKGROUND_LABELS[key]}
+            </span>
+          ))}
+        </div>
+      )}
+      {background.notes && (
+        <div className="bg-slate-50 rounded-xl p-4 mt-2">
+          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Notas</p>
+          <p className="text-xs text-slate-700">{background.notes}</p>
+        </div>
+      )}
+    </div>
   );
 };
 
