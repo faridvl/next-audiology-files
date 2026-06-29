@@ -7,6 +7,10 @@ export interface Patient {
   email?: string;
   address: string | null;
   birthDate: string;
+  gender?: string | null;
+  bloodType?: string | null;
+  documentId?: string | null;
+  occupation?: string | null;
   tenantId: number;
   tenantUuid: string;
   createdAt: string;

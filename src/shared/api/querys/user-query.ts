@@ -1,6 +1,6 @@
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
-import { User } from '@/types/auth/auth';
+import { User } from '@/types/users/user.type';
 import { PaginatedResponse } from '@/types/otros/paginate.types';
 import { useQuery } from '@tanstack/react-query';
 

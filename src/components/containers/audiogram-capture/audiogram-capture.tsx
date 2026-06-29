@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Maximize2 } from "lucide-react";
 import { useAudiometryData } from "./use-audiometry-data";
 import { AudiogramModal } from "../audiogram-modal/audiogram-modal";
+import { AudiogramPoint } from "../audiogram-modal/use-audiogram";
 import { Typography, TypographyVariant } from "@/components/common/typography/typography";
 
 interface AudiometryCaptureProps {
@@ -34,27 +35,23 @@ export const AudiometryCapture: React.FC<AudiometryCaptureProps> = ({ onChange }
                 side={modalSide || 'OD'}
                 initialPoints={auditData[modalSide || 'OD']}
                 onClose={() => setModalSide(null)}
-                onConfirm={(points: { hz: number; db: number }[]) => {
+                onConfirm={(points: AudiogramPoint[]) => {
                     syncFromModal(modalSide!, points);
                     setModalSide(null);
                 }}
             />
 
             {/* Contenedor de inputs numéricos por oído */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 bg-slate-50 p-5 md:p-8 rounded-[2rem] md:rounded-[3rem] border border-slate-100">
+            <div className="bg-slate-50 p-5 md:p-8 rounded-[2rem] border border-slate-100 space-y-6">
                 {(['OI', 'OD'] as const).map((side) => (
-                    <div
-                        key={side}
-                        className={`space-y-3 md:space-y-4 ${side === 'OD' ? 'md:border-l border-slate-200 md:pl-8 border-t pt-5 md:border-t-0 md:pt-0' : ''}`}
-                    >
+                    <div key={side} className="space-y-3">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <div className={`h-3.5 w-3.5 md:h-4 md:w-4 rounded-full ${side === 'OD' ? 'bg-red-500' : 'bg-blue-500'}`} />
-                                <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm md:text-base">
+                                <div className={`h-3.5 w-3.5 rounded-full ${side === 'OD' ? 'bg-red-500' : 'bg-blue-500'}`} />
+                                <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm">
                                     Oído {side === 'OD' ? 'Derecho' : 'Izquierdo'}
                                 </Typography>
                             </div>
-
                             <button
                                 type="button"
                                 onClick={() => setModalSide(side)}
@@ -64,25 +61,27 @@ export const AudiometryCapture: React.FC<AudiometryCaptureProps> = ({ onChange }
                             </button>
                         </div>
 
-                        {/* Grid de Frecuencias — 4 cols en mobile, 4 en desktop */}
-                        <div className="grid grid-cols-4 gap-2 md:gap-3">
+                        {/* 7 columnas — una por frecuencia, sin overflow */}
+                        <div className="grid grid-cols-7 gap-2">
                             {frequencies.map(hz => (
-                                <div key={`${side}-${hz}`} className="flex flex-col gap-1">
-                                    <span className="text-[8px] md:text-[9px] font-black text-slate-400 text-center uppercase">
-                                        {hz >= 1000 ? `${hz / 1000}k` : hz}Hz
+                                <div key={`${side}-${hz}`} className="flex flex-col gap-1.5">
+                                    <span className="text-[8px] font-black text-slate-400 text-center uppercase tracking-tight">
+                                        {hz >= 1000 ? `${hz / 1000}k` : hz}
                                     </span>
                                     <input
                                         type="number"
-                                        placeholder="dB"
+                                        placeholder="—"
                                         min="-10"
                                         max="120"
                                         value={auditData[side][hz] ?? ''}
                                         onChange={(e) => updateValue(side, hz, e.target.value)}
-                                        className="w-full p-2 md:p-2.5 rounded-xl md:rounded-2xl border-none text-center text-xs md:text-sm shadow-inner bg-white focus:ring-2 focus:ring-blue-400 outline-none transition-all"
+                                        className="w-full py-2.5 rounded-xl border-none text-center text-xs font-semibold shadow-inner bg-white focus:ring-2 focus:ring-blue-400 outline-none transition-all"
                                     />
                                 </div>
                             ))}
                         </div>
+
+                        {side === 'OI' && <div className="border-t border-slate-200 pt-2" />}
                     </div>
                 ))}
             </div>

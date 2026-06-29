@@ -32,10 +32,10 @@ export const AppointmentTypeForm: React.FC = () => {
           </div>
           <div>
             <Typography variant={TypographyVariant.SUBTITLE} className="text-xl">
-              Nuevo Servicio
+              Nuevo Tipo de Cita
             </Typography>
             <Typography variant={TypographyVariant.HELPER}>
-              Define el nombre, duración y color del servicio médico.
+              Define el nombre, duración, color y especialidad del tipo de cita.
             </Typography>
           </div>
         </div>

@@ -1,56 +1,53 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+import { UserSpecialty } from '@/types/auth/auth';
 import { useCreateMedicalControlMutation } from '@/shared/api/mutations/medical-control-mutation/medical-control-mutation';
 import { useNavigation } from '@/hooks/use-navigation';
 import { useSession } from '@/hooks/use-session';
 import { ClinicalTemplate } from '@/types/clinical-template/clinical-template.types';
 import { useClinicalTemplateBySpecialityQuery } from '@/shared/api/querys/clinical-templates-query';
 
-export enum Speciality {
-  AUDIOLOGY = 'Audiología',
-  DENTAL = 'Odontología',
-  DERMA = 'Dermatología',
-  GENERAL = 'Medicina General',
+// Mapeo de UserSpecialty (sesión) a MedicalSpeciality (API)
+const userSpecialtyToApiSpeciality: Record<UserSpecialty, MedicalSpeciality> = {
+  [UserSpecialty.AUDIOLOGY]: MedicalSpeciality.AUDIOLOGY,
+  [UserSpecialty.DENTAL]: MedicalSpeciality.DENTAL,
+  [UserSpecialty.GENERAL]: MedicalSpeciality.GENERAL,
+};
+
+// Fallback: tenant.businessType → UserSpecialty
+const businessTypeToUserSpecialty: Record<string, UserSpecialty> = {
+  AUDIOLOGY: UserSpecialty.AUDIOLOGY,
+  DENTAL: UserSpecialty.DENTAL,
+  GENERAL: UserSpecialty.GENERAL,
+};
+
+function resolveSpecialty(userSpecialty?: UserSpecialty, tenantBusinessType?: string): UserSpecialty | null {
+  if (userSpecialty) return userSpecialty;
+  if (tenantBusinessType && businessTypeToUserSpecialty[tenantBusinessType]) {
+    return businessTypeToUserSpecialty[tenantBusinessType];
+  }
+  return null;
 }
-
-const businessTypeToSpeciality: Record<string, Speciality> = {
-  AUDIOLOGY: Speciality.AUDIOLOGY,
-  DENTAL: Speciality.DENTAL,
-  GENERAL: Speciality.GENERAL,
-  DERMA: Speciality.DERMA,
-};
-
-const specialityToApiSpeciality: Record<Speciality, MedicalSpeciality> = {
-  [Speciality.AUDIOLOGY]: MedicalSpeciality.AUDIOLOGY,
-  [Speciality.DENTAL]: MedicalSpeciality.DENTAL,
-  [Speciality.DERMA]: MedicalSpeciality.GENERAL,
-  [Speciality.GENERAL]: MedicalSpeciality.GENERAL,
-};
-
-// Convierte el enum de Speciality (UI) al string de MedicalSpeciality (API)
-const specialityToApiKey: Record<Speciality, string> = {
-  [Speciality.AUDIOLOGY]: 'AUDIOLOGY',
-  [Speciality.DENTAL]: 'DENTAL',
-  [Speciality.DERMA]: 'GENERAL',
-  [Speciality.GENERAL]: 'GENERAL',
-};
 
 export const useNewControl = (patientId: string) => {
   const navigation = useNavigation();
-  const { tenant } = useSession();
+  const { user, tenant } = useSession();
   const { executeCreateControl, isPending, isSuccess, error } = useCreateMedicalControlMutation();
 
   const [showHistory, setShowHistory] = useState(true);
   const [showAudiogram, setShowAudiogram] = useState(false);
   const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
-
-  // Valores de los campos dinámicos de la plantilla: { fieldId -> value }
   const [dynamicFieldValues, setDynamicFieldValues] = useState<Record<string, string | boolean | number>>({});
   const [audiogramData, setAudiogramData] = useState<{ OD: Record<number, string>; OI: Record<number, string> }>({ OD: {}, OI: {} });
 
+  // Especialidad resuelta: usuario logueado > tipo de negocio del tenant
+  const resolvedSpecialty = resolveSpecialty(user?.specialty, tenant?.businessType);
+  const apiSpeciality: MedicalSpeciality = resolvedSpecialty
+    ? userSpecialtyToApiSpeciality[resolvedSpecialty]
+    : MedicalSpeciality.GENERAL;
+
   const [formData, setFormData] = useState({
-    speciality: Speciality.AUDIOLOGY,
     otoscopyRight: '',
     otoscopyLeft: '',
     generalFindings: '',
@@ -59,31 +56,21 @@ export const useNewControl = (patientId: string) => {
     nextControlNotes: '',
   });
 
-  // Plantilla dinámica activa para la especialidad seleccionada — obtenida desde el API
-  const apiSpecialityKeyForQuery = specialityToApiKey[formData.speciality];
-  const { data: activeTemplateData } = useClinicalTemplateBySpecialityQuery(apiSpecialityKeyForQuery);
+  // Plantilla clínica para la especialidad resuelta
+  const { data: activeTemplateData } = useClinicalTemplateBySpecialityQuery(apiSpeciality);
   const activeTemplate: ClinicalTemplate | null = activeTemplateData ?? null;
 
-  useEffect(() => {
-    if (tenant?.businessType && businessTypeToSpeciality[tenant.businessType]) {
-      setFormData((previous) => ({
-        ...previous,
-        speciality: businessTypeToSpeciality[tenant.businessType as string],
-      }));
-    }
-  }, [tenant?.businessType]);
-
-  // Limpiar valores dinámicos al cambiar de especialidad
+  // Limpiar valores dinámicos si cambia la especialidad (cambio de sesión)
   useEffect(() => {
     setDynamicFieldValues({});
-  }, [formData.speciality]);
+  }, [apiSpeciality]);
 
   useEffect(() => {
     if (isSuccess) {
       toast.success('Control médico guardado exitosamente');
       navigation.patients.detail(patientId);
     }
-  }, [isSuccess]);
+  }, [isSuccess, navigation, patientId]);
 
   useEffect(() => {
     if (error) toast.error('Error al guardar el control médico');
@@ -92,7 +79,7 @@ export const useNewControl = (patientId: string) => {
   const setQuickDate = (days: number) => {
     const date = new Date();
     date.setDate(date.getDate() + days);
-    setFormData({ ...formData, nextMaintenanceDate: date.toISOString().split('T')[0] });
+    setFormData((previous) => ({ ...previous, nextMaintenanceDate: date.toISOString().split('T')[0] }));
   };
 
   const setDynamicFieldValue = (fieldId: string, value: string | boolean | number) => {
@@ -105,11 +92,9 @@ export const useNewControl = (patientId: string) => {
       return;
     }
 
-    const apiSpeciality = specialityToApiSpeciality[formData.speciality];
-
     let findings: Record<string, unknown>;
 
-    if (formData.speciality === Speciality.AUDIOLOGY) {
+    if (apiSpeciality === MedicalSpeciality.AUDIOLOGY) {
       findings = {
         otoscopyRight: formData.otoscopyRight,
         otoscopyLeft: formData.otoscopyLeft,
@@ -118,17 +103,20 @@ export const useNewControl = (patientId: string) => {
         tinnitus: false,
         audiogram: audiogramData,
       };
+    } else if (apiSpeciality === MedicalSpeciality.DENTAL) {
+      findings = {
+        generalFindings: formData.generalFindings,
+      };
     } else {
-      findings = { generalFindings: formData.generalFindings };
+      findings = {
+        generalFindings: formData.generalFindings,
+      };
     }
 
-    // Agregar campos dinámicos de la plantilla clínica al objeto findings
     if (activeTemplate && Object.keys(dynamicFieldValues).length > 0) {
       for (const field of activeTemplate.fields) {
         const value = dynamicFieldValues[field.id];
-        if (value !== undefined) {
-          findings[field.label] = value;
-        }
+        if (value !== undefined) findings[field.label] = value;
       }
     }
 
@@ -153,6 +141,8 @@ export const useNewControl = (patientId: string) => {
   };
 
   return {
+    resolvedSpecialty,
+    apiSpeciality,
     states: {
       showHistory,
       showAudiogram,

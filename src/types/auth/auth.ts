@@ -17,11 +17,29 @@ export type FormActions = {
   setSubmitting: (isSubmitting: boolean) => void;
 };
 
+export enum BusinessType {
+  AUDIOLOGY = 'AUDIOLOGY',
+  DENTAL = 'DENTAL',
+  GENERAL = 'GENERAL',
+  OTHER = 'OTHER',
+}
+
 export enum TenantPlan {
   FREE = 'FREE',
   PREMIUM = 'PREMIUM',
   ENTERPRISE = 'ENTERPRISE',
 }
+
+export type RegisterPayload = {
+  businessName: string;
+  businessType: BusinessType;
+  ownerName: string;
+  phone?: string;
+  email: string;
+  password: string;
+  isSpecialist: boolean;
+  specialty?: string;
+};
 
 export enum UserRole {
   OWNER = 'OWNER',
@@ -34,6 +52,7 @@ export type TenantDomain = {
   uuid: string;
   businessName: string;
   businessType?: string;
+  logoUrl?: string | null;
   plan: TenantPlan;
   createdAt: string;
 };
@@ -51,6 +70,8 @@ export type UserDomain = {
   fullName: string;
   role: UserRole;
   specialty?: UserSpecialty;
+  phoneNumber?: string | null;
+  signatureUrl?: string | null;
   tenantId: number;
   createdAt: string;
 };

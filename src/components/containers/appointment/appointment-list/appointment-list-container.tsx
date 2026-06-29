@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     Calendar as CalendarIcon, List, ChevronLeft, ChevronRight, Plus, Search,
-    ChevronDown, ArrowRight, Clock, Loader2, CheckSquare, Square
+    ChevronDown, ArrowRight, Clock, Loader2, CheckSquare, Square, Users
 } from 'lucide-react';
 import { TEXT } from '@/static/texts/i18n';
 import { format, isSameDay } from 'date-fns';
@@ -17,10 +17,94 @@ import {
     useAppointmentsContainer,
     ViewMode,
     statusConfig,
-    ALL_STATUSES
+    specialityColorMap,
 } from './use-appointment-list-container';
 import { AppointmentStatus } from '@/types/appointments/appointment';
 import { AppointmentUI } from '@/types/appointments/appointment-ui.types';
+
+const DEFAULT_TYPE_COLOR = '#6366F1';
+
+function getTypeAccentStyle(typeColor?: string | null) {
+    const color = typeColor || DEFAULT_TYPE_COLOR;
+    return { backgroundColor: `${color}14`, borderColor: `${color}30` };
+}
+
+function getTypeDotStyle(typeColor?: string | null) {
+    return { backgroundColor: typeColor || DEFAULT_TYPE_COLOR };
+}
+
+function getSpecialityBarStyle(typeSpeciality?: string | null) {
+    const color = typeSpeciality ? (specialityColorMap[typeSpeciality] || '#94A3B8') : null;
+    if (!color) return null;
+    return { backgroundColor: color };
+}
+
+interface AppointmentCardProps {
+    appointment: AppointmentUI;
+    onClick: () => void;
+    compact?: boolean;
+}
+
+const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, onClick, compact = false }) => {
+    const specialityBar = getSpecialityBarStyle(appointment.typeSpeciality);
+    const accentStyle = getTypeAccentStyle(appointment.typeColor);
+    const dotStyle = getTypeDotStyle(appointment.typeColor);
+
+    return (
+        <div
+            onClick={onClick}
+            style={accentStyle}
+            className="rounded-2xl border cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all group relative overflow-hidden"
+        >
+            {/* barra lateral de color de tipo de cita */}
+            <div
+                className="absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl"
+                style={dotStyle}
+            />
+
+            <div className={`pl-3 pr-3 ${compact ? 'py-2.5' : 'py-3'}`}>
+                {/* hora */}
+                <div className="flex items-center gap-1.5 mb-1.5">
+                    <Clock size={10} className="text-slate-400 shrink-0" />
+                    <span className="text-[10px] font-black text-slate-500">{appointment.time}</span>
+                    <span className={`ml-auto px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-wider border ${appointment.statusColor}`}>
+                        {appointment.statusLabel}
+                    </span>
+                </div>
+
+                {/* paciente */}
+                <Typography
+                    variant={TypographyVariant.BODY_BOLD}
+                    className={`leading-tight text-slate-800 ${compact ? 'text-[11px]' : 'text-[12px]'} line-clamp-2 mb-1`}
+                >
+                    {appointment.patient}
+                </Typography>
+
+                {/* tipo de cita */}
+                <div className="flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 rounded-full shrink-0" style={dotStyle} />
+                    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] text-slate-500 font-semibold truncate">
+                        {appointment.type}
+                    </Typography>
+                </div>
+
+                {appointment.notes && !compact && (
+                    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] text-slate-400 italic truncate mt-1">
+                        {appointment.notes}
+                    </Typography>
+                )}
+            </div>
+
+            {/* barra de especialidad al fondo — solo visible si hay especialidad */}
+            {specialityBar && (
+                <div
+                    className="h-1 w-full opacity-60"
+                    style={specialityBar}
+                />
+            )}
+        </div>
+    );
+};
 
 export const AppointmentsView: React.FC = () => {
     const { t } = useTranslation();
@@ -36,11 +120,11 @@ export const AppointmentsView: React.FC = () => {
     return (
         <div className="flex flex-col h-[calc(100vh-140px)] gap-4 p-2 overflow-hidden relative">
 
-            {/* HEADER CON FILTROS DINÁMICOS */}
+            {/* HEADER CON FILTROS */}
             <div className="bg-white p-4 rounded-[24px] border border-slate-100 shadow-sm flex flex-col gap-3">
-                {/* Fila 1: toggle vista + navegación semana + botón nuevo */}
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
+                        {/* toggle vista */}
                         <div className="flex bg-slate-100 p-1 rounded-xl shadow-inner">
                             <button
                                 onClick={() => setViewMode(ViewMode.WEEKLY)}
@@ -58,8 +142,12 @@ export const AppointmentsView: React.FC = () => {
 
                         {viewMode === ViewMode.WEEKLY && (
                             <div className="flex items-center gap-2 border-l pl-3 border-slate-100">
-                                <button onClick={() => moveWeek('prev')} className="p-1.5 hover:bg-slate-50 rounded-md text-slate-400 transition-colors"><ChevronLeft size={18} /></button>
-                                <button onClick={() => moveWeek('next')} className="p-1.5 hover:bg-slate-50 rounded-md text-slate-400 transition-colors"><ChevronRight size={18} /></button>
+                                <button onClick={() => moveWeek('prev')} className="p-1.5 hover:bg-slate-50 rounded-md text-slate-400 transition-colors">
+                                    <ChevronLeft size={18} />
+                                </button>
+                                <button onClick={() => moveWeek('next')} className="p-1.5 hover:bg-slate-50 rounded-md text-slate-400 transition-colors">
+                                    <ChevronRight size={18} />
+                                </button>
                                 <Typography variant={TypographyVariant.BODY_BOLD} className="text-slate-700 text-xs md:text-sm whitespace-nowrap hidden sm:block">
                                     {weekRangeLabel}
                                 </Typography>
@@ -67,12 +155,17 @@ export const AppointmentsView: React.FC = () => {
                         )}
                     </div>
 
-                    <Button variant={ButtonVariant.PRIMARY} className="rounded-xl h-10 shadow-lg shadow-blue-500/10 shrink-0" onClick={navigation.appointments.create}>
-                        <Plus size={18} /> <span className="hidden lg:inline ml-1">{t(TEXT.APPOINTMENTS.LIST.NEW_BUTTON)}</span>
+                    <Button
+                        variant={ButtonVariant.PRIMARY}
+                        className="rounded-xl h-10 shadow-lg shadow-blue-500/10 shrink-0"
+                        onClick={navigation.appointments.create}
+                    >
+                        <Plus size={18} />
+                        <span className="hidden lg:inline ml-1">{t(TEXT.APPOINTMENTS.LIST.NEW_BUTTON)}</span>
                     </Button>
                 </div>
 
-                {/* Fila 2: búsqueda + filtro estado — 1 columna en mobile */}
+                {/* búsqueda + filtro */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <div className="relative flex-1 group">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={16} />
@@ -84,7 +177,6 @@ export const AppointmentsView: React.FC = () => {
                             className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-transparent rounded-xl text-sm outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-200 transition-all"
                         />
                     </div>
-
                     <div className="relative">
                         <select
                             value={statusFilter}
@@ -103,50 +195,62 @@ export const AppointmentsView: React.FC = () => {
             {/* CONTENIDO PRINCIPAL */}
             <div className="flex-1 flex gap-4 overflow-hidden">
                 <div className={`flex-1 bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden flex flex-col ${isLoading ? 'opacity-60 cursor-wait' : ''}`}>
+
                     {viewMode === ViewMode.WEEKLY ? (
-                        <div className="flex md:grid md:grid-cols-7 h-full divide-x divide-slate-100 overflow-x-auto overflow-y-auto scrollbar-hide">
-                            {daysOfCurrentWeek.map((day, i) => (
-                                <div key={i} className={`flex flex-col min-w-[120px] md:min-w-[140px] shrink-0 md:shrink ${isSameDay(day, new Date()) ? 'bg-blue-50/5' : ''}`}>
-                                    <div className={`p-4 border-b border-slate-50 text-center sticky top-0 bg-white/80 backdrop-blur-sm z-10 ${isSameDay(day, new Date()) ? 'border-b-blue-100' : ''}`}>
-                                        <Typography variant={TypographyVariant.CAPTION} className={`uppercase font-black text-[10px] tracking-widest ${isSameDay(day, new Date()) ? 'text-blue-500' : 'text-slate-300'}`}>
-                                            {format(day, 'eee', { locale: es })}
-                                        </Typography>
-                                        <Typography variant={TypographyVariant.BODY_BOLD} className={`text-xl ${isSameDay(day, new Date()) ? 'text-blue-600' : 'text-slate-600'}`}>
-                                            {format(day, 'dd')}
-                                        </Typography>
-                                    </div>
-                                    <div className="p-3 space-y-3 flex-1 overflow-y-auto scrollbar-hide">
-                                        {appointments.filter(app => isSameDay(app.date, day)).map(app => (
-                                            <div
-                                                key={app.id}
-                                                onClick={() => setSelectedAppointment(app)}
-                                                className="p-3 rounded-2xl bg-white border border-slate-100 cursor-pointer hover:border-blue-400 hover:shadow-md hover:-translate-y-0.5 transition-all group shadow-sm"
+                        <div className="flex md:grid md:grid-cols-7 h-full divide-x divide-slate-100 overflow-x-auto overflow-y-hidden">
+                            {daysOfCurrentWeek.map((day, i) => {
+                                const dayAppointments = appointments.filter(app => isSameDay(app.date, day));
+                                const isToday = isSameDay(day, new Date());
+
+                                return (
+                                    <div key={i} className={`flex flex-col min-w-[140px] md:min-w-0 shrink-0 md:shrink ${isToday ? 'bg-blue-50/30' : ''}`}>
+                                        {/* header de columna */}
+                                        <div className={`p-3 border-b text-center sticky top-0 z-10 backdrop-blur-sm ${isToday ? 'bg-blue-50/80 border-b-blue-100' : 'bg-white/80 border-slate-50'}`}>
+                                            <Typography
+                                                variant={TypographyVariant.CAPTION}
+                                                className={`uppercase font-black text-[9px] tracking-widest block ${isToday ? 'text-blue-500' : 'text-slate-300'}`}
                                             >
-                                                <div className="flex items-center gap-1.5 mb-2">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                                                    <Typography variant={TypographyVariant.CAPTION} className="font-black text-blue-500 text-[10px]">{app.time}</Typography>
+                                                {format(day, 'eee', { locale: es })}
+                                            </Typography>
+                                            <Typography
+                                                variant={TypographyVariant.BODY_BOLD}
+                                                className={`text-xl leading-none ${isToday ? 'text-blue-600' : 'text-slate-600'}`}
+                                            >
+                                                {format(day, 'dd')}
+                                            </Typography>
+                                            {/* contador de citas */}
+                                            {dayAppointments.length > 0 && (
+                                                <div className={`mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-black ${isToday ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'}`}>
+                                                    <Users size={8} />
+                                                    {dayAppointments.length}
                                                 </div>
-                                                <Typography variant={TypographyVariant.BODY_BOLD} className="text-[12px] leading-tight text-slate-800 mb-1 line-clamp-2">
-                                                    {app.patient}
-                                                </Typography>
-                                                <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-slate-400 font-medium truncate">
-                                                    {app.type}
-                                                </Typography>
-                                                {app.notes && (
-                                                    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] text-slate-300 italic truncate mt-0.5">
-                                                        {app.notes}
-                                                    </Typography>
-                                                )}
-                                                <div className={`mt-2 h-1 w-full rounded-full opacity-30 ${app.statusColor.split(' ')[0]}`}></div>
-                                            </div>
-                                        ))}
+                                            )}
+                                        </div>
+
+                                        {/* cards del día */}
+                                        <div className="p-2 space-y-2 flex-1 overflow-y-auto scrollbar-hide">
+                                            {dayAppointments.length === 0 ? (
+                                                <div className="flex items-center justify-center h-16 opacity-0 group-hover:opacity-100">
+                                                    <div className="w-4 h-px bg-slate-100 rounded" />
+                                                </div>
+                                            ) : (
+                                                dayAppointments.map(app => (
+                                                    <AppointmentCard
+                                                        key={app.id}
+                                                        appointment={app}
+                                                        onClick={() => setSelectedAppointment(app)}
+                                                        compact
+                                                    />
+                                                ))
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     ) : (
                         <div className="flex-1 overflow-auto flex flex-col">
-                            {/* Barra de acciones en lote */}
+                            {/* barra de acciones en lote */}
                             {selectedIds.size > 0 && (
                                 <div className="flex items-center gap-3 px-4 py-3 bg-blue-50 border-b border-blue-100">
                                     <Typography variant={TypographyVariant.CAPTION} className="font-bold text-blue-700">
@@ -172,6 +276,7 @@ export const AppointmentsView: React.FC = () => {
                                     </button>
                                 </div>
                             )}
+
                             <Table
                                 columns={[
                                     { header: '', accessor: 'select' },
@@ -181,45 +286,85 @@ export const AppointmentsView: React.FC = () => {
                                     { header: t(TEXT.APPOINTMENTS.LIST.COLUMNS.STATUS), accessor: 'status' },
                                     { header: '', accessor: 'actions' },
                                 ] as any}
-                                data={appointments.map(appointment => ({
-                                    ...appointment,
-                                    select: (
-                                        <button
-                                            onClick={(event) => { event.stopPropagation(); toggleSelectAppointment(appointment.id); }}
-                                            className="p-1 text-slate-400 hover:text-blue-600 transition-colors"
-                                        >
-                                            {selectedIds.has(appointment.id) ? <CheckSquare size={16} className="text-blue-600" /> : <Square size={16} />}
-                                        </button>
-                                    ),
-                                    patient: (
-                                        <div className="flex flex-col gap-0.5">
+                                data={appointments.map(appointment => {
+                                    const dotStyle = getTypeDotStyle(appointment.typeColor);
+                                    const specialityBar = getSpecialityBarStyle(appointment.typeSpeciality);
+
+                                    return {
+                                        ...appointment,
+                                        select: (
+                                            <button
+                                                onClick={(event) => { event.stopPropagation(); toggleSelectAppointment(appointment.id); }}
+                                                className="p-1 text-slate-400 hover:text-blue-600 transition-colors"
+                                            >
+                                                {selectedIds.has(appointment.id)
+                                                    ? <CheckSquare size={16} className="text-blue-600" />
+                                                    : <Square size={16} />}
+                                            </button>
+                                        ),
+                                        patient: (
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-xl bg-[#1E3A8A]/5 text-[#1E3A8A] flex items-center justify-center text-[11px] font-black">{appointment.patient.charAt(0)}</div>
-                                                <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-slate-700">{appointment.patient}</Typography>
+                                                <div
+                                                    className="w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-black text-white shrink-0"
+                                                    style={{ backgroundColor: appointment.typeColor || DEFAULT_TYPE_COLOR }}
+                                                >
+                                                    {appointment.patient.charAt(0)}
+                                                </div>
+                                                <div className="flex flex-col gap-0.5 min-w-0">
+                                                    <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-slate-700 truncate">
+                                                        {appointment.patient}
+                                                    </Typography>
+                                                    {appointment.notes && (
+                                                        <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-slate-400 truncate max-w-[200px] italic">
+                                                            {appointment.notes}
+                                                        </Typography>
+                                                    )}
+                                                </div>
                                             </div>
-                                            {appointment.notes && (
-                                                <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-slate-400 truncate max-w-[200px] ml-11 italic">
-                                                    {appointment.notes}
+                                        ),
+                                        type: (
+                                            <div className="flex items-center gap-2">
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <div className="w-2 h-2 rounded-full shrink-0" style={dotStyle} />
+                                                        <Typography variant={TypographyVariant.CAPTION} className="text-xs text-slate-700 font-semibold">
+                                                            {appointment.type}
+                                                        </Typography>
+                                                    </div>
+                                                    {specialityBar && (
+                                                        <div className="flex items-center gap-1.5 ml-3.5">
+                                                            <div className="w-8 h-0.5 rounded-full" style={specialityBar} />
+                                                            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] text-slate-400">
+                                                                {appointment.typeSpeciality}
+                                                            </Typography>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ),
+                                        date: (
+                                            <div className="flex flex-col gap-0.5">
+                                                <div className="flex items-center gap-2 text-slate-700">
+                                                    <Clock size={12} className="text-blue-500" />
+                                                    <Typography variant={TypographyVariant.CAPTION} className="font-bold">{appointment.time}</Typography>
+                                                </div>
+                                                <Typography variant={TypographyVariant.CAPTION} className="text-slate-400 text-[10px]">
+                                                    {format(appointment.date, 'dd MMMM, yyyy', { locale: es })}
                                                 </Typography>
-                                            )}
-                                        </div>
-                                    ),
-                                    date: (
-                                        <div className="flex flex-col gap-0.5">
-                                            <div className="flex items-center gap-2 text-slate-700">
-                                                <Clock size={12} className="text-blue-500" />
-                                                <Typography variant={TypographyVariant.CAPTION} className="font-bold">{appointment.time}</Typography>
                                             </div>
-                                            <Typography variant={TypographyVariant.CAPTION} className="text-slate-400 text-[10px]">{format(appointment.date, 'dd MMMM, yyyy', { locale: es })}</Typography>
-                                        </div>
-                                    ),
-                                    status: (
-                                        <span className={`px-3 py-1 rounded-lg text-[10px] font-bold border uppercase tracking-wider ${appointment.statusColor}`}>
-                                            {appointment.statusLabel}
-                                        </span>
-                                    ),
-                                    actions: <button className="p-2 hover:bg-slate-100 rounded-xl text-slate-300 hover:text-blue-600 transition-all"><ArrowRight size={16} /></button>
-                                }))}
+                                        ),
+                                        status: (
+                                            <span className={`px-3 py-1 rounded-lg text-[10px] font-bold border uppercase tracking-wider ${appointment.statusColor}`}>
+                                                {appointment.statusLabel}
+                                            </span>
+                                        ),
+                                        actions: (
+                                            <button className="p-2 hover:bg-slate-100 rounded-xl text-slate-300 hover:text-blue-600 transition-all">
+                                                <ArrowRight size={16} />
+                                            </button>
+                                        ),
+                                    };
+                                })}
                                 onRowClick={(row) => setSelectedAppointment(row as AppointmentUI)}
                                 totalRows={appointments.length}
                                 itemsPerPage={15}
@@ -231,7 +376,10 @@ export const AppointmentsView: React.FC = () => {
                 </div>
 
                 {selectedAppointment && (
-                    <AppointmentDetailPanel appointment={selectedAppointment} onClose={() => setSelectedAppointment(null)} />
+                    <AppointmentDetailPanel
+                        appointment={selectedAppointment}
+                        onClose={() => setSelectedAppointment(null)}
+                    />
                 )}
             </div>
         </div>

@@ -22,6 +22,7 @@ import { Button, ButtonVariant } from "@/components/common/button/button";
 import { MedicalSpeciality } from "@/types/medical-controls/medical-control.types";
 import { ClinicalControl, ControlType } from "@/types/otros/clinical";
 import { useSession } from "@/hooks/use-session";
+import { UserRole } from "@/types/auth/auth";
 import { LinkDeviceModal } from "./link-device-modal";
 import { AudiogramChart, classifyHearingLoss } from "@/components/common/audiogram-chart/audiogram-chart";
 import { useState } from "react";
@@ -80,11 +81,12 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
     const navigation = useNavigation();
     const [isLinkDeviceOpen, setIsLinkDeviceOpen] = useState(false);
     const { user } = useSession();
+    const canStartConsulta = user?.role && user.role !== UserRole.STAFF;
 
     const {
         patient, history, summary, isLoading, isFetching,
         hasMore, searchTerm, setSearchTerm, selectedSpec, setSelectedSpec, loadMore,
-        latestAudiogram,
+        latestAudiogram, recordTypeFilter, setRecordTypeFilter,
     } = usePatientDetail(id, user?.specialty);
 
     if (isLoading || !patient) return (
@@ -94,7 +96,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
     );
 
     const specialityOptions = user?.specialty
-        ? [user.specialty as MedicalSpeciality]
+        ? [user.specialty as unknown as MedicalSpeciality]
         : Object.values(MedicalSpeciality);
 
     return (
@@ -133,10 +135,12 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                         <ClipboardList className="h-4 w-4 shrink-0" />
                         <span className="truncate">Ver ficha completa</span>
                     </button>
-                    <Button variant={ButtonVariant.PRIMARY} className="rounded-xl px-5 h-10 shadow-lg shadow-blue-100 flex-1 sm:flex-none" onClick={() => navigation.patients.consulta(id)}>
-                        <PlusIcon className="h-4 w-4 mr-2 shrink-0" />
-                        <span className="text-xs font-bold uppercase tracking-tight">Iniciar consulta</span>
-                    </Button>
+                    {canStartConsulta && (
+                        <Button variant={ButtonVariant.PRIMARY} className="rounded-xl px-5 h-10 shadow-lg shadow-blue-100 flex-1 sm:flex-none" onClick={() => navigation.patients.consulta(id)}>
+                            <PlusIcon className="h-4 w-4 mr-2 shrink-0" />
+                            <span className="text-xs font-bold uppercase tracking-tight">Iniciar consulta</span>
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -152,13 +156,19 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                 {/* Filtros */}
                 <div className="flex flex-col gap-3 bg-white p-4 rounded-[1.8rem] border border-slate-100 shadow-sm">
                     <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                        {specialityOptions.length > 1 && (
-                            <SpecFilterButton label="Todos" isActive={selectedSpec === 'ALL'} onClick={() => setSelectedSpec('ALL')} />
-                        )}
-                        {specialityOptions.map((spec) => (
-                            <SpecFilterButton key={spec} label={spec} isActive={selectedSpec === spec} onClick={() => setSelectedSpec(spec)} />
-                        ))}
+                        <SpecFilterButton label="Todos" isActive={recordTypeFilter === 'ALL'} onClick={() => setRecordTypeFilter('ALL')} />
+                        <SpecFilterButton label="Controles" isActive={recordTypeFilter === 'CONTROL'} onClick={() => setRecordTypeFilter('CONTROL')} />
+                        <SpecFilterButton label="Audiogramas" isActive={recordTypeFilter === 'AUDIOGRAM'} onClick={() => setRecordTypeFilter('AUDIOGRAM')} />
+                        <SpecFilterButton label="Mantenimientos" isActive={recordTypeFilter === 'MAINTENANCE'} onClick={() => setRecordTypeFilter('MAINTENANCE')} />
                     </div>
+                    {specialityOptions.length > 1 && (
+                        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                            <SpecFilterButton label="Toda especialidad" isActive={selectedSpec === 'ALL'} onClick={() => setSelectedSpec('ALL')} />
+                            {specialityOptions.map((spec) => (
+                                <SpecFilterButton key={spec} label={spec} isActive={selectedSpec === spec} onClick={() => setSelectedSpec(spec)} />
+                            ))}
+                        </div>
+                    )}
                     <div className="relative w-full">
                         <MagnifyingGlassIcon className="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input
@@ -219,8 +229,12 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                             {history.map((record: ClinicalControl) => (
                                 <div
                                     key={record.id}
-                                    onClick={() => navigation.patients.viewControl(id, record.id)}
-                                    className="bg-white p-4 md:p-5 rounded-[1.5rem] md:rounded-[1.8rem] border border-slate-100 hover:border-blue-300 transition-all flex items-center gap-3 md:gap-6 cursor-pointer group"
+                                    onClick={() => {
+                                        if (record.type !== 'MAINTENANCE') {
+                                            navigation.patients.viewControl(id, record.id);
+                                        }
+                                    }}
+                                    className={`bg-white p-4 md:p-5 rounded-[1.5rem] md:rounded-[1.8rem] border border-slate-100 transition-all flex items-center gap-3 md:gap-6 group ${record.type === 'MAINTENANCE' ? '' : 'hover:border-blue-300 cursor-pointer'}`}
                                 >
                                     <div className="shrink-0">
                                         <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-lg border ${getTypeStyle(record.type as ControlType)}`}>

@@ -1,11 +1,16 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 import { AppointmentUI } from '@/types/appointments/appointment-ui.types';
 import { HistoryNote } from '@/types/appointments/history-note.types';
+import { AppointmentStatus } from '@/types/appointments/appointment';
 import { useAppointmentByPatientQuery } from '@/shared/api/querys/get-appoinment-by-patient-query';
+import { useUpdateAppointmentMutation } from '@/shared/api/mutations/appointments/update-appointment-mutation';
 
-export const useAppointmentDetail = (appointment: AppointmentUI) => {
+export const useAppointmentDetail = (appointment: AppointmentUI, onStatusChange?: () => void) => {
   const { data, isLoading } = useAppointmentByPatientQuery(appointment.patientUUID);
+  const { executeUpdateAppointment, isPending: isActionPending } = useUpdateAppointmentMutation();
+  const [localStatus, setLocalStatus] = useState<AppointmentStatus>(appointment.status);
 
   const patientInfo = data?.patient || null;
 
@@ -24,6 +29,34 @@ export const useAppointmentDetail = (appointment: AppointmentUI) => {
       })
       .slice(0, 3);
   }, [rawAppointments, appointment.id]);
+
+  const handleQuickConfirm = (): void => {
+    executeUpdateAppointment(
+      { uuid: appointment.id, status: AppointmentStatus.CONFIRMED },
+      {
+        onSuccess: () => {
+          setLocalStatus(AppointmentStatus.CONFIRMED);
+          toast.success('Cita confirmada');
+          onStatusChange?.();
+        },
+        onError: () => toast.error('No se pudo confirmar la cita'),
+      },
+    );
+  };
+
+  const handleQuickNoAnswer = (): void => {
+    executeUpdateAppointment(
+      { uuid: appointment.id, status: AppointmentStatus.TENTATIVE },
+      {
+        onSuccess: () => {
+          setLocalStatus(AppointmentStatus.TENTATIVE);
+          toast.success('Registrado como no contestó');
+          onStatusChange?.();
+        },
+        onError: () => toast.error('No se pudo actualizar la cita'),
+      },
+    );
+  };
 
   const handleWhatsAppRedirect = (): void => {
     const appointmentDate = appointment.date instanceof Date ? appointment.date : new Date();
@@ -86,8 +119,12 @@ export const useAppointmentDetail = (appointment: AppointmentUI) => {
 
   return {
     isLoading,
+    isActionPending,
+    localStatus,
     patientInfo,
     historyNotes,
+    handleQuickConfirm,
+    handleQuickNoAnswer,
     handleWhatsAppRedirect,
     handleGoogleCalendar,
     handleAppleCalendarDownload,

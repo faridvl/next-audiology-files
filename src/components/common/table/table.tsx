@@ -3,6 +3,7 @@ import { Pagination } from './pagination';
 import { Action, ToggleMenu } from '../menu-item/menu-item';
 import { Typography, TypographyVariant } from '../typography/typography';
 import { tailwind } from '@/utils/tailwind-utils';
+import { Inbox } from 'lucide-react';
 
 type Column = {
     header: string;
@@ -22,6 +23,66 @@ type TableProps = {
     isLoading?: boolean;
 };
 
+function TableSkeleton({ columns, actions }: { columns: Column[]; actions: Action[] }) {
+    return (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="hidden md:block">
+                <table className="w-full border-collapse">
+                    <thead>
+                        <tr className="border-b border-slate-100 bg-slate-50">
+                            {columns.map((column) => (
+                                <th key={column.accessor} className="px-6 py-3.5 text-left" style={{ width: column.width }}>
+                                    <Typography variant={TypographyVariant.OVERLINE} inline>
+                                        {column.header}
+                                    </Typography>
+                                </th>
+                            ))}
+                            {actions.length > 0 && <th className="px-6 py-3.5 w-20" />}
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                            <tr key={index} className="animate-pulse">
+                                {columns.map((column) => (
+                                    <td key={column.accessor} className="px-6 py-4">
+                                        <div className="h-4 bg-slate-100 rounded-full" style={{ width: index % 2 === 0 ? '70%' : '55%' }} />
+                                    </td>
+                                ))}
+                                {actions.length > 0 && (
+                                    <td className="px-6 py-4">
+                                        <div className="h-4 w-8 bg-slate-100 rounded-full ml-auto" />
+                                    </td>
+                                )}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <div className="md:hidden divide-y divide-slate-50 animate-pulse">
+                {Array.from({ length: 4 }).map((_, index) => (
+                    <div key={index} className="p-4 space-y-3">
+                        <div className="h-4 bg-slate-100 rounded-full w-1/2" />
+                        <div className="h-3 bg-slate-100 rounded-full w-1/3" />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function EmptyState() {
+    return (
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center">
+                <Inbox size={22} className="text-slate-300" />
+            </div>
+            <Typography variant={TypographyVariant.HELPER}>
+                Sin resultados para mostrar
+            </Typography>
+        </div>
+    );
+}
+
 export function Table({
     columns,
     data,
@@ -35,22 +96,14 @@ export function Table({
 }: TableProps) {
 
     if (isLoading) {
-        return (
-            <div className="bg-white rounded-[24px] border border-slate-100 p-20 flex flex-col items-center justify-center gap-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1E3A8A]"></div>
-
-                <Typography variant={TypographyVariant.HELPER}>
-                    Cargando datos...
-                </Typography>
-            </div>
-        );
+        return <TableSkeleton columns={columns} actions={actions} />;
     }
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + data.length;
 
     return (
-        <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
 
             {/* VISTA MOBILE — cards */}
             <div className="md:hidden">
@@ -61,37 +114,29 @@ export function Table({
                                 key={item.id || rowIndex}
                                 onClick={() => onRowClick?.(item)}
                                 className={tailwind(
-                                    'p-4 space-y-2 transition-all duration-200',
-                                    onRowClick && 'cursor-pointer active:bg-slate-50'
+                                    'px-4 py-3.5 space-y-2 transition-colors duration-150',
+                                    onRowClick && 'cursor-pointer active:bg-slate-50/80'
                                 )}
                             >
                                 {columns
-                                    .filter((column) => column.header && item[column.accessor] !== undefined && item[column.accessor] !== null)
+                                    .filter((column) => column.header && item[column.accessor] != null)
                                     .map((column) => (
-                                        <div key={column.accessor} className="flex items-start gap-2">
-                                            {column.header && (
-                                                <Typography
-                                                    variant={TypographyVariant.OVERLINE}
-                                                    inline
-                                                    className="text-[10px] text-slate-400 shrink-0 w-24"
-                                                >
-                                                    {column.header}
-                                                </Typography>
-                                            )}
-                                            <div className="flex-1 min-w-0">
-                                                <Typography
-                                                    variant={TypographyVariant.BODY}
-                                                    className="text-slate-700 break-words"
-                                                >
-                                                    {item[column.accessor]}
-                                                </Typography>
-                                            </div>
+                                        <div key={column.accessor} className="flex items-start gap-3">
+                                            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 shrink-0 w-24 pt-0.5">
+                                                {column.header}
+                                            </span>
+                                            <Typography
+                                                variant={TypographyVariant.BODY}
+                                                className="text-slate-700 break-words text-sm"
+                                            >
+                                                {item[column.accessor]}
+                                            </Typography>
                                         </div>
                                     ))}
                                 {actions.length > 0 && (
                                     <div
-                                        className="flex justify-end pt-2"
-                                        onClick={(e) => e.stopPropagation()}
+                                        className="flex justify-end pt-1"
+                                        onClick={(event) => event.stopPropagation()}
                                     >
                                         <ToggleMenu actions={actions} rowData={item} />
                                     </div>
@@ -100,11 +145,7 @@ export function Table({
                         ))}
                     </div>
                 ) : (
-                    <div className="px-6 py-12 text-center">
-                        <Typography variant={TypographyVariant.HELPER}>
-                            No se encontraron resultados
-                        </Typography>
-                    </div>
+                    <EmptyState />
                 )}
             </div>
 
@@ -112,30 +153,22 @@ export function Table({
             <div className="hidden md:block overflow-x-auto">
                 <table className="w-full border-collapse">
 
-                    {/* HEADER */}
                     <thead>
-                        <tr className="bg-slate-50/60 border-b border-slate-100">
+                        <tr className="border-b border-slate-100 bg-slate-50">
                             {columns.map((column) => (
                                 <th
                                     key={column.accessor}
-                                    className="px-6 py-4 text-left"
+                                    className="px-6 py-3.5 text-left"
                                     style={{ width: column.width }}
                                 >
-                                    <Typography
-                                        variant={TypographyVariant.OVERLINE}
-                                        inline
-                                    >
+                                    <Typography variant={TypographyVariant.OVERLINE} inline>
                                         {column.header}
                                     </Typography>
                                 </th>
                             ))}
-
                             {actions.length > 0 && (
-                                <th className="px-6 py-4 text-right">
-                                    <Typography
-                                        variant={TypographyVariant.OVERLINE}
-                                        inline
-                                    >
+                                <th className="px-6 py-3.5 text-right w-20">
+                                    <Typography variant={TypographyVariant.OVERLINE} inline>
                                         Acciones
                                     </Typography>
                                 </th>
@@ -143,7 +176,6 @@ export function Table({
                         </tr>
                     </thead>
 
-                    {/* BODY */}
                     <tbody className="divide-y divide-slate-50">
                         {data.length > 0 ? (
                             data.map((item, rowIndex) => (
@@ -151,27 +183,27 @@ export function Table({
                                     key={item.id || rowIndex}
                                     onClick={() => onRowClick?.(item)}
                                     className={tailwind(
-                                        'group transition-all duration-200',
-                                        onRowClick && 'cursor-pointer hover:bg-slate-50'
+                                        'group transition-colors duration-150',
+                                        onRowClick && 'cursor-pointer hover:bg-slate-50/60'
                                     )}
                                 >
-                                    {columns.map((column) => (
+                                    {columns.map((column, columnIndex) => (
                                         <td key={column.accessor} className="px-6 py-4">
-
                                             <Typography
-                                                variant={TypographyVariant.BODY}
-                                                className="group-hover:text-slate-900 transition-colors"
+                                                variant={columnIndex === 0 ? TypographyVariant.BODY_SEMIBOLD : TypographyVariant.BODY}
+                                                className={tailwind(
+                                                    'transition-colors duration-150',
+                                                    columnIndex === 0 ? 'text-slate-800 group-hover:text-[#1E3A8A]' : 'text-slate-500 group-hover:text-slate-700'
+                                                )}
                                             >
                                                 {item[column.accessor]}
                                             </Typography>
-
                                         </td>
                                     ))}
-
                                     {actions.length > 0 && (
                                         <td
                                             className="px-6 py-4 text-right"
-                                            onClick={(e) => e.stopPropagation()}
+                                            onClick={(event) => event.stopPropagation()}
                                         >
                                             <ToggleMenu actions={actions} rowData={item} />
                                         </td>
@@ -180,23 +212,17 @@ export function Table({
                             ))
                         ) : (
                             <tr>
-                                <td
-                                    colSpan={columns.length + 1}
-                                    className="px-6 py-12 text-center"
-                                >
-                                    <Typography variant={TypographyVariant.HELPER}>
-                                        No se encontraron resultados
-                                    </Typography>
+                                <td colSpan={columns.length + (actions.length > 0 ? 1 : 0)}>
+                                    <EmptyState />
                                 </td>
                             </tr>
                         )}
                     </tbody>
-
                 </table>
             </div>
 
-            {/* FOOTER */}
-            <div className="bg-slate-50/40 border-t border-slate-100 px-6 py-4">
+            {/* FOOTER — paginación */}
+            <div className="border-t border-slate-100 px-6 py-3 bg-slate-50/40">
                 <Pagination
                     currentPage={currentPage}
                     onPageChange={onPageChange}

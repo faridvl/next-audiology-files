@@ -48,16 +48,19 @@ const ProfileSettingsPage: React.FC = () => {
     const [fullName, setFullName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [specialty, setSpecialty] = useState('');
+    const [signatureUrl, setSignatureUrl] = useState('');
 
-    // Estados funcionales para archivos
+    // Estados funcionales para archivos (solo preview local — no hay upload real aún)
     const [avatar, setAvatar] = useState<string | null>(null);
-    const [signature, setSignature] = useState<string | null>(null);
     const avatarRef = useRef<HTMLInputElement>(null);
     const signatureRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (user) {
             setFullName(user.fullName ?? '');
+            setPhoneNumber(user.phoneNumber ?? '');
+            setSpecialty(user.specialty ?? '');
+            setSignatureUrl(user.signatureUrl ?? '');
         }
     }, [user]);
 
@@ -87,6 +90,7 @@ const ProfileSettingsPage: React.FC = () => {
             fullName: fullName || undefined,
             phoneNumber: phoneNumber || undefined,
             specialty: specialty || undefined,
+            signatureUrl: signatureUrl || null,
         });
     };
 
@@ -209,34 +213,32 @@ const ProfileSettingsPage: React.FC = () => {
                                         </div>
 
                                         {/* Firma Section */}
-                                        <div className="space-y-4 pt-4">
+                                        <div className="space-y-4 pt-4 col-span-full">
                                             <Typography variant={TypographyVariant.OVERLINE} className="ml-1 !text-slate-400 !text-[10px] uppercase font-bold">
                                                 Firma Digitalizada para Recetas
                                             </Typography>
-                                            <div
-                                                onClick={() => signatureRef.current?.click()}
-                                                className="group relative border-2 border-dashed border-slate-200 rounded-[2.5rem] bg-slate-50/50 h-48 flex flex-col items-center justify-center hover:bg-white hover:border-[#1E3A8A]/30 transition-all cursor-pointer overflow-hidden"
-                                            >
-                                                {signature ? (
-                                                    <>
-                                                        <img src={signature} className="h-full object-contain p-4 mix-blend-multiply" alt="Firma" />
-                                                        <button
-                                                            onClick={(event) => { event.stopPropagation(); setSignature(null); }}
-                                                            className="absolute top-4 right-4 p-2 bg-red-100 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm"
-                                                        >
-                                                            <X size={14} />
-                                                        </button>
-                                                    </>
-                                                ) : (
-                                                    <div className="flex flex-col items-center gap-3">
-                                                        <div className="p-4 bg-white rounded-2xl shadow-sm group-hover:scale-110 transition-transform text-[#1E3A8A]">
-                                                            <UploadCloud size={24} />
-                                                        </div>
-                                                        <Typography variant={TypographyVariant.CAPTION} className="!text-slate-400 font-bold uppercase tracking-widest text-[10px]">Cargar archivo PNG</Typography>
-                                                    </div>
-                                                )}
-                                                <input type="file" ref={signatureRef} className="hidden" accept="image/png" onChange={(event) => handleFileChange(event, setSignature)} />
-                                            </div>
+                                            <FormField label="URL de firma (imagen pública)" icon={UploadCloud}>
+                                                <input
+                                                    type="url"
+                                                    className={inputStyles}
+                                                    placeholder="https://ejemplo.com/mi-firma.png"
+                                                    value={signatureUrl}
+                                                    onChange={(event) => setSignatureUrl(event.target.value)}
+                                                />
+                                            </FormField>
+                                            {signatureUrl && (
+                                                <div className="relative border border-slate-200 rounded-[2rem] bg-slate-50 h-36 flex items-center justify-center overflow-hidden">
+                                                    <img src={signatureUrl} className="h-full object-contain p-4 mix-blend-multiply" alt="Firma" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setSignatureUrl('')}
+                                                        className="absolute top-3 right-3 p-2 bg-red-100 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            )}
+                                            <input type="file" ref={signatureRef} className="hidden" accept="image/png" onChange={(event) => { const file = event.target.files?.[0]; if (file) setSignatureUrl(URL.createObjectURL(file)); }} />
                                         </div>
                                     </div>
                                 )}

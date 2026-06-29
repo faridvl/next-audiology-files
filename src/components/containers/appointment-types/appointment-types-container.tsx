@@ -39,10 +39,10 @@ export const AppointmentTypesContainer: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-0.5">
           <Typography variant={TypographyVariant.HEADER} className="text-2xl font-black text-slate-900">
-            Servicios
+            Tipos de Cita
           </Typography>
           <Typography variant={TypographyVariant.HELPER} className="text-sm text-slate-500 font-medium">
-            Administra el catálogo de servicios médicos.
+            Administra los tipos de cita disponibles para tu clínica.
           </Typography>
         </div>
         <div className="flex gap-2">
@@ -125,8 +125,8 @@ export const AppointmentTypesContainer: React.FC = () => {
               <Plus size={28} />
             </div>
             <div className="text-center">
-              <p className="font-black text-sm uppercase tracking-widest">Nuevo Servicio</p>
-              <p className="text-xs opacity-60">Crear configuración médica</p>
+              <p className="font-black text-sm uppercase tracking-widest">Nuevo Tipo de Cita</p>
+              <p className="text-xs opacity-60">Agregar al catálogo</p>
             </div>
           </button>
         </div>

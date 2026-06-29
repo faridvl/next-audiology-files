@@ -6,7 +6,8 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { useNavigation } from '@/hooks/use-navigation';
 import { useControlDetail } from './use-control-detail';
 import { useSession } from '@/hooks/use-session';
-import { MedicalSpeciality, AudiologyFindings } from '@/types/medical-controls/medical-control.types';
+import { MedicalSpeciality, AudiologyFindings, AudiogramData } from '@/types/medical-controls/medical-control.types';
+import { AudiogramChart, classifyHearingLoss } from '@/components/common/audiogram-chart/audiogram-chart';
 
 const specialityLabels: Record<MedicalSpeciality, string> = {
     [MedicalSpeciality.AUDIOLOGY]: 'Audiología Clínica',
@@ -42,8 +43,8 @@ interface HeaderCellProps {
 
 const HeaderCell: React.FC<HeaderCellProps> = ({ label, value, className = '' }) => (
     <div className={`p-5 border-r border-slate-100 last:border-r-0 ${className}`}>
-        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-        <p className="text-xs font-bold text-slate-900 tracking-tight uppercase">{value}</p>
+        <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</Typography>
+        <Typography variant={TypographyVariant.BODY_BOLD} className="text-xs font-bold text-slate-900 tracking-tight uppercase">{value}</Typography>
     </div>
 );
 
@@ -96,14 +97,14 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                     </button>
                 </div>
                 <div className="bg-amber-50 border border-amber-200 rounded-2xl p-10 text-center space-y-3">
-                    <p className="text-sm font-black text-amber-700 uppercase tracking-widest">
+                    <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-black text-amber-700 uppercase tracking-widest">
                         Acceso restringido
-                    </p>
-                    <p className="text-xs text-amber-600">
+                    </Typography>
+                    <Typography variant={TypographyVariant.CAPTION} className="text-xs text-amber-600">
                         No tienes permiso para ver este control. Este registro pertenece a la especialidad{' '}
                         <span className="font-bold">{controlSpeciality}</span> y tu especialidad es{' '}
                         <span className="font-bold">{userSpecialty}</span>.
-                    </p>
+                    </Typography>
                 </div>
             </div>
         );
@@ -123,6 +124,10 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
         if (audiologyFindings.usesAuxiliaries) parts.push('Usa auxiliares auditivos.');
         return parts.join(' ') || '—';
     };
+
+    const audiogram = data.control.speciality === MedicalSpeciality.AUDIOLOGY
+        ? ((data.control.findings as AudiologyFindings).audiogram as AudiogramData | undefined)
+        : undefined;
 
     // Campos genéricos: cualquier clave no conocida de la especialidad actual
     const renderGenericFindings = () => {
@@ -193,8 +198,8 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                 {/* ENCABEZADO HOSPITALARIO */}
                 <div className="p-10 border-b-4 border-slate-900 flex justify-between items-start bg-slate-50">
                     <div className="space-y-1">
-                        <p className="text-xl font-black text-slate-900 tracking-tighter uppercase">{institutionName}</p>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Sistema de Gestión de Expedientes Digitales</p>
+                        <Typography variant={TypographyVariant.HEADER} className="text-xl font-black text-slate-900 tracking-tighter uppercase">{institutionName}</Typography>
+                        <Typography variant={TypographyVariant.CAPTION} className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Sistema de Gestión de Expedientes Digitales</Typography>
                     </div>
                     <div className="text-right">
                         <div className="inline-block bg-slate-900 text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase">
@@ -223,9 +228,9 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                             Especialista
                         </div>
                         <div className="md:col-span-3">
-                            <p className="text-sm font-bold text-slate-900 uppercase tracking-tight">
+                            <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-bold text-slate-900 uppercase tracking-tight">
                                 {specialistName}
-                            </p>
+                            </Typography>
                         </div>
                     </div>
 
@@ -235,9 +240,9 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                             Especialidad
                         </div>
                         <div className="md:col-span-3">
-                            <p className="text-sm font-bold text-slate-900 uppercase tracking-tight">
+                            <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-bold text-slate-900 uppercase tracking-tight">
                                 {specialityLabel}
-                            </p>
+                            </Typography>
                         </div>
                     </div>
 
@@ -251,6 +256,18 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                         </div>
                     </div>
 
+                    {/* AUDIOGRAMA */}
+                    {audiogram && (
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-4 border-t border-slate-50 pt-8">
+                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
+                                Audiograma
+                            </div>
+                            <div className="md:col-span-3">
+                                <AudiogramChart audiogram={audiogram} showClassification />
+                            </div>
+                        </div>
+                    )}
+
                     {/* CAMPOS GENÉRICOS (plantilla clínica) */}
                     {renderGenericFindings()}
 
@@ -260,9 +277,9 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                             Diagnóstico
                         </div>
                         <div className="md:col-span-3">
-                            <p className="text-sm font-bold text-slate-900 leading-snug">
+                            <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-bold text-slate-900 leading-snug">
                                 {data.control.diagnosis}
-                            </p>
+                            </Typography>
                         </div>
                     </div>
 
@@ -273,10 +290,10 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                         </div>
                         <div className="md:col-span-3">
                             <ul className="space-y-3">
-                                {data.control.plan.map((item, index) => (
-                                    <li key={index} className="text-sm text-slate-600 flex items-start gap-3">
-                                        <span className="text-[10px] font-black text-slate-300 pt-0.5">{index + 1}.</span>
-                                        {item}
+                                {data.control.plan.map((item, planItemIndex) => (
+                                    <li key={planItemIndex} className="text-sm text-slate-600 flex items-start gap-3">
+                                        <span className="text-[10px] font-black text-slate-300 pt-0.5">{planItemIndex + 1}.</span>
+                                        <Typography variant={TypographyVariant.BODY} className="text-sm text-slate-600">{item}</Typography>
                                     </li>
                                 ))}
                             </ul>
@@ -285,8 +302,10 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                 </div>
 
                 {/* PIE DE PÁGINA TÉCNICO */}
-                <div className="bg-slate-50 p-6 text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] text-center border-t border-slate-200">
-                    Propiedad Privada del Paciente - Confidencialidad bajo Ley de Protección de Datos
+                <div className="bg-slate-50 p-6 text-center border-t border-slate-200">
+                    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">
+                        Propiedad Privada del Paciente - Confidencialidad bajo Ley de Protección de Datos
+                    </Typography>
                 </div>
             </div>
         </div>

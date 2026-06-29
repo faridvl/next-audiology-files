@@ -6,6 +6,7 @@ export type UpdateTenantPayload = {
   uuid: string;
   businessName?: string;
   businessType?: string;
+  logoUrl?: string | null;
 };
 
 export type UpdateTenantResponse = {

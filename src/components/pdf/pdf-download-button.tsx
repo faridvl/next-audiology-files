@@ -1,25 +1,12 @@
-// src/components/pdf/pdf-download-button.tsx
-// Botón de descarga PDF — usa PDFDownloadLink de @react-pdf/renderer.
-// Debe cargarse solo en el cliente (sin SSR) porque @react-pdf/renderer
-// accede a APIs del navegador. Se importa vía dynamic() desde la página.
+// Este archivo debe importarse exclusivamente vía dynamic({ ssr: false }) desde el padre.
+// No usar dynamic() internamente — react-pdf renderiza `document` en su propio renderer
+// y los chunks dinámicos sin resolver causan "useSyncExternalStore is not a function".
 
-import React from 'react';
-import dynamic from 'next/dynamic';
+import React, { useEffect, useState } from 'react';
+import { BlobProvider } from '@react-pdf/renderer';
 import { Download } from 'lucide-react';
 import { usePdfReport } from './use-pdf-report';
-
-// PDFDownloadLink solo funciona en el cliente
-const PDFDownloadLinkDynamic = dynamic(
-  () => import('@react-pdf/renderer').then((module) => module.PDFDownloadLink),
-  { ssr: false },
-);
-
-// MedicalControlReport también solo en cliente
-const MedicalControlReportDynamic = dynamic(
-  () =>
-    import('./medical-control-report').then((module) => module.MedicalControlReport),
-  { ssr: false },
-);
+import { MedicalControlReport } from './medical-control-report';
 
 interface Props {
   controlUuid: string;
@@ -27,7 +14,12 @@ interface Props {
 }
 
 export const PdfDownloadButton: React.FC<Props> = ({ controlUuid, patientUuid }) => {
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => { setIsMounted(true); }, []);
+
   const { pdfProps, isLoading, isError } = usePdfReport(controlUuid, patientUuid);
+
+  if (!isMounted) return null;
 
   if (isLoading || !pdfProps) {
     return (
@@ -47,22 +39,22 @@ export const PdfDownloadButton: React.FC<Props> = ({ controlUuid, patientUuid })
 
   const fileName = `control-${pdfProps.patient.fullName.replace(/\s+/g, '-').toLowerCase()}-${pdfProps.controlNumber}.pdf`;
 
-  const renderButton = ({ loading }: { loading: boolean }) => (
-    <button
-      className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold uppercase tracking-widest transition-colors disabled:opacity-60"
-      disabled={loading}
-    >
-      <Download size={14} />
-      {loading ? 'Generando...' : 'Descargar reporte PDF'}
-    </button>
-  );
-
   return (
-    <PDFDownloadLinkDynamic
-      document={<MedicalControlReportDynamic {...pdfProps} />}
-      fileName={fileName}
-    >
-      {renderButton as any}
-    </PDFDownloadLinkDynamic>
+    <BlobProvider document={<MedicalControlReport {...pdfProps} />}>
+      {({ url, loading }) => (
+        <a
+          href={url ?? undefined}
+          download={fileName}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-colors ${
+            loading || !url
+              ? 'bg-slate-100 text-slate-400 cursor-not-allowed pointer-events-none'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
+          }`}
+        >
+          <Download size={14} />
+          {loading ? 'Generando...' : 'Descargar reporte PDF'}
+        </a>
+      )}
+    </BlobProvider>
   );
 };

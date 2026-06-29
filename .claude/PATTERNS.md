@@ -153,3 +153,13 @@ Keys are also mapped in `src/static/texts/i18n.ts` as typed constants. Prefer th
 10. **Container naming: `{Feature}Container`** — always suffix with `Container`. Not `View`, `Screen`, or `Page`. Rename when touching a file that violates this.
 11. **All user-visible strings via i18n** — use `t(TEXT.MODULE.KEY)` from `useTranslation()`. Add keys to `src/static/texts/es.json` and the typed `TEXT` constant in `src/static/texts/i18n.ts`. Migrate hardcoded strings in any file being edited.
 12. **Verify after any rename** — after renaming a component, variable, or i18n key, confirm all imports compile and all `t('key')` calls have a matching entry in `es.json`.
+13. **Enums para valores discretos — nunca string literals** — cualquier valor que tenga un conjunto finito de opciones (estados, tipos, modos, vías, roles) debe declararse como `enum` TypeScript, no como `type = 'a' | 'b'` ni strings hardcodeados. Esto aplica a código nuevo y a strings literales que se encuentren al tocar un archivo existente.
+14. **No raw HTML text elements for UI copy** — never use `<p>`, `<span>`, `<h1-h6>`, or `<label>` with hardcoded text directly. Always use `<Typography variant={TypographyVariant.X}>` from `@/components/common/typography/typography`. Migrate any raw text elements found in files being edited. Exception: text inside Tailwind utility-only wrappers (e.g. a `<div>` used purely for layout) may keep a single `<Typography>` child without an extra wrapper.
+
+## Boy Scout Rule — copy & typography
+
+**When you touch any file for any reason**, also fix in that same file:
+- Hardcoded Spanish strings → move to `es.json` + `i18n.ts`, replace with `t(TEXT.X.Y)`
+- Raw `<p>`, `<span>`, `<h*>` with text → replace with `<Typography variant={TypographyVariant.X}>`
+
+Do NOT open files solely to fix copy/typography — only fix what you're already touching. This keeps the cost near zero while progressively cleaning the codebase.

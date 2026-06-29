@@ -17,7 +17,16 @@ const textareaClass = `${inputClass} min-h-[100px]`;
 export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
   const navigation = useNavigation();
   const { data: patient } = usePatientDetailQuery(patientUuid);
-  const { apiSpeciality, activeTemplate, fields, isPending, handleSave } = useConsultaControl(patientUuid);
+  const {
+    apiSpeciality,
+    templates,
+    activeTemplate,
+    selectedTemplateUuid,
+    setSelectedTemplateUuid,
+    fields,
+    isPending,
+    handleSave,
+  } = useConsultaControl(patientUuid);
 
   const isAudiology = apiSpeciality === MedicalSpeciality.AUDIOLOGY;
 
@@ -74,6 +83,24 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
                 />
               </div>
             </div>
+          </section>
+        )}
+
+        {/* SELECTOR DE PLANTILLA */}
+        {templates.length > 1 && (
+          <section className="space-y-2 pt-2 border-t border-slate-50">
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+              Plantilla clínica
+            </label>
+            <select
+              className={`${inputClass} bg-white`}
+              value={selectedTemplateUuid ?? ''}
+              onChange={(e) => setSelectedTemplateUuid(e.target.value)}
+            >
+              {templates.map((template) => (
+                <option key={template.uuid} value={template.uuid}>{template.name}</option>
+              ))}
+            </select>
           </section>
         )}
 

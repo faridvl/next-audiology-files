@@ -11,6 +11,8 @@ export interface AppointmentUI {
   statusLabel: string;
   statusColor: string;
   type: string;
+  typeColor?: string | null;
+  typeSpeciality?: string | null;
   notes?: string;
   monthsSinceLastVisit: number;
   warrantyExpirationDate: string;

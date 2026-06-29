@@ -32,10 +32,10 @@ export function useControlDetail(patientId: string, controlId: string) {
       ? {
           patient: {
             fullName: `${patientRaw.firstName} ${patientRaw.lastName}`.toUpperCase(),
-            documentId: patientRaw.uuid.split('-')[0].toUpperCase(),
-            gender: 'NO REGISTRADO',
+            documentId: (patientRaw.documentId ?? patientRaw.uuid.split('-')[0]).toUpperCase(),
+            gender: patientRaw.gender?.toUpperCase() ?? 'NO REGISTRADO',
             age: calculateAge(patientRaw.birthDate),
-            bloodType: 'NO REGISTRADO',
+            bloodType: patientRaw.bloodType?.toUpperCase() ?? 'NO REGISTRADO',
           },
           control: {
             id: controlRaw.uuid,

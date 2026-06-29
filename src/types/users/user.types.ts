@@ -14,4 +14,5 @@ export type UpdateUserPayload = {
   fullName?: string;
   phoneNumber?: string;
   specialty?: string;
+  signatureUrl?: string | null;
 };

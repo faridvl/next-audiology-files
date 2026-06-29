@@ -29,12 +29,15 @@ src/
 │   ├── use-session.ts              # Fetches GET /auth/me, returns user + tenant
 │   └── use-logout.ts
 ├── types/
-│   ├── auth/                       # LoginResponse, UserSessionResponse, UserRole, etc.
+│   ├── auth/                       # LoginResponse, UserSessionResponse, UserRole, BusinessType, RegisterPayload
 │   ├── appointments/               # Appointment, AppointmentStatus, AppointmentType
-│   ├── patients/                   # Patient
-│   ├── medical-controls/           # MedicalControl, MedicalSpeciality, AudiologyFindings
+│   ├── patients/                   # Patient (incluye gender, bloodType, documentId, occupation)
+│   ├── medical-controls/           # MedicalControl, MedicalSpeciality (= ControlType), AudiologyFindings
+│   ├── maintenance/                # MaintenanceEntity, CreateMaintenancePayload
 │   ├── inventory/                  # Product, ProductStock
-│   └── users/                      # User type
+│   ├── pdf/                        # PdfReportProps
+│   ├── otros/                      # ClinicalControl, ControlType (re-export), PaginatedResponse
+│   └── users/                      # User (uuid, fullName, role, specialty, status)
 └── static/texts/                   # i18n JSON files (es.json)
 ```
 
@@ -42,13 +45,13 @@ src/
 
 All routes use `getServerSideProps` with `authorizeServerSidePage()` for auth guarding — this checks for a JWT cookie server-side and redirects to `/login` if missing.
 
-**Exception — broken guard:** `src/pages/report-template/create.tsx` has `getServerSideProps` commented out, making it publicly accessible without a token.
+All pages including `src/pages/report-template/create.tsx` have `authorizeServerSidePage()` — no known exceptions.
 
 Route definitions live in `src/shared/navigation/routes.ts`. All navigation calls go through `useNavigation()` hook — **never call `router.push()` directly in components**.
 
-### Known routing bug
+### Known routing behavior
 
-`src/shared/constants/sidebar.ts` — the "Tipos de Citas" menu entry points to `routesPrivate.reportTemplate.index` (`/report-template`) instead of `routesPrivate.appointmentType.index` (`/appointment-type`). The `/report-template` index page does not exist, so the sidebar link leads to a 404.
+`src/shared/constants/sidebar.ts` — el sidebar incluye una entrada que apunta a `routesPrivate.reportTemplate.create` (`/report-template/create`), que existe y tiene auth guard. No hay bug de routing activo conocido.
 
 ## State management
 

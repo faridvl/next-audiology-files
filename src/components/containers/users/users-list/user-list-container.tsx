@@ -13,6 +13,7 @@ import { Action } from '@/components/common/menu-item/menu-item';
 import { useNavigation } from '@/hooks/use-navigation';
 import { tailwind } from '@/utils/tailwind-utils';
 import { useUsersContainer, ROLES_FILTER } from './use-user-list';
+import { User } from '@/types/users/user.type';
 import { TEXT } from '@/static/texts/i18n';
 
 interface InfoTooltipProps {
@@ -69,7 +70,7 @@ export function UsersContainer() {
 
     // Formateamos los datos para que incluyan el JSX antes de pasar a la Tabla
     const formattedData = useMemo(() => {
-        return users.map((user: any) => ({
+        return users.map((user: User) => ({
             ...user,
             id: user.uuid,
             userDisplay: (

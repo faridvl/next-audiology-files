@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
@@ -9,7 +9,7 @@ import { useUpdateTenantMutation } from '@/shared/api/mutations/tenants/update-t
 import { toast } from 'sonner';
 import {
   Building2, CreditCard, PenTool, Check,
-  MapPin, FileText, Globe, Upload, Loader2
+  MapPin, FileText, Globe, Upload, Loader2, X
 } from 'lucide-react';
 
 const specialityLabels: Record<string, string> = {
@@ -55,11 +55,14 @@ const BusinessSettingsPage: React.FC = () => {
 
   const [businessName, setBusinessName] = useState('');
   const [businessType, setBusinessType] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (tenant) {
       setBusinessName(tenant.businessName ?? '');
       setBusinessType(tenant.businessType ?? '');
+      setLogoUrl(tenant.logoUrl ?? '');
     }
   }, [tenant]);
 
@@ -84,6 +87,7 @@ const BusinessSettingsPage: React.FC = () => {
       uuid: tenant.uuid,
       businessName: businessName || undefined,
       businessType: businessType || undefined,
+      logoUrl: logoUrl || null,
     });
   };
 
@@ -91,6 +95,7 @@ const BusinessSettingsPage: React.FC = () => {
     if (tenant) {
       setBusinessName(tenant.businessName ?? '');
       setBusinessType(tenant.businessType ?? '');
+      setLogoUrl(tenant.logoUrl ?? '');
     }
   };
 
@@ -106,17 +111,42 @@ const BusinessSettingsPage: React.FC = () => {
             <SectionHeader icon={Building2} title="Identidad Institucional" />
 
             <div className="flex items-center gap-6 mb-6">
-              <div className="h-16 w-16 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400 hover:border-[#1E3A8A]/40 hover:text-[#1E3A8A] transition-all cursor-pointer group">
-                <Upload size={18} />
-                <Typography variant={TypographyVariant.CAPTION} className="!text-[8px] font-black uppercase mt-1">Logo</Typography>
+              <div
+                onClick={() => logoInputRef.current?.click()}
+                className="relative h-16 w-16 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400 hover:border-[#1E3A8A]/40 hover:text-[#1E3A8A] transition-all cursor-pointer group shrink-0 overflow-hidden"
+              >
+                {logoUrl ? (
+                  <>
+                    <img src={logoUrl} className="h-full w-full object-contain p-1" alt="Logo" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setLogoUrl(''); }}
+                      className="absolute top-0.5 right-0.5 p-0.5 bg-red-100 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"
+                    >
+                      <X size={10} />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Upload size={18} />
+                    <Typography variant={TypographyVariant.CAPTION} className="!text-[8px] font-black uppercase mt-1">Logo</Typography>
+                  </>
+                )}
+                <input type="file" ref={logoInputRef} className="hidden" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; if (f) setLogoUrl(URL.createObjectURL(f)); }} />
               </div>
-              <div className="w-full">
+              <div className="w-full space-y-2">
                 <CompactInput
                   label="Nombre Comercial de la Clínica"
                   value={isLoading ? '' : businessName}
                   placeholder={isLoading ? 'Cargando...' : 'Nombre de la clínica'}
                   onChange={(event) => setBusinessName(event.target.value)}
                   disabled={isLoading}
+                />
+                <CompactInput
+                  label="URL del logo (imagen pública)"
+                  value={logoUrl}
+                  placeholder="https://ejemplo.com/logo.png"
+                  onChange={(event) => setLogoUrl(event.target.value)}
                 />
               </div>
             </div>

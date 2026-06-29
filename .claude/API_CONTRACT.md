@@ -21,85 +21,88 @@ Full API contract: `C:\Users\Personal\Desktop\standard-saas-api\.claude\ENDPOINT
 5. `authorizeServerSidePage()` validates cookie presence server-side via `getServerSideProps`
 6. No token refresh — session expires after 1 hour; user must re-login
 
-## Endpoints currently consumed by the site
+## Endpoints consumed by the site
 
 ### Identity Service (`NEXT_PUBLIC_IDENTITY_API_URL`)
 
-| Method | Endpoint | File | Notes |
-|--------|----------|------|-------|
-| POST | `/auth/login` | `mutations/auth/use-login-mutation.ts` | Returns `access_token` + `user` |
-| POST | `/auth/register` | `mutations/auth/use-register-mutation.ts` | Creates Tenant + User |
-| GET | `/auth/me` | `hooks/use-session.ts` | Used everywhere for user context |
-| POST | `/users` | `mutations/users/create-user-matation.ts` | Note typo in filename |
-| GET | `/users` | `querys/user-query.ts` | `?page&limit&role` filter |
+| Method | Endpoint | Archivo | Notas |
+|--------|----------|---------|-------|
+| POST | `/auth/login` | `mutations/auth/use-login-mutation.ts` | Devuelve `access_token` + `user` |
+| POST | `/auth/register` | `mutations/auth/use-register-mutation.ts` | Crea Tenant + User (businessType, isSpecialist, specialty, phone) |
+| GET | `/auth/me` | `hooks/use-session.ts` | Devuelve `user` + `tenant`. staleTime 30 min |
+| POST | `/users` | `mutations/users/create-user-matation.ts` | Nota: typo en filename |
+| GET | `/users` | `querys/user-query.ts` | `?page&limit&role&search` |
+| GET | `/users/:uuid` | `querys/get-user-query.ts` | User detail |
+| PATCH | `/users/:uuid` | `mutations/users/update-user-mutation.ts` | Actualiza `fullName`, `phoneNumber`, `specialty` |
+| DELETE | `/users/:uuid` | `mutations/users/delete-user-mutation.ts` | |
+| PATCH | `/tenants/:uuid` | `mutations/tenants/update-tenant-mutation.ts` | Actualiza `businessName`, `businessType` |
 
 ### Medical Records Service (`NEXT_PUBLIC_MEDICAL_RECORDS_API_URL`)
 
-| Method | Endpoint | File | Notes |
-|--------|----------|------|-------|
+| Method | Endpoint | Archivo | Notas |
+|--------|----------|---------|-------|
 | POST | `/patients` | `mutations/patients/create-patients-mutation.ts` | |
 | GET | `/patients` | `querys/patients-query.ts` | `?page&limit&search` |
-| GET | `/patients/:uuid` | `querys/get-patient-query.ts` | |
+| GET | `/patients/:uuid` | `querys/get-patient-query.ts` | Incluye `gender`, `bloodType`, `documentId`, `occupation` |
+| PATCH | `/patients/:uuid` | `mutations/patients/update-patient-mutation.ts` | |
+| GET | `/appointment-types` | `querys/appointment-types-query.ts` | |
+| POST | `/appointment-types` | `mutations/appointment-types/` | |
 | POST | `/appointments` | `mutations/appointments/create-appointment-mutation.ts` | |
-| GET | `/appointments` | `querys/appointments-query.ts` | **BUG: params not sent** (see below) |
+| GET | `/appointments` | `querys/appointments-query.ts` | **BUG: params no enviados (ver inconsistencias)** |
+| GET | `/appointments/:uuid` | `querys/get-appointment-query.ts` | |
 | GET | `/appointments/patient/:uuid` | `querys/get-appoinment-by-patient-query.ts` | |
-| POST | `/medical-controls` | `mutations/medical-control-mutation/medical-control-mutation.ts` | **NOT connected to form** (see MOCKS.md) |
-| GET | `/medical-controls/patient/:uuid` | `querys/get-medical-controls-query.ts` | |
-| GET | `/medical-controls/:uuid` | `querys/medical-controls-query.ts` | |
+| PATCH | `/appointments/:uuid` | `mutations/appointments/update-appointment-mutation.ts` | |
+| DELETE | `/appointments/:uuid` | `mutations/appointments/delete-appointment-mutation.ts` | |
+| POST | `/medical-controls` | `mutations/medical-control-mutation/medical-control-mutation.ts` | |
+| GET | `/medical-controls/patient/:uuid` | `querys/get-medical-controls-query.ts` | Listado paginado |
+| GET | `/medical-controls/:uuid` | `querys/medical-controls-query.ts` | Detail |
+| GET | `/maintenance/patient/:uuid` | `querys/maintenance-query.ts` | Para `warrantyExpiration` en patient detail |
 | POST | `/products` | `mutations/inventory/inventory-mutation.ts` | |
 | GET | `/products` | `querys/inventory/inventory-query.ts` | `?includeInactive` |
 | GET | `/products/:uuid` | `querys/inventory/get-product-query.ts` | |
 | PATCH | `/products/:uuid` | `mutations/inventory/inventory-mutation.ts` | |
 
-## Endpoints from the API that the site does NOT yet consume
+## Endpoints disponibles en API que el site aún no consume
 
-| Method | Endpoint | Needed for | Status |
+| Method | Endpoint | Needed for | Estado |
 |--------|----------|------------|--------|
-| GET | `/appointments/:uuid` | `ManageAppointmentContainer` — to load the appointment being edited | Not connected |
-| PATCH | `/appointments/:uuid` | `ManageAppointmentContainer` — confirm/reschedule logic | Not connected; code is dead (no mutation called) |
-| DELETE | `/appointments/:uuid` | Appointment deletion | Commented out in API — not functional |
-| GET | `/users/:uuid` | `UserDetailPage` — currently fully mocked | Endpoint does not exist in API |
-| PATCH | `/users/:uuid` | `EditUserPage` — currently fully mocked | Endpoint does not exist in API |
+| GET | `/maintenance/upcoming` | Dashboard — próximos mantenimientos | Sin UI |
+| PATCH | `/appointment-types/:uuid` | Editar tipo de cita | Sin UI |
+| DELETE | `/appointment-types/:uuid` | Eliminar tipo de cita | Sin UI |
+| GET | `/patient-background/:uuid` | Antecedentes clínicos del paciente | Query existe (`patient-background-query.ts`), sin UI conectada |
 
-## Endpoints the site needs that do NOT exist in the API yet
+## Endpoints que el site necesita y NO existen en la API
 
-These must be implemented in the API before connecting the site:
+| Endpoint | Needed for | Prioridad |
+|----------|------------|-----------|
+| `POST /patients/:uuid/documents` | Subir documento de paciente | P1-3 |
+| `GET /patients/:uuid/documents` | Listar documentos del paciente | P1-3 |
 
-| Endpoint | Needed for | Priority |
-|----------|------------|----------|
-| `GET /appointment-types` | `AppointmentTypesContainer` list (currently hardcoded array) | HIGH |
-| `POST /appointment-types` | `AppointmentTypeForm` create (currently console.log + fake delay) | HIGH |
-| `PATCH /appointment-types/:uuid` | Edit appointment type | MEDIUM |
-| `DELETE /appointment-types/:uuid` | Delete appointment type | MEDIUM |
-| `GET /users/:uuid` | User detail page | MEDIUM |
-| `PATCH /users/:uuid` | User edit page | MEDIUM |
-| `GET /auth/me` extended | Profile page (currently static form) | LOW |
-
-Note: `AppointmentType` table exists in the DB schema (`DATABASE.md`) but has no API endpoints exposed yet.
-
-## Inconsistencies between site expectations and API reality
+## Inconsistencias entre site y API
 
 ### 1. ~~Appointment response shape — `schedule` nesting~~ ✅ RESUELTO
-`mapToDomain` en `appointments.storage.ts` ya nesta `date/startTime/endTime` bajo `schedule` y construye `patientName` desde `patient.firstName + lastName`. El site accede correctamente `raw.schedule.startTime` y `raw.patientName`.
-
-**Problema real descubierto (fix/p0-1):** El filtro de fecha usaba igualdad exacta (`date: new Date(date)`) pero las citas se almacenan con hora en el campo `date`. Fix: filtrar por rango en `startTime` (`gte`/`lt`). El campo `date` en el create del site ahora se envía como medianoche UTC separado de `startTime`.
+`mapToDomain` en `appointments.storage.ts` nesta `date/startTime/endTime` bajo `schedule` y construye `patientName`. El site accede correctamente a `raw.schedule.startTime` y `raw.patientName`.
 
 ### 2. ~~Appointment `patientName` field~~ ✅ RESUELTO
-`mapToDomain` incluye `patientName`. El site accedía `raw.patient?.uuid` para el patientUUID pero la API devuelve `raw.patientUUID` (campo plano). Fix en `use-appointment-list-container.ts`.
+`mapToDomain` incluye `patientName`. Fix en `use-appointment-list-container.ts`.
 
-### 3. `GET /appointments` query params not sent (BUG)
-`src/shared/api/querys/appointments-query.ts` line 17 builds `URLSearchParams` with `page`, `limit`, `date` but then calls:
+### 3. `GET /appointments` query params no enviados (BUG activo)
+
+`src/shared/api/querys/appointments-query.ts` construye `URLSearchParams` con `page`, `limit`, `date` pero llama:
 ```ts
 return await ApiServiceClient(APPOINTMENTS_URL).get<any>(`/appointments`);
-// Should be: .get<any>(`/appointments?${params}`)
+// Debería ser: .get<any>(`/appointments?${params}`)
 ```
-Result: every appointment fetch returns ALL appointments for the tenant with no date/page filtering.
+Resultado: devuelve TODAS las citas del tenant sin filtrar por fecha ni página.
 
-### 4. `GET /appointments/patient/:uuid` response shape
-Frontend (`get-appoinment-by-patient-query.ts`) expects `{ patient: { phone, email, idNumber }, appointments: [...] }`. API docs document only `{ patient: { uuid, name }, appointments: [...] }`. Fields `phone`, `email`, `idNumber` may be missing, causing WhatsApp redirect to fail or use a fallback hardcoded number (`88165808`).
+### 4. `GET /appointments/patient/:uuid` — campos extras
 
-### 5. `useSession` user field name
-`use-session.ts` expects `data.user.fullName`. The API's `User` DB column is `name` but the domain layer maps it to `fullName`. This should work, but must be verified when adding user management features.
+Frontend espera `{ patient: { phone, email, idNumber }, appointments: [...] }`. La API documenta solo `{ patient: { uuid, name }, appointments: [...] }`. `phone`, `email`, `idNumber` pueden estar ausentes — el redirect a WhatsApp usa un número hardcodeado (`88165808`) como fallback.
 
-### 6. `AppointmentType` type mismatch
-Frontend type `AppointmentType` has `id: string` but DB uses `uuid` as public identifier. The `typeUUID` field in appointment payload sends the UUID correctly, but the type definition uses `id` instead of `uuid` as the field name.
+### 5. `useSession` — nombre de campo `fullName`
+
+`use-session.ts` espera `data.user.fullName`. El storage de Identity mapea `record.name → fullName` en `findByUuid`. Funciona, pero es frágil si se cambia el mapeo.
+
+### 6. `AppointmentType` — `id` vs `uuid`
+
+El tipo frontend `AppointmentType` usa `id: string` pero la DB usa `uuid` como identificador público. El payload de creación de citas envía `typeUUID` correctamente, pero la definición del tipo es inconsistente.

@@ -31,7 +31,6 @@ export function useUserForm(onSuccess?: () => void): useUserFormReturn {
   });
 
   async function handleSave(values: UserFormValues) {
-    console.log(values);
     executeCreateUser(values, {
       onSuccess: () => {
         toast.success('Operación realizada con éxito');

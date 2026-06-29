@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { useSession } from '@/hooks/use-session';
 import { useNavigation } from '@/hooks/use-navigation';
 import { useCreateMedicalControlMutation } from '@/shared/api/mutations/medical-control-mutation/medical-control-mutation';
-import { useClinicalTemplateBySpecialityQuery } from '@/shared/api/querys/clinical-templates-query';
+import { useClinicalTemplatesBySpecialityQuery } from '@/shared/api/querys/clinical-templates-query';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
 import { UserSpecialty } from '@/types/auth/auth';
 import { ConsultaSessionStorage } from '@/shared/utils/consulta-session';
@@ -22,8 +22,17 @@ export function useConsultaControl(patientUuid: string) {
     ? userSpecialtyToApiSpeciality[user.specialty]
     : MedicalSpeciality.GENERAL;
 
-  const { data: templateData } = useClinicalTemplateBySpecialityQuery(apiSpeciality);
-  const activeTemplate = templateData ?? null;
+  const { data: templatesData } = useClinicalTemplatesBySpecialityQuery(apiSpeciality);
+  const templates = templatesData ?? [];
+  const [selectedTemplateUuid, setSelectedTemplateUuid] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (templates.length > 0 && !selectedTemplateUuid) {
+      setSelectedTemplateUuid(templates[0].uuid);
+    }
+  }, [templates, selectedTemplateUuid]);
+
+  const activeTemplate = templates.find((template) => template.uuid === selectedTemplateUuid) ?? null;
 
   const [otoscopyRight, setOtoscopyRight] = useState('');
   const [otoscopyLeft, setOtoscopyLeft] = useState('');
@@ -86,7 +95,10 @@ export function useConsultaControl(patientUuid: string) {
 
   return {
     apiSpeciality,
+    templates,
     activeTemplate,
+    selectedTemplateUuid,
+    setSelectedTemplateUuid,
     fields: { otoscopyRight, setOtoscopyRight, otoscopyLeft, setOtoscopyLeft, diagnosis, setDiagnosis, fieldValues, setFieldValue },
     isPending,
     handleSave,

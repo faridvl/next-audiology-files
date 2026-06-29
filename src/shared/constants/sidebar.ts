@@ -1,5 +1,6 @@
 import { INavigationPath } from '@/types/system/navigation-path';
 import { routesPrivate } from '../navigation/routes';
+import { UserRole } from '@/types/auth/auth';
 import {
   LayoutDashboard,
   CalendarDays,
@@ -10,6 +11,12 @@ import {
   ClipboardList,
   Stethoscope,
 } from 'lucide-react';
+
+// Recepcionista = STAFF: ve Inicio, Agenda, Inventario. Sin acceso al expediente clínico.
+// Médico = DOCTOR: ve todo clínico. Sin Usuarios ni Reportes.
+// Admin/Owner = OWNER | ADMIN: acceso completo.
+const ADMIN_ROLES = [UserRole.OWNER, UserRole.ADMIN];
+const CLINICAL_ROLES = [UserRole.OWNER, UserRole.ADMIN, UserRole.DOCTOR];
 
 // Orden operativo: lo que el clínico necesita primero → al fondo la administración
 export const NAVIGATION_PATHS: INavigationPath[] = [
@@ -33,6 +40,7 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
     icon: Users,
     labelKey: 'Pacientes',
     route: routesPrivate.patients.index,
+    allowedRoles: CLINICAL_ROLES,
   },
   {
     menuKey: 'clinicalTemplates',
@@ -40,6 +48,7 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
     icon: Stethoscope,
     labelKey: 'Plantillas',
     route: routesPrivate.clinicalTemplates.index,
+    allowedRoles: CLINICAL_ROLES,
   },
   {
     menuKey: 'inventory',
@@ -54,6 +63,7 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
     icon: ClipboardList,
     labelKey: 'Tipos de Cita',
     route: routesPrivate.appointmentType.index,
+    allowedRoles: ADMIN_ROLES,
   },
   {
     menuKey: 'users',
@@ -61,6 +71,7 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
     icon: ShieldCheck,
     labelKey: 'Usuarios',
     route: routesPrivate.users.index,
+    allowedRoles: ADMIN_ROLES,
   },
   {
     menuKey: 'report-template',
@@ -68,5 +79,6 @@ export const NAVIGATION_PATHS: INavigationPath[] = [
     icon: LayoutTemplate,
     labelKey: 'Reportes',
     route: routesPrivate.reportTemplate.create,
+    allowedRoles: ADMIN_ROLES,
   },
 ];

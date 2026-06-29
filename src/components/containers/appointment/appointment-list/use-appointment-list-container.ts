@@ -48,10 +48,19 @@ export const statusConfig: Record<string, { label: string; color: string }> = {
   },
 };
 
-const specialityMap: Record<string, string> = {
+const specialityLabelMap: Record<string, string> = {
   [MedicalSpeciality.AUDIOLOGY]: 'Audiología',
   [MedicalSpeciality.DENTAL]: 'Odontología',
   [MedicalSpeciality.GENERAL]: 'Consulta General',
+};
+
+export const specialityColorMap: Record<string, string> = {
+  [MedicalSpeciality.AUDIOLOGY]: '#3B82F6',
+  [MedicalSpeciality.DENTAL]: '#10B981',
+  [MedicalSpeciality.GENERAL]: '#8B5CF6',
+  OPHTHALMOLOGY: '#F59E0B',
+  NUTRITION: '#EC4899',
+  PSYCHOLOGY: '#06B6D4',
 };
 
 export type { AppointmentUI } from '@/types/appointments/appointment-ui.types';
@@ -83,6 +92,8 @@ export const useAppointmentsContainer = () => {
       const service = rawAppointment.service as Record<string, string> | undefined;
       const patientRecord = rawAppointment.patient as Record<string, string> | undefined;
 
+      const typeSpeciality = (service?.speciality || rawAppointment.speciality) as string | undefined;
+
       return {
         id: (rawAppointment.id || rawAppointment.uuid) as string,
         patient: (rawAppointment.patientName as string) || 'Paciente no identificado',
@@ -93,7 +104,9 @@ export const useAppointmentsContainer = () => {
         status,
         statusLabel: config.label,
         statusColor: config.color,
-        type: service?.name || specialityMap[rawAppointment.speciality as string] || (rawAppointment.speciality as string) || 'General',
+        type: service?.name || specialityLabelMap[rawAppointment.speciality as string] || (rawAppointment.speciality as string) || 'General',
+        typeColor: service?.color || null,
+        typeSpeciality: typeSpeciality || null,
         notes: rawAppointment.notes as string | undefined,
         monthsSinceLastVisit: 0,
         warrantyExpirationDate: 'N/A',

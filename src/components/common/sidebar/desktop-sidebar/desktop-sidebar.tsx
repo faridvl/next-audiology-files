@@ -3,12 +3,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { TypographyVariant, Typography } from "../../typography/typography";
 import { routesPrivate } from "@/shared/navigation/routes";
-import { NAVIGATION_PATHS } from '@/shared/constants/sidebar';
 import { useSidebar } from './use-sidebar';
 
 export default function DesktopSidebar() {
   const router = useRouter();
-  const { userName, userRole, businessName, initials, isLoading } = useSidebar();
+  const { userName, userRole, businessName, initials, isLoading, filteredNavigation } = useSidebar();
 
   return (
     <div className="flex h-full max-h-screen flex-col bg-white border-r border-slate-100">
@@ -40,7 +39,7 @@ export default function DesktopSidebar() {
       {/* Navigation */}
       <div className="flex-1 overflow-auto px-3">
         <nav className="space-y-1">
-          {NAVIGATION_PATHS.map((item) => {
+          {filteredNavigation.map((item) => {
             const isActive = router.pathname.startsWith(item.route);
             const Icon = item.icon;
 

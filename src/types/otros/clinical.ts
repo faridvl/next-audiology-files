@@ -1,15 +1,10 @@
-export enum ControlType {
-  AUDIOLOGY = 'AUDIOLOGY',
-  DERMATOLOGY = 'DERMATOLOGY',
-  GENERAL = 'GENERAL',
-  DENTAL = 'DENTAL',
-}
+export { MedicalSpeciality as ControlType } from '@/types/medical-controls/medical-control.types';
 
 export interface ClinicalControl {
   id: string;
   patientId: string;
   specialistName: string;
-  type: ControlType;
+  type: string;
   date: string;
   note: string;
   details?: {

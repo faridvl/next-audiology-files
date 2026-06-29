@@ -6,6 +6,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
 import '../styles/globals.scss';
 import '@/shared/i18n/i18n';
+import '@/shared/utils/suppress-extension-errors';
 import { DashboardContextProvider } from '@/layouts/dashboard/dashboard-context';
 import { NavigationContextProvider } from '@/shared/context/navigation-context';
 import { PageLoadingBar } from '@/components/common/page-loading-bar/page-loading-bar';
