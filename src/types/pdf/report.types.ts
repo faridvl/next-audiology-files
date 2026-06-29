@@ -44,4 +44,8 @@ export interface PdfReportProps {
 
   // Seguimiento
   followUp?: PdfReportFollowUp;
+
+  // Branding
+  logoUrl?: string;
+  signatureUrl?: string;
 }

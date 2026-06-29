@@ -6,6 +6,7 @@ import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/box
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { useSession } from '@/hooks/use-session';
 import { useUpdateTenantMutation } from '@/shared/api/mutations/tenants/update-tenant-mutation';
+import { useUploadLogoMutation } from '@/shared/api/mutations/identity/use-upload-logo-mutation';
 import { toast } from 'sonner';
 import {
   Building2, CreditCard, PenTool, Check,
@@ -52,6 +53,7 @@ const SectionHeader = ({ icon: Icon, title }: { icon: React.ElementType; title: 
 const BusinessSettingsPage: React.FC = () => {
   const { tenant, isLoading } = useSession();
   const { executeUpdateTenant, isPending, isSuccess, error } = useUpdateTenantMutation();
+  const { uploadLogo, isPending: isUploadingLogo } = useUploadLogoMutation(tenant?.uuid ?? '');
 
   const [businessName, setBusinessName] = useState('');
   const [businessType, setBusinessType] = useState('');
@@ -112,7 +114,7 @@ const BusinessSettingsPage: React.FC = () => {
 
             <div className="flex items-center gap-6 mb-6">
               <div
-                onClick={() => logoInputRef.current?.click()}
+                onClick={() => !isUploadingLogo && logoInputRef.current?.click()}
                 className="relative h-16 w-16 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400 hover:border-[#1E3A8A]/40 hover:text-[#1E3A8A] transition-all cursor-pointer group shrink-0 overflow-hidden"
               >
                 {logoUrl ? (
@@ -132,7 +134,23 @@ const BusinessSettingsPage: React.FC = () => {
                     <Typography variant={TypographyVariant.CAPTION} className="!text-[8px] font-black uppercase mt-1">Logo</Typography>
                   </>
                 )}
-                <input type="file" ref={logoInputRef} className="hidden" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; if (f) setLogoUrl(URL.createObjectURL(f)); }} />
+                <input
+                  type="file"
+                  ref={logoInputRef}
+                  className="hidden"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file || !tenant?.uuid) return;
+                    try {
+                      const result = await uploadLogo(file);
+                      setLogoUrl(result.url);
+                      toast.success('Logo subido correctamente');
+                    } catch {
+                      toast.error('Error al subir el logo');
+                    }
+                  }}
+                />
               </div>
               <div className="w-full space-y-2">
                 <CompactInput

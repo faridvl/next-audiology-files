@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-    ArrowLeft,
+    ArrowLeft, PenLine, Check, X,
 } from 'lucide-react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { useNavigation } from '@/hooks/use-navigation';
 import { useControlDetail } from './use-control-detail';
 import { useSession } from '@/hooks/use-session';
+import { useAddCorrectionNoteMutation } from '@/shared/api/mutations/medical-controls/use-add-correction-note-mutation';
+import { toast } from 'sonner';
 import { MedicalSpeciality, AudiologyFindings, AudiogramData } from '@/types/medical-controls/medical-control.types';
 import { AudiogramChart, classifyHearingLoss } from '@/components/common/audiogram-chart/audiogram-chart';
 
@@ -59,6 +61,9 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
     const navigation = useNavigation();
     const { data, isLoading, isError } = useControlDetail(patientId, controlId);
     const { tenant, user } = useSession();
+    const { addCorrectionNote, isPending: isSavingNote } = useAddCorrectionNoteMutation(controlId);
+    const [isEditingNote, setIsEditingNote] = useState(false);
+    const [noteText, setNoteText] = useState('');
 
     if (isLoading) {
         return (
@@ -280,6 +285,68 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                             <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-bold text-slate-900 leading-snug">
                                 {data.control.diagnosis}
                             </Typography>
+                        </div>
+                    </div>
+
+                    {/* NOTA DE CORRECCIÓN */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-slate-50 pt-8 no-print">
+                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
+                            Nota de Corrección
+                        </div>
+                        <div className="md:col-span-3 space-y-3">
+                            {data.control.correctionNotes && !isEditingNote && (
+                                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-2 block">
+                                        Corrección registrada
+                                    </Typography>
+                                    <Typography variant={TypographyVariant.BODY} className="text-sm text-amber-900 leading-relaxed">
+                                        {data.control.correctionNotes}
+                                    </Typography>
+                                </div>
+                            )}
+                            {!isEditingNote ? (
+                                <button
+                                    onClick={() => { setNoteText(data.control.correctionNotes ?? ''); setIsEditingNote(true); }}
+                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-700 transition-colors border border-dashed border-slate-200 px-4 py-2 rounded-xl hover:border-slate-400"
+                                >
+                                    <PenLine size={12} />
+                                    {data.control.correctionNotes ? 'Editar nota' : 'Agregar nota de corrección'}
+                                </button>
+                            ) : (
+                                <div className="space-y-2">
+                                    <textarea
+                                        autoFocus
+                                        value={noteText}
+                                        onChange={(e) => setNoteText(e.target.value)}
+                                        rows={4}
+                                        className="w-full border border-amber-300 bg-amber-50 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-amber-200 resize-none"
+                                        placeholder="Describe la corrección o aclaración a este registro..."
+                                    />
+                                    <div className="flex gap-2">
+                                        <button
+                                            disabled={isSavingNote || !noteText.trim()}
+                                            onClick={async () => {
+                                                try {
+                                                    await addCorrectionNote(noteText.trim());
+                                                    toast.success('Nota de corrección guardada');
+                                                    setIsEditingNote(false);
+                                                } catch {
+                                                    toast.error('Error al guardar la nota');
+                                                }
+                                            }}
+                                            className="flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-700 disabled:opacity-50 transition-all"
+                                        >
+                                            <Check size={12} /> Guardar
+                                        </button>
+                                        <button
+                                            onClick={() => setIsEditingNote(false)}
+                                            className="flex items-center gap-2 text-slate-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:text-slate-700 transition-colors"
+                                        >
+                                            <X size={12} /> Cancelar
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 

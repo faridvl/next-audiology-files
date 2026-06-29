@@ -26,6 +26,8 @@ import { UserRole } from "@/types/auth/auth";
 import { LinkDeviceModal } from "./link-device-modal";
 import { AudiogramChart, classifyHearingLoss } from "@/components/common/audiogram-chart/audiogram-chart";
 import { useState } from "react";
+import { useDeletePatientMutation } from "@/shared/api/mutations/patients/use-delete-patient-mutation";
+import { toast } from "sonner";
 
 interface HeaderInfoProps { icon: React.ReactNode; text: string; isWarning?: boolean; }
 const HeaderInfo = ({ icon, text, isWarning }: HeaderInfoProps) => (
@@ -80,8 +82,11 @@ const getTypeStyle = (type: ControlType) => {
 export const PatientDetailContainer = ({ id }: { id: string }) => {
     const navigation = useNavigation();
     const [isLinkDeviceOpen, setIsLinkDeviceOpen] = useState(false);
+    const [isConfirmDelete, setIsConfirmDelete] = useState(false);
     const { user } = useSession();
     const canStartConsulta = user?.role && user.role !== UserRole.STAFF;
+    const isAdmin = user?.role === UserRole.OWNER || user?.role === UserRole.ADMIN;
+    const { deletePatient, isPending: isDeletingPatient } = useDeletePatientMutation();
 
     const {
         patient, history, summary, isLoading, isFetching,
@@ -121,6 +126,36 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                     </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2">
+                    {isAdmin && !isConfirmDelete && (
+                        <button
+                            onClick={() => setIsConfirmDelete(true)}
+                            className="flex items-center justify-center gap-1.5 border border-red-200 text-red-500 px-4 h-10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-50 transition-all flex-1 sm:flex-none"
+                        >
+                            Desactivar paciente
+                        </button>
+                    )}
+                    {isAdmin && isConfirmDelete && (
+                        <div className="flex items-center gap-2 border border-red-300 bg-red-50 px-4 h-10 rounded-xl flex-1 sm:flex-none">
+                            <span className="text-[10px] font-black text-red-600 uppercase tracking-widest">¿Confirmar?</span>
+                            <button
+                                disabled={isDeletingPatient}
+                                onClick={async () => {
+                                    try {
+                                        await deletePatient(id);
+                                        toast.success('Paciente desactivado');
+                                        navigation.patients.list();
+                                    } catch {
+                                        toast.error('Error al desactivar');
+                                        setIsConfirmDelete(false);
+                                    }
+                                }}
+                                className="text-[10px] font-black text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg uppercase tracking-widest transition-all disabled:opacity-50"
+                            >
+                                {isDeletingPatient ? '...' : 'Sí'}
+                            </button>
+                            <button onClick={() => setIsConfirmDelete(false)} className="text-[10px] font-black text-slate-500 hover:text-slate-700 uppercase tracking-widest">No</button>
+                        </div>
+                    )}
                     <button
                         onClick={() => setIsLinkDeviceOpen(true)}
                         className="flex items-center justify-center gap-1.5 border border-slate-200 text-slate-600 px-4 h-10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all flex-1 sm:flex-none"

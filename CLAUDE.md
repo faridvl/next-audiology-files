@@ -6,12 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Leer todos estos archivos antes de responder cualquier tarea:**
 
-1. `.claude/CHANGES.md` — branch activo, próximo paso, cola de trabajo
-2. `.claude/PENDING.md` — todos los pendientes con prioridad y esfuerzo
-3. `.claude/PATTERNS.md` — convenciones de código que aplican a cada cambio
-4. `.claude/ARCHITECTURE.md` — estructura de carpetas, routing, auth guard
-5. `.claude/API_CONTRACT.md` — endpoints disponibles, inconsistencias conocidas
-6. `.claude/MOCKS.md` — qué datos están hardcodeados y cuál es su estado
+1. `.claude/STATUS.md` — branch activo, próximo paso, pendientes y completado reciente
+2. `.claude/PATTERNS.md` — convenciones de código que aplican a cada cambio
+3. `.claude/ARCHITECTURE.md` — estructura de carpetas, routing, auth guard
+4. `.claude/API_CONTRACT.md` — endpoints disponibles, inconsistencias conocidas
+5. `.claude/MOCKS.md` — qué datos están hardcodeados y cuál es su estado
 
 Sin leer estos archivos no es posible saber el estado del proyecto, qué está roto, qué convenciones seguir ni qué endpoints existen.
 
@@ -64,8 +63,7 @@ Both vars are consumed in `src/shared/api/config.ts`. There is no fallback — m
 | [API_CONTRACT.md](.claude/API_CONTRACT.md) | How the site connects to the API, endpoints consumed, inconsistencies |
 | [MOCKS.md](.claude/MOCKS.md) | Pages/components with hardcoded data, per-item integration status |
 | [PATTERNS.md](.claude/PATTERNS.md) | Component conventions, data fetching patterns, typing rules |
-| [CHANGES.md](.claude/CHANGES.md) | Completed / in-progress / pending / blocked work |
-| [PENDING.md](.claude/PENDING.md) | Lista unificada de pendientes con prioridad, esfuerzo y definición de MVP |
+| [STATUS.md](.claude/STATUS.md) | Próximo paso, pendientes (P0–P3), completado reciente, mocks pendientes |
 
 ## Related repos
 
@@ -86,16 +84,15 @@ Do not implement anything in the site that depends on an endpoint that does not 
 
 Al finalizar cada etapa (antes de `git push`):
 
-1. Actualizar `CHANGES.md` — sección `🎯 SESIÓN ACTIVA` con el próximo paso y mover lo terminado a `✅ COMPLETADO`.
-2. Actualizar `PENDING.md` — marcar con `~~tachado~~` y ✅ los ítems resueltos.
-3. **Actualizar `README.md`** — cambiar ⬜ → ✅ en los ítems del Roadmap que se completaron en esta etapa.
+1. Actualizar `.claude/STATUS.md` — mover lo completado a `✅ Completado`, actualizar `🎯 Próximo paso`, tachar ítems resueltos en `📋 Pendientes`.
+2. **Actualizar `README.md`** — cambiar ⬜ → ✅ en los ítems del Roadmap que se completaron en esta etapa.
 
 ## Regla de features cross-repo
 
 Cuando implementes un endpoint nuevo o lo modifiques:
 1. Actualiza `.claude/ENDPOINTS.md` con el contrato exacto antes de terminar
 2. El site leerá ese contrato — incluir tipos de request/response precisos
-3. Marcar en `.claude/CHANGES.md` qué cambió
+3. Marcar en `.claude/STATUS.md` qué cambió
 
 Los incompletos que más afectan al site:
 - `DELETE /appointments/:uuid` — site lo necesita para cancelar citas

@@ -13,6 +13,7 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { UserRole } from '@/types/auth/auth';
 import { useSession } from '@/hooks/use-session';
 import { useUpdateUserMutation } from '@/shared/api/mutations/users/update-user-mutation';
+import { useUploadSignatureMutation } from '@/shared/api/mutations/identity/use-upload-signature-mutation';
 import { toast } from 'sonner';
 
 // --- COMPONENTES ATÓMICOS REUTILIZABLES ---
@@ -43,6 +44,7 @@ const ProfileSettingsPage: React.FC = () => {
     const { t } = useTranslation();
     const { user, isLoading: isSessionLoading } = useSession();
     const { executeUpdateUser, isPending, isSuccess, error } = useUpdateUserMutation();
+    const { uploadSignature, isPending: isUploadingSignature } = useUploadSignatureMutation(user?.uuid ?? '');
     const [activeTab, setActiveTab] = useState<'general' | 'medical'>('general');
 
     const [fullName, setFullName] = useState('');
@@ -50,7 +52,6 @@ const ProfileSettingsPage: React.FC = () => {
     const [specialty, setSpecialty] = useState('');
     const [signatureUrl, setSignatureUrl] = useState('');
 
-    // Estados funcionales para archivos (solo preview local — no hay upload real aún)
     const [avatar, setAvatar] = useState<string | null>(null);
     const avatarRef = useRef<HTMLInputElement>(null);
     const signatureRef = useRef<HTMLInputElement>(null);
@@ -217,15 +218,45 @@ const ProfileSettingsPage: React.FC = () => {
                                             <Typography variant={TypographyVariant.OVERLINE} className="ml-1 !text-slate-400 !text-[10px] uppercase font-bold">
                                                 Firma Digitalizada para Recetas
                                             </Typography>
-                                            <FormField label="URL de firma (imagen pública)" icon={UploadCloud}>
+                                            <div className="flex gap-3">
+                                                <div className="flex-1">
+                                                    <FormField label="URL de firma (imagen pública)" icon={UploadCloud}>
+                                                        <input
+                                                            type="url"
+                                                            className={inputStyles}
+                                                            placeholder="https://ejemplo.com/mi-firma.png"
+                                                            value={signatureUrl}
+                                                            onChange={(event) => setSignatureUrl(event.target.value)}
+                                                        />
+                                                    </FormField>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    disabled={isUploadingSignature || !user?.uuid}
+                                                    onClick={() => signatureRef.current?.click()}
+                                                    className="mt-6 px-4 py-3.5 bg-slate-100 text-slate-600 rounded-2xl hover:bg-slate-200 transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shrink-0 disabled:opacity-50"
+                                                >
+                                                    {isUploadingSignature ? <Loader2 size={14} className="animate-spin" /> : <UploadCloud size={14} />}
+                                                    Subir
+                                                </button>
                                                 <input
-                                                    type="url"
-                                                    className={inputStyles}
-                                                    placeholder="https://ejemplo.com/mi-firma.png"
-                                                    value={signatureUrl}
-                                                    onChange={(event) => setSignatureUrl(event.target.value)}
+                                                    type="file"
+                                                    ref={signatureRef}
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    onChange={async (e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (!file || !user?.uuid) return;
+                                                        try {
+                                                            const result = await uploadSignature(file);
+                                                            setSignatureUrl(result.url);
+                                                            toast.success('Firma subida correctamente');
+                                                        } catch {
+                                                            toast.error('Error al subir la firma');
+                                                        }
+                                                    }}
                                                 />
-                                            </FormField>
+                                            </div>
                                             {signatureUrl && (
                                                 <div className="relative border border-slate-200 rounded-[2rem] bg-slate-50 h-36 flex items-center justify-center overflow-hidden">
                                                     <img src={signatureUrl} className="h-full object-contain p-4 mix-blend-multiply" alt="Firma" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />

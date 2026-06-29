@@ -109,6 +109,8 @@ export function usePdfReport(controlUuid: string, patientUuid: string): UsePdfRe
       institutionName: tenant?.businessName?.toUpperCase() ?? 'INSTITUCIÓN MÉDICA',
       specialistName: user?.fullName ? `DR. ${user.fullName.toUpperCase()}` : 'ESPECIALISTA',
       printDate: formatPrintDate(),
+      logoUrl: tenant?.logoUrl ?? undefined,
+      signatureUrl: user?.signatureUrl ?? undefined,
 
       patient: {
         fullName: `${patientRaw.firstName} ${patientRaw.lastName}`.toUpperCase(),

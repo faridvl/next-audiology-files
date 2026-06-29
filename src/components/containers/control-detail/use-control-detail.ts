@@ -47,6 +47,7 @@ export function useControlDetail(patientId: string, controlId: string) {
             speciality: controlRaw.header.speciality as MedicalSpeciality,
             findings: controlRaw.clinicalData.findings as unknown as AudiologyFindings,
             diagnosis: controlRaw.clinicalData.diagnosis.toUpperCase(),
+            correctionNotes: (controlRaw as unknown as { correctionNotes?: string | null }).correctionNotes ?? null,
             plan: [
               'CONTINUAR CON CUIDADOS HABITUALES.',
               'CONSULTAR EN CASO DE MOLESTIAS O RECURRENCIA.',

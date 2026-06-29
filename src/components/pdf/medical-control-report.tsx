@@ -8,6 +8,7 @@ import {
   Page,
   View,
   Text,
+  Image,
   StyleSheet,
   Font,
 } from '@react-pdf/renderer';
@@ -207,6 +208,19 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: COLORS.textDark,
   },
+  // ——— Logo ———
+  logoImage: {
+    width: 48,
+    height: 48,
+    objectFit: 'contain',
+    marginRight: 10,
+  },
+  signatureImage: {
+    width: 100,
+    height: 40,
+    objectFit: 'contain',
+    marginBottom: 3,
+  },
   // ——— Footer ———
   footer: {
     position: 'absolute',
@@ -266,6 +280,8 @@ export const MedicalControlReport: React.FC<PdfReportProps> = (props) => {
     diagnosis,
     audiogram,
     followUp,
+    logoUrl,
+    signatureUrl,
   } = props;
 
   const findingEntries = Object.entries(findings).filter(
@@ -282,11 +298,14 @@ export const MedicalControlReport: React.FC<PdfReportProps> = (props) => {
 
         {/* HEADER */}
         <View style={styles.headerSection}>
-          <View>
-            <Text style={styles.headerTitle}>{institutionName}</Text>
-            <Text style={styles.headerSubtitle}>
-              Sistema de Gestión de Expedientes Digitales — Zynka
-            </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {logoUrl && <Image src={logoUrl} style={styles.logoImage} />}
+            <View>
+              <Text style={styles.headerTitle}>{institutionName}</Text>
+              <Text style={styles.headerSubtitle}>
+                Sistema de Gestión de Expedientes Digitales — Zynka
+              </Text>
+            </View>
           </View>
           <View style={styles.headerRight}>
             <Text style={styles.headerSpecialist}>{specialistName}</Text>
@@ -414,6 +433,7 @@ export const MedicalControlReport: React.FC<PdfReportProps> = (props) => {
             </Text>
           </View>
           <View style={styles.footerSignature}>
+            {signatureUrl && <Image src={signatureUrl} style={styles.signatureImage} />}
             <View style={styles.footerSignatureLine} />
             <Text style={styles.footerSignatureText}>{specialistName}</Text>
             <Text style={styles.footerSignatureText}>{speciality}</Text>

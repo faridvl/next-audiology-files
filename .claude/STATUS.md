@@ -9,8 +9,8 @@
 ## 🎯 Próximo paso
 
 **Branch activo:** `main`  
-**Última etapa completada:** Guards de especialidad en API, filtro timeline por tipo, selector de plantillas, signatureUrl + logoUrl en esquema Identity (migración aplicada), roles en sidebar/nav, typecheck limpio en ambos repos.  
-**Siguiente:** Mejoras que requieren migraciones de Medical Records (soft delete pacientes, múltiples audífonos, notas de corrección) — confirmar con cliente antes de tocar esquema. O conectar PDF con logo + firma del médico.
+**Última etapa completada:** StorageModule en core (Cloudflare R2), soft delete de pacientes, PatientDevice (múltiples audífonos), correctionNotes en controles, logo+firma conectados al PDF. Migraciones aplicadas. Typecheck limpio en ambos repos.  
+**Siguiente:** UI de múltiples audífonos en patient-detail (el endpoint existe, falta el listado+formulario en el site). O soft delete en la lista de pacientes (filtrar `isActive: false`).
 
 ---
 
@@ -26,7 +26,7 @@ _Ninguno conocido._
 | # | Tarea | Esfuerzo | Repo | Notas |
 |---|-------|----------|------|-------|
 | P1-1 | **Soft delete de pacientes** | M | API+Site | `Patient` en Medical Records no tiene `isActive`/`deletedAt`. Agregar campos + migración + filtro en `GET /patients` + botón "Desactivar" en patient detail. |
-| P1-5 | **Patient documents: diseño + infraestructura** | L | API+Site | `handleUpload`/`handleDelete` son console.log. Requiere storage (S3/R2) + endpoints `POST/GET /patients/:uuid/documents`. |
+| P1-5 | **Patient documents: UI listado** | M | Site | Endpoints de upload a R2 listos: `POST /upload/patients/:uuid/audiometrias|imagenes|informes`. Falta UI de lista de documentos vinculados. |
 | P1-6 | **Filtro/cambio de estado en citas en lote** | S | Site | UI de `statusFilter` existe. Falta acción de cambio por ítem desde la lista. |
 
 ---
@@ -35,8 +35,7 @@ _Ninguno conocido._
 
 | # | Tarea | Esfuerzo | Repo | Notas |
 |---|-------|----------|------|-------|
-| P2-1 | **Múltiples audífonos por paciente (PatientDevice)** | M | API+Site | `Patient.linkedProductUuid` es un solo string. Cliente confirmó que puede tener OD+OI por separado. Requiere modelo `PatientDevice` + historial de mantenimiento por dispositivo. |
-| P2-2 | **Conectar logo y firma al PDF** | M | Site | `tenant.logoUrl` y `user.signatureUrl` ya existen en DB y se exponen en sesión. Falta leerlos desde el contexto del PDF (`MedicalControlReport`) e insertarlos en el template. |
+| P2-1 | **UI múltiples audífonos (PatientDevice)** | S | Site | Modelo `PatientDevice` migrado y endpoints `GET/POST/DELETE /patients/:uuid/devices` listos. Falta UI de listado + formulario de alta en patient-detail. |
 | P2-4 | **Snapshot de plantilla al guardar control** | M | API | Al crear `MedicalControl`, copiar el contenido de las preguntas en `clinicalData` para que cambios futuros a la plantilla no alteren registros históricos. Sin nuevo modelo — solo guardar el snapshot en el JSON. |
 | P2-5 | **Nota de corrección en controles** | M | API+Site | `MedicalControl` no tiene `correctionNotes`. Cliente dijo que los controles no se editan, se corrigen con una nota. Agregar campo + UI en control-detail. |
 | P2-6 | **Vencimiento de garantía y próxima receta** | L | API+Site | Sin diseño. Requiere campos nuevos en `Patient` o modelo separado. |
@@ -62,6 +61,15 @@ _Ninguno conocido._
 ---
 
 ## ✅ Completado (últimas etapas)
+
+- **StorageModule en @project/core:** `StorageService` con Cloudflare R2 (S3-compatible). Acepta imágenes y PDFs, incluye timestamp en filename. `@Global()` — importado por identity y medical-records.
+- **Upload endpoints — identity:** `POST /upload/tenants/:uuid/logo`, `/upload/users/:uuid/signature`, `/upload/users/:uuid/avatar`. Sube a R2 y actualiza el campo en DB.
+- **Upload endpoints — medical-records:** `POST /upload/patients/:uuid/audiometrias|imagenes|informes`. Solo sube, no persiste URL (documentos aún sin listado).
+- **Upload real en site:** Settings sube logo a R2 directo. Profile sube firma a R2. Ambas páginas actualizadas.
+- **Soft delete de pacientes:** `DELETE /patients/:uuid` (204). `GET /patients?includeInactive=true` muestra activos+inactivos. UI en patient-detail con confirmación (solo OWNER/ADMIN).
+- **PatientDevice (múltiples audífonos):** Modelo migrado con `side`, `brand`, `model`, `serialNumber`, `warrantyUntil`. Endpoints `GET/POST /patients/:uuid/devices` + `DELETE /patients/:uuid/devices/:deviceUuid`.
+- **correctionNotes en controles:** `PATCH /medical-controls/:uuid/correction-note`. UI inline en control-detail con confirmación tipo amber.
+- **Logo y firma en PDF:** `MedicalControlReport` muestra `<Image>` con logo en header y firma encima de la línea de firma en footer. Props `logoUrl` y `signatureUrl` inyectados desde sesión.
 
 - **Guard de especialidad en listado:** `GET /medical-controls/patient/:uuid` ahora filtra por `user.specialty` del JWT. Antes devolvía todos sin filtrar.
 - **Filtro de timeline por tipo:** patient-detail ahora muestra Todos / Controles / Audiogramas / Mantenimientos. Los mantenimientos se mezclan en el mismo timeline.
@@ -96,5 +104,5 @@ _Ninguno conocido._
 |---------|---------|---------|
 | Patient documents | `src/components/containers/documents/use-documents.tsx` | Sin endpoint ni storage definido |
 | Report template | `src/pages/report-template/create.tsx` | Feature sin diseñar |
-| Logo/firma upload real | Settings + Profile | `logoUrl` y `signatureUrl` se guardan como URL texto. Upload real a archivo requiere S3/R2 — pendiente de configurar. |
+| Patient documents (listado) | `src/components/containers/documents/use-documents.tsx` | Endpoints de upload listos. Falta UI de listado de documentos del paciente. |
 | Patient bloodType en summary | `use-patient-summary-header.ts` | Campo existe en DB, falta leerlo del query |
