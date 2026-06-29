@@ -25,10 +25,19 @@ export function useLogin() {
     });
   }
 
+  function resolveErrorMessage(raw: Error | null): string | null {
+    if (!raw) return null;
+    const message = raw.message ?? '';
+    if (message.toLowerCase().includes('unauthorized') || message.toLowerCase().includes('401') || message.toLowerCase().includes('invalid') || message.toLowerCase().includes('credentials')) {
+      return 'Correo o contraseña incorrectos.';
+    }
+    return message;
+  }
+
   return {
     handleLoginSubmit,
     isLoading: isPending,
-    error: error?.message || null,
+    error: resolveErrorMessage(error),
     handleResetError: reset,
   };
 }

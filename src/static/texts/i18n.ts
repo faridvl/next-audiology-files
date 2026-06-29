@@ -179,4 +179,38 @@ export const TEXT = {
       },
     },
   },
+  AUTH: {
+    LOGIN: {
+      TITLE: 'auth.login.title',
+      SUBTITLE: 'auth.login.subtitle',
+      EMAIL_LABEL: 'auth.login.emailLabel',
+      EMAIL_PLACEHOLDER: 'auth.login.emailPlaceholder',
+      PASSWORD_LABEL: 'auth.login.passwordLabel',
+      PASSWORD_PLACEHOLDER: 'auth.login.passwordPlaceholder',
+      FORGOT_PASSWORD: 'auth.login.forgotPassword',
+      SUBMIT_BUTTON: 'auth.login.submitButton',
+      SUBMITTING: 'auth.login.submitting',
+      NO_ACCOUNT: 'auth.login.noAccount',
+      REGISTER_LINK: 'auth.login.registerLink',
+    },
+    FORGOT: {
+      TITLE: 'auth.forgot.title',
+      SUBTITLE: 'auth.forgot.subtitle',
+      EMAIL_LABEL: 'auth.forgot.emailLabel',
+      EMAIL_PLACEHOLDER: 'auth.forgot.emailPlaceholder',
+      SUBMIT_BUTTON: 'auth.forgot.submitButton',
+      BACK_BUTTON: 'auth.forgot.backButton',
+    },
+    SUCCESS: {
+      TITLE: 'auth.success.title',
+      SUBTITLE: 'auth.success.subtitle',
+      BACK_BUTTON: 'auth.success.backButton',
+    },
+    ERRORS: {
+      INVALID_CREDENTIALS: 'auth.errors.invalidCredentials',
+      NETWORK_ERROR: 'auth.errors.networkError',
+      EMAIL_INVALID: 'auth.errors.emailInvalid',
+      REQUIRED: 'auth.errors.required',
+    },
+  },
 } as const;

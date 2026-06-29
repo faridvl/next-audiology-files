@@ -13,17 +13,22 @@ export const ApiServiceClient = (baseUrl: string) => {
       headers.set('Authorization', `Bearer ${token}`);
     }
 
-    const response = await fetch(`${baseUrl}${endpoint}`, {
-      ...options,
-      headers,
-    });
+    let response: Response;
+    try {
+      response = await fetch(`${baseUrl}${endpoint}`, {
+        ...options,
+        headers,
+      });
+    } catch {
+      throw new Error('No se pudo conectar con el servidor. Verifica tu conexión o intenta más tarde.');
+    }
 
     if (response.status === 204) return null;
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Error en la petición');
+      throw new Error(data.message || 'Ocurrió un error inesperado. Intenta nuevamente.');
     }
 
     return data;

@@ -227,5 +227,39 @@
         "title": "Historial"
       }
     }
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar Sesión",
+      "subtitle": "Accede a tu panel de control clínico.",
+      "emailLabel": "Email Corporativo",
+      "emailPlaceholder": "nombre@clinica.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "••••••••",
+      "forgotPassword": "¿Olvidaste la clave?",
+      "submitButton": "Entrar al Sistema",
+      "submitting": "Autenticando...",
+      "noAccount": "¿No tienes una cuenta aún?",
+      "registerLink": "Regístrate aquí"
+    },
+    "forgot": {
+      "title": "Recuperar Acceso",
+      "subtitle": "Te enviaremos un código para restablecer tu cuenta.",
+      "emailLabel": "Email de registro",
+      "emailPlaceholder": "tu@email.com",
+      "submitButton": "Enviar Instrucciones",
+      "backButton": "Volver"
+    },
+    "success": {
+      "title": "Correo Enviado",
+      "subtitle": "Revisa tu bandeja de entrada para continuar.",
+      "backButton": "Regresar al Inicio"
+    },
+    "errors": {
+      "invalidCredentials": "Correo o contraseña incorrectos.",
+      "networkError": "No se pudo conectar con el servidor. Verifica tu conexión o intenta más tarde.",
+      "emailInvalid": "Email inválido",
+      "required": "Requerido"
+    }
   }
 }
