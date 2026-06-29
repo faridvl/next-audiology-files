@@ -1,102 +1,162 @@
 # PRODUCT_QA.md
 
-Preguntas y respuestas sobre cómo funciona Zynka desde el punto de vista clínico.  
-Este documento es para el médico/cliente, no para el desarrollador.  
-Cada decisión aquí tomada afecta cómo se construye el sistema.
+Preguntas para hacerle al cliente (médico/dueño de la clínica) antes de construir o definir cada módulo.
+Están redactadas en lenguaje simple, sin términos técnicos.
+Las que ya tienen respuesta se marcan con ✅. Las pendientes con ❓.
 
 ---
 
-## Expediente del paciente
+## Pacientes
 
-**¿Qué es un expediente en Zynka?**  
-Es todo lo que existe sobre un paciente: su ficha de identificación, sus antecedentes médicos, el historial de consultas y sus documentos adjuntos.
+✅ **¿Qué datos básicos necesita tener un paciente?**
+Nombre, teléfono, correo, dirección, fecha de nacimiento, cédula, ocupación, sede.
 
----
+❓ **¿Hay pacientes que pertenecen a más de una sede o clínica?**
+Esto define si un paciente puede aparecer en más de una cuenta del sistema.
 
-**¿Qué es una consulta?**  
-Es todo lo que se le hace al paciente en un mismo día. Puede incluir una o varias de estas secciones:
-- Control clínico (preguntas de la historia clínica + diagnóstico)
-- Audiograma (valores numéricos por frecuencia OD/OI)
-- Mantenimiento del audífono (texto libre + fecha del próximo)
+❓ **¿Quién puede ver los pacientes — solo el médico que los atendió, o todos los usuarios de la clínica?**
 
-No es obligatorio llenar todas las secciones. Si ese día solo se hace mantenimiento, solo se llena esa sección.
+❓ **¿Se pueden eliminar pacientes o solo desactivarlos?**
 
 ---
 
-**¿Un control y un mantenimiento son lo mismo?**  
-No. Son registros distintos:
-- **Control clínico**: evaluación médica, responde preguntas de una historia clínica, tiene diagnóstico.
-- **Mantenimiento**: servicio al audífono (limpieza, ajuste, cambio de filtros). Tiene descripción de lo que se hizo y fecha del próximo mantenimiento.
+## Consulta / Expediente
 
-En una misma consulta puede haber los dos, o solo uno.
+✅ **¿Qué se puede hacer en una consulta?**
+Control clínico (preguntas + diagnóstico), audiograma, mantenimiento del audífono. No es obligatorio hacer todo en una misma visita.
 
----
+✅ **¿Un control y un mantenimiento son lo mismo?**
+No. El control es la evaluación médica. El mantenimiento es el servicio al audífono.
 
-**¿El audiograma es parte del control o es independiente?**  
-Es independiente dentro de la consulta. Se puede hacer audiograma sin hacer control clínico ese día, o hacerlo junto al control. Los valores se guardan con el registro del control para que queden en el historial.
+❓ **¿Una consulta siempre la hace un solo médico, o puede haber dos médicos en la misma visita?**
 
----
+❓ **¿Se puede editar o corregir un control ya guardado, o queda bloqueado?**
+Esto es importante para la trazabilidad del expediente.
 
-**¿Qué son las preguntas del control clínico?**  
-Son preguntas que el médico define previamente en "Plantillas de Historia Clínica". Por ejemplo, una plantilla "Audiología General" puede tener preguntas como "¿Usa audífonos?", "¿Tiene tinnitus?", etc. Cada pregunta se responde con Sí o No, y se puede agregar un apunte de texto.
+❓ **¿Se puede eliminar un registro del historial?**
 
----
-
-**¿Quién aparece como autor de un control?**  
-El médico que inició sesión al momento de guardar el control. Queda registrado con el perfil del usuario logueado.
+❓ **¿El paciente tiene acceso a su propio expediente de alguna forma (app, portal)?**
 
 ---
 
-**¿Qué pasa al finalizar una consulta?**  
-Se muestra un resumen de todo lo que se guardó ese día y se puede descargar un PDF para entregar al paciente.
+## Historia Clínica (Plantillas)
+
+✅ **¿Las preguntas del control las define el médico?**
+Sí, se crean como plantillas reutilizables por especialidad.
+
+❓ **¿Puede haber más de una plantilla activa al mismo tiempo para la misma especialidad?**
+Por ejemplo, ¿una plantilla para adultos y otra para niños, ambas de audiología?
+
+❓ **¿Las preguntas siempre son Sí/No, o también hay preguntas de texto libre o numéricas?**
+
+❓ **¿Una plantilla se puede modificar después de haberla usado en controles pasados?**
+Si se modifica, ¿los controles viejos deben mostrar las preguntas originales o las nuevas?
 
 ---
 
-## Documentos
+## Audiograma
 
-**¿Qué tipo de archivos se pueden subir?**  
-Cualquier archivo relacionado al paciente: fotos, PDFs externos, resultados de otros centros, etc. Se organizan por categoría:
-- **Recibos**: facturas de compra de audífonos u otros equipos
-- **Garantías**: documentos de garantía del equipo
-- **Pruebas Externas**: audiogramas o exámenes hechos en otra clínica
+✅ **¿El audiograma es solo números (dB por frecuencia), sin gráfica obligatoria?**
+Los números son obligatorios. La gráfica es opcional y se genera automáticamente.
 
----
+❓ **¿Se hacen audiogramas de vía aérea y vía ósea, o solo vía aérea?**
 
-**¿Dónde aparecen los documentos?**  
-Dentro del detalle del paciente, en una sección separada del historial de consultas. Los documentos son archivos adjuntos, no eventos clínicos.
+❓ **¿Las frecuencias siempre son las mismas (250, 500, 1000, 2000, 4000, 8000 Hz) o varían?**
 
-> ⏳ **Pendiente**: la subida de archivos requiere configurar almacenamiento en la nube (Cloudflare R2 u otro). Por ahora esta sección muestra "Próximamente".
-
----
-
-## Historial del paciente
-
-**¿Qué aparece en el historial?**  
-Los registros clínicos ordenados del más reciente al más antiguo: controles, audiogramas y mantenimientos. Se pueden filtrar por tipo.
-
-**¿Los documentos aparecen en el historial?**  
-No. Los documentos tienen su propia sección debajo del historial. Son cosas distintas: el historial son eventos médicos, los documentos son archivos.
+❓ **¿El resultado del audiograma (normal, leve, moderado, severo) lo calcula el sistema o lo escribe el médico?**
 
 ---
 
 ## Mantenimientos
 
-**¿Dónde se ven los mantenimientos pendientes?**  
-Hay una vista global en el menú principal ("Mantenimientos") que muestra todos los pacientes con mantenimiento programado para un mes específico. Se puede navegar mes a mes.
+✅ **¿El mantenimiento es texto libre de lo que se hizo más la fecha del próximo?**
+Sí.
+
+❓ **¿El sistema debe avisar al médico cuando se acerca la fecha de un mantenimiento programado?**
+Por correo, notificación en el sistema, o simplemente se ve en la vista de mantenimientos del mes.
+
+❓ **¿Un paciente puede tener más de un audífono (ej. OD y OI por separado)?**
+Esto afecta si el mantenimiento se registra por audífono o por paciente.
+
+❓ **¿El paciente recibe algún aviso de que tiene mantenimiento próximo?**
 
 ---
 
-## Antecedentes médicos
+## Documentos
 
-**¿Qué son los antecedentes?**  
-Condiciones médicas previas del paciente: diabetes, alergias, cirugías de oído, etc. Se llenan una sola vez y quedan guardados en la ficha del paciente. Se pueden actualizar si algo cambia.
+❓ **¿Qué tipos de archivos sube el médico?**
+Fotos, PDFs, resultados de otros centros, facturas, garantías... ¿hay algo más?
+
+❓ **¿Los documentos los sube solo el médico o también el personal administrativo?**
+
+❓ **¿Hay un límite de tamaño por archivo o de espacio total por paciente?**
+
+❓ **¿Los documentos se pueden compartir con el paciente (enviar por correo, link)?**
+
+❓ **¿Un documento puede estar vinculado a una consulta específica, o solo al paciente en general?**
+Por ejemplo, una foto tomada durante una consulta — ¿debe aparecer ligada a ese día?
 
 ---
 
-## Pendientes por definir
+## PDF / Reporte de consulta
 
-- [ ] ¿Los documentos van dentro del detalle del paciente o en una página propia `/patients/:uuid/documentos`?
-- [ ] ¿El filtro del historial muestra especialidad (Audiología/Dental) o tipo de registro (Control/Audiograma/Mantenimiento)?
-- [ ] ¿Se puede subir más de un archivo a la vez?
-- [ ] ¿Los archivos tienen un límite de tamaño?
-- [ ] ¿El PDF de la consulta lo recibe el paciente en papel o también por correo?
+✅ **¿El PDF se genera al finalizar la consulta?**
+Sí, desde la pantalla de resumen.
+
+✅ **¿Se le entrega al paciente en papel?**
+Generalmente sí, directo al imprimir.
+
+❓ **¿También se envía por correo al paciente?**
+
+❓ **¿Qué debe incluir el PDF?**
+¿Solo lo de esa consulta, o también el historial completo, los antecedentes, el audiograma anterior para comparar?
+
+❓ **¿El PDF lleva membrete o logo de la clínica?**
+
+❓ **¿El PDF lo firma digitalmente el médico o solo lleva su nombre?**
+
+---
+
+## Citas / Agenda
+
+❓ **¿Las citas se agendan desde Zynka o desde otro sistema (Google Calendar, etc.)?**
+
+❓ **¿Hay recordatorios automáticos al paciente antes de su cita?**
+
+❓ **¿Una cita cancelada se puede reagendar desde el sistema?**
+
+❓ **¿Hay tipos de cita (primera consulta, control, mantenimiento, urgencia)?**
+
+---
+
+## Usuarios y permisos
+
+❓ **¿Qué puede hacer un recepcionista que un médico no puede, o viceversa?**
+Por ejemplo, ¿el recepcionista puede ver el expediente clínico o solo las citas?
+
+❓ **¿Puede haber más de un médico en la misma clínica usando el sistema?**
+Y si es así, ¿cada uno ve solo sus pacientes o todos los de la clínica?
+
+❓ **¿El dueño de la clínica tiene un acceso diferente (reportes, estadísticas)?**
+
+---
+
+## Inventario / Audífonos
+
+❓ **¿El inventario es solo audífonos o también accesorios, pilas, filtros?**
+
+❓ **¿Cuando se vende un audífono, se descuenta del inventario automáticamente?**
+
+❓ **¿Se necesita saber qué audífono tiene cada paciente (marca, modelo, serial)?**
+
+---
+
+## General
+
+❓ **¿La clínica tiene más de una sede?**
+Esto cambia bastante la estructura del sistema.
+
+❓ **¿Hay horarios de atención configurables por sede o por médico?**
+
+❓ **¿Se necesitan reportes o estadísticas? ¿De qué tipo?**
+Pacientes atendidos por mes, ingresos, tipos de diagnóstico más frecuentes, etc.
