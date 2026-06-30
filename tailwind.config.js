@@ -48,6 +48,9 @@ const customColors = {
 
   'navy-blue': '#001f3f',
   'navy-blue-dark': '#001737',
+
+  'ear-right': '#2563eb',
+  'ear-left': '#ef4444',
 };
 
 function getColorWhitelist() {
@@ -230,6 +233,14 @@ module.exports = {
 
       animation: {
         'fade-in-down': 'fade-in-down 0.7s ease-out',
+      },
+
+      borderRadius: {
+        'app-sm': '0.75rem',  // replaces rounded-xl
+        'app-md': '1rem',     // replaces rounded-2xl / rounded-[24px]
+        'app-lg': '1.5rem',   // replaces rounded-3xl / rounded-[32px] / rounded-[1.5rem]
+        'app-xl': '2rem',     // replaces rounded-[40px] / rounded-[2.5rem]
+        'app-2xl': '3rem',    // replaces rounded-[3rem] / rounded-[3.5rem]
       },
 
       translate: {
