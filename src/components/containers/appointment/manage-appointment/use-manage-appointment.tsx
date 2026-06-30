@@ -11,6 +11,8 @@ import { FETCH_APPOINTMENTS_KEY } from '@/shared/api/querys/appointments-query';
 import { FETCH_APPOINTMENT_KEY } from '@/shared/api/querys/get-appointment-query';
 
 const CALL_ATTEMPT_MARKER = '— No contestó';
+const MAX_NOTES_LENGTH = 490;
+const MAX_CALL_ATTEMPTS_STORED = 5;
 
 function countCallAttempts(notes: string): number {
   if (!notes) return 0;
@@ -21,6 +23,15 @@ function buildCallNote(currentNotes: string): string {
   const attemptNumber = countCallAttempts(currentNotes) + 1;
   const timestamp = format(new Date(), 'yyyy-MM-dd HH:mm');
   return `[${timestamp}] Intento #${attemptNumber} ${CALL_ATTEMPT_MARKER}`;
+}
+
+function buildUpdatedNotes(currentNotes: string, newEntry: string): string {
+  const existingLines = currentNotes
+    ? currentNotes.split('\n').filter((line) => line.includes(CALL_ATTEMPT_MARKER))
+    : [];
+  const recentLines = existingLines.slice(-(MAX_CALL_ATTEMPTS_STORED - 1));
+  const combined = [...recentLines, newEntry].join('\n');
+  return combined.length > MAX_NOTES_LENGTH ? combined.slice(-MAX_NOTES_LENGTH) : combined;
 }
 
 function parseCallAttempts(notes: string): CallAttemptEntry[] {
@@ -85,7 +96,7 @@ export const useManageAppointment = (appointmentId: string) => {
         }
         const nextMonth = addMonths(new Date(formData.date), 1);
         const callNote = buildCallNote(formData.notes);
-        const updatedNotes = formData.notes ? `${formData.notes}\n${callNote}` : callNote;
+        const updatedNotes = buildUpdatedNotes(formData.notes, callNote);
 
         executeUpdateAppointment(
             {

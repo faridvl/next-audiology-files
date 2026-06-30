@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigation } from '@/hooks/use-navigation';
+import { useSession } from '@/hooks/use-session';
 import {
   ClinicalTemplate,
   ClinicalFieldDefinition,
@@ -75,6 +76,7 @@ export function useClinicalTemplateForm(
 ): UseClinicalTemplateFormResult {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
+  const { user } = useSession();
 
   const isEditMode = !!templateId && templateId !== 'new';
 
@@ -82,12 +84,20 @@ export function useClinicalTemplateForm(
   const { executeCreateClinicalTemplate, isPending: isCreating } = useCreateClinicalTemplateMutation();
   const { executeUpdateClinicalTemplate, isPending: isUpdating } = useUpdateClinicalTemplateMutation();
 
+  const defaultSpeciality = user?.specialty ?? 'AUDIOLOGY';
+
   const [templateName, setTemplateName] = useState('');
-  const [templateSpeciality, setTemplateSpeciality] = useState('AUDIOLOGY');
+  const [templateSpeciality, setTemplateSpeciality] = useState(defaultSpeciality);
   const [fields, setFields] = useState<ClinicalFieldDefinition[]>([]);
   const [newFieldDraft, setNewFieldDraft] = useState<NewFieldDraft>(INITIAL_FIELD_DRAFT);
 
   const isSaving = isCreating || isUpdating;
+
+  // Setear especialidad del usuario logueado en modo creación
+  useEffect(() => {
+    if (isEditMode || !user?.specialty) return;
+    setTemplateSpeciality(user.specialty);
+  }, [user?.specialty, isEditMode]);
 
   // Cargar plantilla existente si estamos en modo edición
   useEffect(() => {

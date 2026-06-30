@@ -20,50 +20,49 @@ interface ProductCardProps {
 const ProductCard = ({ brand, model, stock, minStock, price, id, onDetail, onManage }: ProductCardProps) => (
     <div
         onClick={onDetail}
-        className="bg-white p-6 rounded-[2.5rem] border border-neutral-100 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-500 cursor-pointer group relative overflow-hidden"
+        className="bg-white p-4 rounded-app-md border border-neutral-100 shadow-sm hover:shadow-md hover:border-neutral-200 transition-all duration-200 cursor-pointer group"
     >
-        <div className="flex justify-between items-start mb-6">
-            <div className="p-4 bg-neutral-50 rounded-app-md text-neutral-400 group-hover:bg-primary group-hover:text-white transition-all duration-500">
-                <Package size={22} />
+        <div className="flex justify-between items-start mb-3">
+            <div className="p-2.5 bg-neutral-50 rounded-lg text-neutral-400 group-hover:bg-neutral-100 transition-colors">
+                <Package size={16} />
             </div>
-            <div className="flex gap-2">
-                {/* Ahora la alerta es dinámica según el minStock de la BD */}
+            <div className="flex gap-1.5 items-center">
                 {stock <= minStock && (
-                    <div className="flex items-center gap-1.5 bg-danger/10 text-danger px-3 py-1.5 rounded-xl border border-danger/10 animate-pulse">
-                        <AlertCircle size={12} />
-                        <Typography variant={TypographyVariant.OVERLINE} textColor="text-danger" className="italic font-bold">Stock Bajo</Typography>
+                    <div className="flex items-center gap-1 bg-danger/8 text-danger px-2 py-1 rounded-md border border-danger/15">
+                        <AlertCircle size={10} />
+                        <Typography variant={TypographyVariant.OVERLINE} textColor="text-danger" className="font-semibold text-[10px]">Stock bajo</Typography>
                     </div>
                 )}
                 <button
                     onClick={onManage}
-                    className="p-2.5 bg-neutral-50 text-neutral-400 hover:bg-primary-soft hover:text-primary rounded-xl transition-all"
+                    className="p-1.5 text-neutral-300 hover:text-neutral-600 hover:bg-neutral-50 rounded-lg transition-all"
                 >
-                    <Settings2 size={16} />
+                    <Settings2 size={14} />
                 </button>
             </div>
         </div>
 
-        <div className="space-y-1">
-            <Typography variant={TypographyVariant.OVERLINE} textColor="text-secondary" className="mb-1">{id}</Typography>
-            <Typography variant={TypographyVariant.ACCENT} className="group-hover:text-[#1E3A8A] transition-colors uppercase truncate">
+        <div className="space-y-0.5 mb-3">
+            <Typography variant={TypographyVariant.OVERLINE} className="text-neutral-300 text-[10px]">{id}</Typography>
+            <Typography variant={TypographyVariant.BODY_BOLD} className="text-neutral-800 uppercase truncate text-sm leading-tight">
                 {brand}
             </Typography>
-            <Typography variant={TypographyVariant.HELPER} className="uppercase font-bold tracking-wider truncate opacity-60">
+            <Typography variant={TypographyVariant.HELPER} className="text-neutral-400 uppercase truncate text-xs tracking-wide">
                 {model}
             </Typography>
         </div>
 
-        <div className="flex justify-between items-end border-t border-neutral-50 mt-6 pt-5">
+        <div className="flex justify-between items-end border-t border-neutral-50 pt-3">
             <div>
-                <Typography variant={TypographyVariant.OVERLINE} className="mb-1">Existencia</Typography>
-                <div className="flex items-baseline gap-1">
-                    <Typography variant={TypographyVariant.SUBTITLE} textColor={stock <= minStock ? "text-danger" : "text-neutral-700"}>
+                <Typography variant={TypographyVariant.OVERLINE} className="text-neutral-300 text-[10px] mb-0.5">Existencia</Typography>
+                <div className="flex items-baseline gap-0.5">
+                    <Typography variant={TypographyVariant.BODY_BOLD} textColor={stock <= minStock ? "text-danger" : "text-neutral-700"} className="text-sm font-bold">
                         {stock}
                     </Typography>
-                    <Typography variant={TypographyVariant.CAPTION}>uds</Typography>
+                    <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400 text-[10px]">uds</Typography>
                 </div>
             </div>
-            <Typography variant={TypographyVariant.HEADER} textColor="text-primary" className="tracking-tighter text-lg">
+            <Typography variant={TypographyVariant.BODY_BOLD} className="text-neutral-700 font-semibold text-sm">
                 {price}
             </Typography>
         </div>
@@ -110,7 +109,7 @@ export const InventoryContainer: React.FC = () => {
                     <Typography variant={TypographyVariant.OVERLINE}>Sincronizando bodega...</Typography>
                 </div>
             ) : products.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {products.map((item) => (
                         <ProductCard
                             key={item.uuid}
