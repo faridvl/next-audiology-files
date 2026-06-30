@@ -63,10 +63,10 @@ export const FormField = ({ label, icon: Icon, error, children }: FormFieldProps
       {label}
     </Typography>
     <div className="relative">
-      <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+      <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
       {children}
     </div>
-    {error && <span className="text-xs text-red-500 ml-1">{error}</span>}
+    {error && <span className="text-xs text-danger ml-1">{error}</span>}
   </div>
 );
 
@@ -79,10 +79,10 @@ export function UserFormContainer() {
 
   const { register, formState: { errors } } = form;
 
-  const inputStyles = "w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-100 outline-none transition-all";
+  const inputStyles = "w-full pl-12 pr-4 py-3 bg-neutral-50 border-none rounded-app-md text-sm focus:ring-2 focus:ring-primary/10 outline-none transition-all";
 
   return (
-    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/20 overflow-hidden">
+    <div className="bg-white rounded-[2.5rem] border border-neutral-100 shadow-xl shadow-neutral-200/20 overflow-hidden">
 
       <form onSubmit={onSubmit} className="p-8 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -160,7 +160,7 @@ export function UserFormContainer() {
             type="button"
             disabled={isLoading} // Evitamos que cancelen mientras se está guardando
           >
-            <Typography variant={TypographyVariant.BUTTON_TEXT} className="text-slate-600">
+            <Typography variant={TypographyVariant.BUTTON_TEXT} className="text-neutral-600">
               {t('common.buttons.cancel')}
             </Typography>
           </Button>

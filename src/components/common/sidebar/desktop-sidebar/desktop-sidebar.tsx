@@ -10,26 +10,26 @@ export default function DesktopSidebar() {
   const { userName, userRole, businessName, initials, isLoading, filteredNavigation } = useSidebar();
 
   return (
-    <div className="flex h-full max-h-screen flex-col bg-white border-r border-slate-100">
+    <div className="flex h-full max-h-screen flex-col bg-white border-r border-neutral-100">
 
       {/* Logo Section */}
       <div className="flex h-[80px] items-center px-8 mb-2">
         <Link href={routesPrivate.dashboard} className="flex items-center gap-3 group">
 
           {/* Logo Box */}
-          <div className="h-10 w-10 bg-[#1E3A8A] rounded-2xl flex items-center justify-center text-white font-extrabold text-sm tracking-tight transition-all duration-300 group-hover:scale-105">
+          <div className="h-10 w-10 bg-primary rounded-app-md flex items-center justify-center text-white font-extrabold text-sm tracking-tight transition-all duration-300 group-hover:scale-105">
             Z
           </div>
 
           <div className="flex flex-col">
             <Typography
               variant={TypographyVariant.BODY_SEMIBOLD}
-              className="text-slate-900 text-[15px] tracking-tight leading-none"
+              className="text-neutral-900 text-[15px] tracking-tight leading-none"
             >
               Zynka
             </Typography>
 
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.18em] mt-0.5">
+            <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-[0.18em] mt-0.5">
               Gestión para Clínicas
             </span>
           </div>
@@ -48,15 +48,15 @@ export default function DesktopSidebar() {
                 key={item.menuKey}
                 href={item.route}
                 className={`
-                  relative flex items-center gap-3 px-5 py-2.5 rounded-xl transition-all duration-200 group
+                  relative flex items-center gap-3 px-5 py-2.5 rounded-app-sm transition-all duration-200 group
                   ${isActive
-                    ? "text-[#1E3A8A] bg-[#1E3A8A]/10"
-                    : "text-slate-500 hover:text-slate-900 hover:bg-slate-50 hover:translate-x-1"
+                    ? "text-primary bg-primary/10"
+                    : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 hover:translate-x-1"
                   }
                 `}
               >
                 {isActive && (
-                  <div className="absolute left-0 w-1 h-5 bg-[#1E3A8A] rounded-r-full" />
+                  <div className="absolute left-0 w-1 h-5 bg-primary rounded-r-full" />
                 )}
 
                 {Icon && (
@@ -65,15 +65,15 @@ export default function DesktopSidebar() {
                     strokeWidth={isActive ? 2.5 : 2}
                     className={
                       isActive
-                        ? "text-[#1E3A8A]"
-                        : "text-slate-400 group-hover:text-slate-600"
+                        ? "text-primary"
+                        : "text-neutral-400 group-hover:text-neutral-600"
                     }
                   />
                 )}
 
                 <Typography
                   variant={isActive ? TypographyVariant.BODY_SEMIBOLD : TypographyVariant.BODY}
-                  className={`text-[13.5px] ${isActive ? "text-[#1E3A8A]" : ""}`}
+                  className={`text-[13.5px] ${isActive ? "text-primary" : ""}`}
                 >
                   {item.labelKey}
                 </Typography>
@@ -85,25 +85,25 @@ export default function DesktopSidebar() {
 
 
       {/* User Section (Footer) */}
-      <div className="px-3 py-6 mt-auto border-t border-slate-100">
+      <div className="px-3 py-6 mt-auto border-t border-neutral-100">
         <Link
           href="/settings"
-          className="flex items-center gap-3 px-4 py-3 bg-slate-50 hover:bg-white rounded-2xl border border-slate-100 hover:border-blue-200 hover:shadow-md hover:shadow-blue-500/5 transition-all duration-300 group cursor-pointer"
+          className="flex items-center gap-3 px-4 py-3 bg-neutral-50 hover:bg-white rounded-app-md border border-neutral-100 hover:border-primary/30 hover:shadow-md hover:shadow-primary/5 transition-all duration-300 group cursor-pointer"
         >
-          <div className="h-9 w-9 rounded-xl bg-[#1E3A8A] group-hover:bg-blue-600 flex items-center justify-center font-bold text-white text-[11px] flex-shrink-0 transition-colors shadow-sm">
+          <div className="h-9 w-9 rounded-app-sm bg-primary group-hover:bg-primary-dark flex items-center justify-center font-bold text-white text-[11px] flex-shrink-0 transition-colors shadow-sm">
             {isLoading ? '?' : initials}
           </div>
 
           <div className="flex flex-col min-w-0 flex-1">
-            <span className="text-[12px] font-bold text-slate-800 truncate group-hover:text-blue-700 transition-colors">
+            <span className="text-[12px] font-bold text-neutral-800 truncate group-hover:text-primary-dark transition-colors">
               {isLoading ? 'Cargando...' : businessName}
             </span>
-            <span className="text-[10px] text-slate-400 font-black truncate uppercase tracking-widest">
+            <span className="text-[10px] text-neutral-400 font-black truncate uppercase tracking-widest">
               {isLoading ? '...' : userRole}
             </span>
           </div>
 
-          <div className="text-slate-300 group-hover:text-blue-400 transition-colors">
+          <div className="text-neutral-300 group-hover:text-primary-light transition-colors">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 18l6-6-6-6" />
             </svg>

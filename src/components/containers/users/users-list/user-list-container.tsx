@@ -32,16 +32,16 @@ export function InfoTooltip({ title, description }: InfoTooltipProps) {
             <button
                 onMouseEnter={() => setShow(true)}
                 onMouseLeave={() => setShow(false)}
-                className="p-1.5 text-blue-500 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors"
+                className="p-1.5 text-primary bg-primary-soft rounded-full hover:bg-primary-soft/70 transition-colors"
             >
                 <Info size={16} />
             </button>
             {show && (
-                <div className="absolute left-8 top-0 w-64 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in duration-200 border border-slate-700">
-                    <p className="font-bold mb-1 border-b border-slate-700 pb-1 text-blue-400 uppercase tracking-tight">
+                <div className="absolute left-8 top-0 w-64 p-3 bg-neutral-900 text-white text-[10px] rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in duration-200 border border-neutral-700">
+                    <p className="font-bold mb-1 border-b border-neutral-700 pb-1 text-primary-light uppercase tracking-tight">
                         {title}
                     </p>
-                    <p className="text-slate-300 leading-relaxed">
+                    <p className="text-neutral-300 leading-relaxed">
                         {description}
                     </p>
                 </div>
@@ -75,14 +75,14 @@ export function UsersContainer() {
             id: user.uuid,
             userDisplay: (
                 <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs uppercase shadow-sm">
+                    <div className="h-10 w-10 rounded-xl bg-primary-soft flex items-center justify-center text-primary font-bold text-xs uppercase shadow-sm">
                         {user.fullName ? user.fullName.charAt(0) : 'U'}
                     </div>
                     <div className="flex flex-col">
-                        <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm leading-tight text-slate-700">
+                        <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm leading-tight text-neutral-700">
                             {user.fullName}
                         </Typography>
-                        <div className="flex items-center gap-1 text-slate-400 text-[10px] mt-0.5">
+                        <div className="flex items-center gap-1 text-neutral-400 text-[10px] mt-0.5">
                             <Mail size={10} /> {user.email}
                         </div>
                     </div>
@@ -92,12 +92,12 @@ export function UsersContainer() {
                 <div className="flex flex-col gap-1">
                     <span className={tailwind(
                         "text-[9px] font-black uppercase w-fit px-2 py-0.5 rounded-md",
-                        user.role === 'ADMIN' ? 'bg-purple-50 text-purple-600' :
-                            user.role === 'DOCTOR' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
+                        user.role === 'ADMIN' ? 'bg-accent/10 text-accent' :
+                            user.role === 'DOCTOR' ? 'bg-primary-soft text-primary' : 'bg-warning/10 text-warning'
                     )}>
                         {user.role}
                     </span>
-                    <Typography variant={TypographyVariant.CAPTION} className="text-slate-500 italic">
+                    <Typography variant={TypographyVariant.CAPTION} className="text-neutral-500 italic">
                         {user.specialty || 'General'}
                     </Typography>
                 </div>
@@ -105,7 +105,7 @@ export function UsersContainer() {
             statusDisplay: (
                 <div className={tailwind(
                     "flex items-center gap-1.5 text-[11px] font-bold",
-                    user.status === 'ACTIVE' ? 'text-emerald-500' : 'text-slate-300'
+                    user.status === 'ACTIVE' ? 'text-success' : 'text-neutral-300'
                 )}>
                     {user.status === 'ACTIVE' ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
                     {user.status === 'ACTIVE' ? 'Activo' : 'Inactivo'}
@@ -148,26 +148,26 @@ export function UsersContainer() {
             </div>
 
             {/* Filtros */}
-            <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center mb-6">
+            <div className="bg-white p-3 rounded-app-md border border-neutral-100 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center mb-6">
                 <div className="relative flex-1">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={16} />
                     <input
                         type="text"
                         placeholder={t(TEXT.USERS.CREATE.FORM.FULL_NAME_PLACEHOLDER)}
-                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all"
+                        className="w-full pl-10 pr-4 py-2 bg-neutral-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-soft transition-all"
                         value={searchTerm}
                         onChange={(e) => handleSearch(e.target.value)}
                     />
                 </div>
 
-                <div className="flex gap-1 bg-slate-50 p-1 rounded-xl w-full md:w-auto">
+                <div className="flex gap-1 bg-neutral-50 p-1 rounded-xl w-full md:w-auto">
                     {ROLES_FILTER.map(role => (
                         <button
                             key={role}
                             onClick={() => handleRoleChange(role)}
                             className={tailwind(
                                 "flex-1 md:flex-none px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all",
-                                activeRole === role ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                activeRole === role ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500 hover:text-neutral-700"
                             )}
                         >
                             {role}

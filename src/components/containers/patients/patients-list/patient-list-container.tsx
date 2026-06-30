@@ -52,7 +52,7 @@ export const PatientListContainer: React.FC = () => {
     return (
         <div className="max-w-[1400px] mx-auto px-4 md:px-6 space-y-6">
             <div className="flex justify-between items-center mt-6 md:mt-8">
-                <h1 className="text-xl md:text-2xl font-bold text-slate-800">{t(TEXT.PATIENTS.LIST.TITLE)}</h1>
+                <h1 className="text-xl md:text-2xl font-bold text-neutral-800">{t(TEXT.PATIENTS.LIST.TITLE)}</h1>
                 <Button
                     variant={ButtonVariant.PRIMARY}
                     onClick={navigateToCreate}
@@ -62,13 +62,13 @@ export const PatientListContainer: React.FC = () => {
                 </Button>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+            <div className="bg-white rounded-app-md shadow-sm border border-neutral-100 p-4">
                 <div className="relative w-full">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={16} />
                     <input
                         type="text"
                         placeholder={t(TEXT.PATIENTS.LIST.SEARCH_PLACEHOLDER)}
-                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all"
+                        className="w-full pl-10 pr-4 py-2 bg-neutral-50 border-none rounded-app-sm text-sm outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                         value={searchTerm}
                         onChange={(event) => handleSearch(event.target.value)}
                     />

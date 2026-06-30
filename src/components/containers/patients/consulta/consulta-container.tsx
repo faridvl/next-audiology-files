@@ -31,32 +31,32 @@ function SectionButton({ icon, label, description, done, onClick, color }: Secti
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-4 p-5 rounded-2xl border transition-all text-left group ${
+      className={`w-full flex items-center gap-4 p-5 rounded-app-md border transition-all text-left group ${
         done
-          ? 'bg-emerald-50 border-emerald-200 hover:border-emerald-300'
-          : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-sm'
+          ? 'bg-success/10 border-success/30 hover:border-success/50'
+          : 'bg-white border-neutral-100 hover:border-neutral-300 hover:shadow-sm'
       }`}
     >
       <div
-        className={`h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 transition-colors ${
-          done ? 'bg-emerald-100' : `bg-${color}-50 group-hover:bg-${color}-100`
+        className={`h-12 w-12 rounded-app-md flex items-center justify-center shrink-0 transition-colors ${
+          done ? 'bg-success/20' : `bg-${color}-50 group-hover:bg-${color}-100`
         }`}
       >
         {done ? (
-          <CheckCircle size={22} className="text-emerald-500" />
+          <CheckCircle size={22} className="text-success" />
         ) : (
           <span className={`text-${color}-500`}>{icon}</span>
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <Typography variant={TypographyVariant.BODY_BOLD} className={`text-sm ${done ? 'text-emerald-700' : 'text-slate-800'}`}>
+        <Typography variant={TypographyVariant.BODY_BOLD} className={`text-sm ${done ? 'text-success-dark' : 'text-neutral-800'}`}>
           {label}
         </Typography>
-        <Typography variant={TypographyVariant.CAPTION} className={`text-[11px] mt-0.5 ${done ? 'text-emerald-500' : 'text-slate-400'}`}>
+        <Typography variant={TypographyVariant.CAPTION} className={`text-[11px] mt-0.5 ${done ? 'text-success' : 'text-neutral-400'}`}>
           {done ? 'Guardado ✓' : description}
         </Typography>
       </div>
-      <ChevronRight size={16} className={`shrink-0 ${done ? 'text-emerald-400' : 'text-slate-300 group-hover:text-slate-500'}`} />
+      <ChevronRight size={16} className={`shrink-0 ${done ? 'text-success/60' : 'text-neutral-300 group-hover:text-neutral-500'}`} />
     </button>
   );
 }
@@ -113,24 +113,24 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={() => navigation.patients.detail(patientUuid)}
-          className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors shrink-0"
+          className="w-10 h-10 rounded-app-sm bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors shrink-0"
         >
-          <ArrowLeft size={16} className="text-slate-500" />
+          <ArrowLeft size={16} className="text-neutral-500" />
         </button>
         <div className="flex-1 min-w-0">
-          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
             Consulta del día
           </Typography>
-          <Typography variant={TypographyVariant.SUBTITLE} className="text-slate-800 leading-tight">
+          <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
             {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
           </Typography>
-          <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-slate-400 capitalize mt-0.5">
+          <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 capitalize mt-0.5">
             {today}
           </Typography>
         </div>
         {/* Progreso */}
         <div className="hidden md:flex flex-col items-end gap-1 shrink-0">
-          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
             Progreso
           </Typography>
           <div className="flex items-center gap-2">
@@ -138,11 +138,11 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
               {Array.from({ length: totalCount }).map((_, index) => (
                 <div
                   key={index}
-                  className={`h-2 w-8 rounded-full transition-all ${index < completedCount ? 'bg-emerald-400' : 'bg-slate-100'}`}
+                  className={`h-2 w-8 rounded-full transition-all ${index < completedCount ? 'bg-success' : 'bg-neutral-100'}`}
                 />
               ))}
             </div>
-            <span className="text-xs font-black text-slate-500">{completedCount}/{totalCount}</span>
+            <span className="text-xs font-black text-neutral-500">{completedCount}/{totalCount}</span>
           </div>
         </div>
       </div>
@@ -152,7 +152,7 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
 
         {/* COLUMNA IZQUIERDA — secciones */}
         <div className="space-y-4">
-          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">
+          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1">
             ¿Qué se va a realizar hoy?
           </Typography>
 
@@ -190,7 +190,7 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
             <div className="pt-2 md:hidden">
               <button
                 onClick={() => navigation.patients.consultaResumen(patientUuid)}
-                className="w-full flex items-center justify-center gap-3 bg-slate-900 hover:bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg transition-all text-sm"
+                className="w-full flex items-center justify-center gap-3 bg-neutral-900 hover:bg-primary text-white font-black py-4 rounded-app-md shadow-lg transition-all text-sm"
               >
                 <Flag size={16} />
                 Finalizar consulta
@@ -203,19 +203,19 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
         <div className="hidden md:flex flex-col gap-4">
 
           {/* Card paciente */}
-          <div className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-sm space-y-4">
-            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          <div className="bg-white border border-neutral-100 rounded-app-xl p-6 shadow-sm space-y-4">
+            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
               Paciente
             </Typography>
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500 font-black text-lg shrink-0">
+              <div className="h-12 w-12 rounded-app-md bg-neutral-100 flex items-center justify-center text-neutral-500 font-black text-lg shrink-0">
                 {patient ? patient.firstName[0] : '?'}
               </div>
               <div className="min-w-0">
-                <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-slate-800 truncate">
+                <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800 truncate">
                   {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
                 </Typography>
-                <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-slate-400">
+                <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400">
                   {patient?.documentId ?? '—'}
                 </Typography>
               </div>
@@ -223,8 +223,8 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
           </div>
 
           {/* Resumen de progreso */}
-          <div className="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-sm space-y-3">
-            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+          <div className="bg-white border border-neutral-100 rounded-app-xl p-6 shadow-sm space-y-3">
+            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
               Estado de la consulta
             </Typography>
             {[
@@ -233,15 +233,15 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
               { label: 'Mantenimiento', done: !!session?.savedMaintenanceUuid },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-3">
-                <div className={`h-2 w-2 rounded-full shrink-0 ${item.done ? 'bg-emerald-400' : 'bg-slate-200'}`} />
+                <div className={`h-2 w-2 rounded-full shrink-0 ${item.done ? 'bg-success' : 'bg-neutral-200'}`} />
                 <Typography
                   variant={TypographyVariant.CAPTION}
-                  className={`text-xs ${item.done ? 'text-emerald-600 font-bold' : 'text-slate-400'}`}
+                  className={`text-xs ${item.done ? 'text-success-dark font-bold' : 'text-neutral-400'}`}
                 >
                   {item.label}
                 </Typography>
                 {item.done && (
-                  <span className="ml-auto text-[9px] font-black text-emerald-500 uppercase tracking-wider">
+                  <span className="ml-auto text-[9px] font-black text-success uppercase tracking-wider">
                     ✓ Listo
                   </span>
                 )}
@@ -253,14 +253,14 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
           {hasSomethingSaved ? (
             <button
               onClick={() => navigation.patients.consultaResumen(patientUuid)}
-              className="w-full flex items-center justify-center gap-3 bg-slate-900 hover:bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg transition-all text-sm"
+              className="w-full flex items-center justify-center gap-3 bg-neutral-900 hover:bg-primary text-white font-black py-4 rounded-app-md shadow-lg transition-all text-sm"
             >
               <Flag size={16} />
               Finalizar consulta
             </button>
           ) : (
-            <div className="p-4 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-center">
-              <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-slate-400">
+            <div className="p-4 bg-neutral-50 border border-dashed border-neutral-200 rounded-app-md text-center">
+              <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400">
                 Completa al menos una sección para finalizar
               </Typography>
             </div>

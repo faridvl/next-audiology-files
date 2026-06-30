@@ -25,11 +25,11 @@ type TableProps = {
 
 function TableSkeleton({ columns, actions }: { columns: Column[]; actions: Action[] }) {
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-app-md border border-neutral-100 shadow-sm overflow-hidden">
             <div className="hidden md:block">
                 <table className="w-full border-collapse">
                     <thead>
-                        <tr className="border-b border-slate-100 bg-slate-50">
+                        <tr className="border-b border-neutral-100 bg-neutral-50">
                             {columns.map((column) => (
                                 <th key={column.accessor} className="px-6 py-3.5 text-left" style={{ width: column.width }}>
                                     <Typography variant={TypographyVariant.OVERLINE} inline>
@@ -40,17 +40,17 @@ function TableSkeleton({ columns, actions }: { columns: Column[]; actions: Actio
                             {actions.length > 0 && <th className="px-6 py-3.5 w-20" />}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50">
+                    <tbody className="divide-y divide-neutral-50">
                         {Array.from({ length: 5 }).map((_, index) => (
                             <tr key={index} className="animate-pulse">
                                 {columns.map((column) => (
                                     <td key={column.accessor} className="px-6 py-4">
-                                        <div className="h-4 bg-slate-100 rounded-full" style={{ width: index % 2 === 0 ? '70%' : '55%' }} />
+                                        <div className="h-4 bg-neutral-100 rounded-full" style={{ width: index % 2 === 0 ? '70%' : '55%' }} />
                                     </td>
                                 ))}
                                 {actions.length > 0 && (
                                     <td className="px-6 py-4">
-                                        <div className="h-4 w-8 bg-slate-100 rounded-full ml-auto" />
+                                        <div className="h-4 w-8 bg-neutral-100 rounded-full ml-auto" />
                                     </td>
                                 )}
                             </tr>
@@ -58,11 +58,11 @@ function TableSkeleton({ columns, actions }: { columns: Column[]; actions: Actio
                     </tbody>
                 </table>
             </div>
-            <div className="md:hidden divide-y divide-slate-50 animate-pulse">
+            <div className="md:hidden divide-y divide-neutral-50 animate-pulse">
                 {Array.from({ length: 4 }).map((_, index) => (
                     <div key={index} className="p-4 space-y-3">
-                        <div className="h-4 bg-slate-100 rounded-full w-1/2" />
-                        <div className="h-3 bg-slate-100 rounded-full w-1/3" />
+                        <div className="h-4 bg-neutral-100 rounded-full w-1/2" />
+                        <div className="h-3 bg-neutral-100 rounded-full w-1/3" />
                     </div>
                 ))}
             </div>
@@ -73,8 +73,8 @@ function TableSkeleton({ columns, actions }: { columns: Column[]; actions: Actio
 function EmptyState() {
     return (
         <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center">
-                <Inbox size={22} className="text-slate-300" />
+            <div className="w-12 h-12 rounded-app-md bg-neutral-50 flex items-center justify-center">
+                <Inbox size={22} className="text-neutral-300" />
             </div>
             <Typography variant={TypographyVariant.HELPER}>
                 Sin resultados para mostrar
@@ -103,31 +103,31 @@ export function Table({
     const endIndex = startIndex + data.length;
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-app-md border border-neutral-100 shadow-sm overflow-hidden">
 
             {/* VISTA MOBILE — cards */}
             <div className="md:hidden">
                 {data.length > 0 ? (
-                    <div className="divide-y divide-slate-50">
+                    <div className="divide-y divide-neutral-50">
                         {data.map((item, rowIndex) => (
                             <div
                                 key={item.id || rowIndex}
                                 onClick={() => onRowClick?.(item)}
                                 className={tailwind(
                                     'px-4 py-3.5 space-y-2 transition-colors duration-150',
-                                    onRowClick && 'cursor-pointer active:bg-slate-50/80'
+                                    onRowClick && 'cursor-pointer active:bg-neutral-50/80'
                                 )}
                             >
                                 {columns
                                     .filter((column) => column.header && item[column.accessor] != null)
                                     .map((column) => (
                                         <div key={column.accessor} className="flex items-start gap-3">
-                                            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 shrink-0 w-24 pt-0.5">
+                                            <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400 shrink-0 w-24 pt-0.5">
                                                 {column.header}
                                             </span>
                                             <Typography
                                                 variant={TypographyVariant.BODY}
-                                                className="text-slate-700 break-words text-sm"
+                                                className="text-neutral-700 break-words text-sm"
                                             >
                                                 {item[column.accessor]}
                                             </Typography>
@@ -154,7 +154,7 @@ export function Table({
                 <table className="w-full border-collapse">
 
                     <thead>
-                        <tr className="border-b border-slate-100 bg-slate-50">
+                        <tr className="border-b border-neutral-100 bg-neutral-50">
                             {columns.map((column) => (
                                 <th
                                     key={column.accessor}
@@ -176,7 +176,7 @@ export function Table({
                         </tr>
                     </thead>
 
-                    <tbody className="divide-y divide-slate-50">
+                    <tbody className="divide-y divide-neutral-50">
                         {data.length > 0 ? (
                             data.map((item, rowIndex) => (
                                 <tr
@@ -184,7 +184,7 @@ export function Table({
                                     onClick={() => onRowClick?.(item)}
                                     className={tailwind(
                                         'group transition-colors duration-150',
-                                        onRowClick && 'cursor-pointer hover:bg-slate-50/60'
+                                        onRowClick && 'cursor-pointer hover:bg-neutral-50/60'
                                     )}
                                 >
                                     {columns.map((column, columnIndex) => (
@@ -193,7 +193,7 @@ export function Table({
                                                 variant={columnIndex === 0 ? TypographyVariant.BODY_SEMIBOLD : TypographyVariant.BODY}
                                                 className={tailwind(
                                                     'transition-colors duration-150',
-                                                    columnIndex === 0 ? 'text-slate-800 group-hover:text-[#1E3A8A]' : 'text-slate-500 group-hover:text-slate-700'
+                                                    columnIndex === 0 ? 'text-neutral-800 group-hover:text-primary' : 'text-neutral-500 group-hover:text-neutral-700'
                                                 )}
                                             >
                                                 {item[column.accessor]}
@@ -222,7 +222,7 @@ export function Table({
             </div>
 
             {/* FOOTER — paginación */}
-            <div className="border-t border-slate-100 px-6 py-3 bg-slate-50/40">
+            <div className="border-t border-neutral-100 px-6 py-3 bg-neutral-50/40">
                 <Pagination
                     currentPage={currentPage}
                     onPageChange={onPageChange}

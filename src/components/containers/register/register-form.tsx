@@ -37,24 +37,24 @@ const RegisterInput = ({
   touched,
 }: RegisterInputProps) => (
   <div className="relative">
-    <Icon className="absolute left-4 top-[38px] text-slate-300" size={18} />
-    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-1 block">
+    <Icon className="absolute left-4 top-[38px] text-neutral-300" size={18} />
+    <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1 mb-1 block">
       {label}
     </label>
     <Field
       name={name}
       type={type}
       placeholder={placeholder}
-      className={`w-full pl-12 pr-5 py-3.5 bg-slate-50 border-2 rounded-2xl outline-none transition-all font-semibold text-sm ${
+      className={`w-full pl-12 pr-5 py-3.5 bg-neutral-50 border-2 rounded-app-md outline-none transition-all font-semibold text-sm ${
         error && touched
-          ? 'border-red-100 focus:border-red-500'
-          : 'border-transparent focus:border-blue-500 focus:bg-white'
+          ? 'border-danger/20 focus:border-danger'
+          : 'border-transparent focus:border-primary focus:bg-white'
       }`}
     />
     <ErrorMessage
       name={name}
       component="p"
-      className="text-red-500 text-[10px] mt-1 ml-2 font-bold italic"
+      className="text-danger text-[10px] mt-1 ml-2 font-bold italic"
     />
   </div>
 );
@@ -94,14 +94,14 @@ export const RegisterForm: React.FC = () => {
   const { handleAccountInfo, isLoading, error } = useRegister();
 
   return (
-    <div className="max-w-[520px] w-full bg-white rounded-[3rem] shadow-2xl p-10 sm:p-12 border border-slate-100">
+    <div className="max-w-[520px] w-full bg-white rounded-app-2xl shadow-2xl p-10 sm:p-12 border border-neutral-100">
       {/* Cabecera */}
       <div className="mb-10 text-center">
-        <div className="inline-flex bg-blue-600 p-3.5 rounded-2xl mb-6 shadow-lg shadow-blue-100">
+        <div className="inline-flex bg-primary p-3.5 rounded-app-md mb-6 shadow-lg shadow-primary-soft">
           <AudioWaveform className="h-6 w-6 text-white" />
         </div>
 
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">Crear Cuenta</h2>
+          <h2 className="text-3xl font-black text-neutral-900 tracking-tight">Crear Cuenta</h2>
       </div>
 
       <Formik
@@ -113,7 +113,7 @@ export const RegisterForm: React.FC = () => {
             <Form className="space-y-5">
               {/* Sección: La organización */}
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-3">
+                <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1 mb-3">
                   Tu clínica u organización
                 </p>
                 <RegisterInput
@@ -127,7 +127,7 @@ export const RegisterForm: React.FC = () => {
 
                 {/* Selector de tipo de clínica */}
                 <div className="mt-4">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-2 block">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1 mb-2 block">
                     Tipo de Especialidad
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -138,10 +138,10 @@ export const RegisterForm: React.FC = () => {
                           key={option.value}
                           type="button"
                           onClick={() => setFieldValue('businessType', option.value)}
-                          className={`flex items-center gap-3 p-3 rounded-2xl border-2 text-left transition-all ${
+                          className={`flex items-center gap-3 p-3 rounded-app-md border-2 text-left transition-all ${
                             isSelected
-                              ? 'border-blue-500 bg-blue-50 text-blue-700'
-                              : 'border-transparent bg-slate-50 text-slate-600 hover:border-slate-200'
+                              ? 'border-primary bg-primary-soft text-primary-dark'
+                              : 'border-transparent bg-neutral-50 text-neutral-600 hover:border-neutral-200'
                           }`}
                         >
                           <span className="text-lg">{option.icon}</span>
@@ -156,14 +156,14 @@ export const RegisterForm: React.FC = () => {
                   <ErrorMessage
                     name="businessType"
                     component="p"
-                    className="text-red-500 text-[10px] mt-1 ml-2 font-bold italic"
+                    className="text-danger text-[10px] mt-1 ml-2 font-bold italic"
                   />
                 </div>
               </div>
 
               {/* Sección: El administrador */}
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-3 mt-2">
+                <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1 mb-3 mt-2">
                   Tu cuenta de acceso
                 </p>
                 <div className="grid grid-cols-2 gap-4">
@@ -207,10 +207,10 @@ export const RegisterForm: React.FC = () => {
 
               {/* Toggle: ¿También eres especialista? */}
               <div
-                className={`rounded-2xl border-2 p-4 transition-all cursor-pointer ${
+                className={`rounded-app-md border-2 p-4 transition-all cursor-pointer ${
                   values.isSpecialist
-                    ? 'border-blue-200 bg-blue-50'
-                    : 'border-slate-100 bg-slate-50'
+                    ? 'border-primary-soft bg-primary-soft'
+                    : 'border-neutral-100 bg-neutral-50'
                 }`}
                 onClick={() => setFieldValue('isSpecialist', !values.isSpecialist)}
               >
@@ -218,24 +218,24 @@ export const RegisterForm: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <Stethoscope
                       size={18}
-                      className={values.isSpecialist ? 'text-blue-600' : 'text-slate-400'}
+                      className={values.isSpecialist ? 'text-primary' : 'text-neutral-400'}
                     />
                     <div>
                       <p
                         className={`text-sm font-black ${
-                          values.isSpecialist ? 'text-blue-700' : 'text-slate-700'
+                          values.isSpecialist ? 'text-primary-dark' : 'text-neutral-700'
                         }`}
                       >
                         También soy especialista en esta clínica
                       </p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">
+                      <p className="text-[10px] text-neutral-400 mt-0.5">
                         Actívalo si atiendes pacientes directamente
                       </p>
                     </div>
                   </div>
                   <div
                     className={`w-10 h-6 rounded-full transition-all relative ${
-                      values.isSpecialist ? 'bg-blue-600' : 'bg-slate-200'
+                      values.isSpecialist ? 'bg-primary' : 'bg-neutral-200'
                     }`}
                   >
                     <div
@@ -248,29 +248,29 @@ export const RegisterForm: React.FC = () => {
 
                 {values.isSpecialist && (
                   <div className="mt-3" onClick={(event) => event.stopPropagation()}>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-1 block">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1 mb-1 block">
                       Mi especialidad
                     </label>
                     <Field
                       name="specialty"
                       placeholder="Ej. Audiólogo, Odontólogo general..."
-                      className={`w-full px-4 py-3 bg-white border-2 rounded-xl outline-none transition-all font-semibold text-sm ${
+                      className={`w-full px-4 py-3 bg-white border-2 rounded-app-sm outline-none transition-all font-semibold text-sm ${
                         errors.specialty && touched.specialty
-                          ? 'border-red-200 focus:border-red-500'
-                          : 'border-slate-100 focus:border-blue-500'
+                          ? 'border-danger/30 focus:border-danger'
+                          : 'border-neutral-100 focus:border-primary'
                       }`}
                     />
                     <ErrorMessage
                       name="specialty"
                       component="p"
-                      className="text-red-500 text-[10px] mt-1 ml-2 font-bold italic"
+                      className="text-danger text-[10px] mt-1 ml-2 font-bold italic"
                     />
                   </div>
                 )}
               </div>
 
               {error && (
-                <p className="text-red-500 text-xs text-center font-bold bg-red-50 py-3 rounded-2xl">
+                <p className="text-danger text-xs text-center font-bold bg-danger/10 py-3 rounded-app-md">
                   {error}
                 </p>
               )}
@@ -278,15 +278,15 @@ export const RegisterForm: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-slate-900 hover:bg-blue-600 text-white font-black py-4 rounded-2xl shadow-xl transition-all mt-2 flex items-center justify-center gap-3 disabled:opacity-60"
+                className="w-full bg-neutral-900 hover:bg-primary text-white font-black py-4 rounded-app-md shadow-xl transition-all mt-2 flex items-center justify-center gap-3 disabled:opacity-60"
               >
                 {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
                 <ArrowRight size={18} />
               </button>
 
-              <p className="text-center text-xs text-slate-400 mt-2">
+              <p className="text-center text-xs text-neutral-400 mt-2">
                 ¿Ya tienes cuenta?{' '}
-                <Link href={routesPublic.login} className="text-blue-600 font-bold hover:underline">
+                <Link href={routesPublic.login} className="text-primary font-bold hover:underline">
                   Inicia sesión
                 </Link>
               </p>

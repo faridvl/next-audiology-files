@@ -10,15 +10,15 @@ export function Header({ title }: { title?: string }) {
   const { userName, userRole, initials, isLoading, handleLogout } = useHeader();
 
   return (
-    <header className="h-16 border-b border-slate-100 bg-white/90 backdrop-blur-sm sticky top-0 z-40">
+    <header className="h-16 border-b border-neutral-100 bg-white/90 backdrop-blur-sm sticky top-0 z-40">
       <div className="h-full px-4 md:px-6 flex items-center justify-between gap-3">
 
         {/* Logo mobile — solo visible cuando el sidebar está oculto */}
         <Link href={routesPrivate.dashboard} className="md:hidden flex items-center gap-2 shrink-0">
-          <div className="h-8 w-8 bg-[#1E3A8A] rounded-xl flex items-center justify-center text-white font-extrabold text-xs">
+          <div className="h-8 w-8 bg-primary rounded-app-sm flex items-center justify-center text-white font-extrabold text-xs">
             Z
           </div>
-          <span className="text-sm font-black text-slate-800 tracking-tight">Zynka</span>
+          <span className="text-sm font-black text-neutral-800 tracking-tight">Zynka</span>
         </Link>
 
         {/* Title Section */}
@@ -26,7 +26,7 @@ export function Header({ title }: { title?: string }) {
           {title && (
             <Typography
               variant={TypographyVariant.ACCENT}
-              className="text-slate-900 truncate"
+              className="text-neutral-900 truncate"
             >
               {title}
             </Typography>
@@ -36,7 +36,7 @@ export function Header({ title }: { title?: string }) {
         {/* Right Section */}
         <div className="flex items-center gap-4">
 
-          <div className="w-px h-8 bg-slate-100" />
+          <div className="w-px h-8 bg-neutral-100" />
 
           <Menu as="div" className="relative inline-block text-left">
             <MenuButton
@@ -47,21 +47,21 @@ export function Header({ title }: { title?: string }) {
               <div className="hidden md:flex flex-col items-end leading-tight">
                 <Typography
                   variant={TypographyVariant.BODY_SEMIBOLD}
-                  className="text-[13px] text-slate-800"
+                  className="text-[13px] text-neutral-800"
                 >
                   {isLoading ? '...' : userName}
                 </Typography>
 
                 <Typography
                   variant={TypographyVariant.CAPTION}
-                  className="text-[#1E3A8A] uppercase tracking-wide"
+                  className="text-primary uppercase tracking-wide"
                 >
                   {userRole}
                 </Typography>
               </div>
 
               {/* Avatar */}
-              <div className="h-9 w-9 rounded-xl bg-[#1E3A8A] flex items-center justify-center font-semibold text-white uppercase text-[11px] transition-all duration-200 group-hover:opacity-90">
+              <div className="h-9 w-9 rounded-app-sm bg-primary flex items-center justify-center font-semibold text-white uppercase text-[11px] transition-all duration-200 group-hover:opacity-90">
                 {isLoading ? '?' : initials}
               </div>
             </MenuButton>
@@ -75,10 +75,10 @@ export function Header({ title }: { title?: string }) {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <MenuItems className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl bg-white shadow-lg border border-slate-100 focus:outline-none p-1.5 z-50">
+              <MenuItems className="absolute right-0 mt-2 w-56 origin-top-right rounded-app-sm bg-white shadow-lg border border-neutral-100 focus:outline-none p-1.5 z-50">
 
                 {/* Account Info */}
-                <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                <div className="px-3 py-2 border-b border-neutral-100 mb-1">
                   <Typography
                     variant={TypographyVariant.OVERLINE}
                   >
@@ -94,7 +94,7 @@ export function Header({ title }: { title?: string }) {
 
                   <Typography
                     variant={TypographyVariant.CAPTION}
-                    className="text-[#1E3A8A] uppercase"
+                    className="text-primary uppercase"
                   >
                     {userRole}
                   </Typography>
@@ -107,10 +107,10 @@ export function Header({ title }: { title?: string }) {
                       href="/profile"
                       className={`
                         flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors
-                        ${active ? 'bg-slate-50' : ''}
+                        ${active ? 'bg-neutral-50' : ''}
                       `}
                     >
-                      <UserIcon size={16} className="text-slate-500" />
+                      <UserIcon size={16} className="text-neutral-500" />
                       <Typography variant={TypographyVariant.BODY}>
                         Mi Perfil
                       </Typography>
@@ -124,10 +124,10 @@ export function Header({ title }: { title?: string }) {
                     <button
                       className={`
                         flex items-center gap-3 px-3 py-2 rounded-lg w-full text-left transition-colors
-                        ${active ? 'bg-slate-50' : ''}
+                        ${active ? 'bg-neutral-50' : ''}
                       `}
                     >
-                      <LifeBuoy size={16} className="text-slate-500" />
+                      <LifeBuoy size={16} className="text-neutral-500" />
                       <Typography variant={TypographyVariant.BODY}>
                         Soporte
                       </Typography>
@@ -135,7 +135,7 @@ export function Header({ title }: { title?: string }) {
                   )}
                 </MenuItem>
 
-                <div className="h-px bg-slate-100 my-1" />
+                <div className="h-px bg-neutral-100 my-1" />
 
                 {/* Logout */}
                 <MenuItem>
@@ -144,13 +144,13 @@ export function Header({ title }: { title?: string }) {
                       onClick={handleLogout}
                       className={`
                         flex items-center gap-3 px-3 py-2 rounded-lg w-full text-left transition-colors
-                        ${active ? 'bg-red-50' : ''}
+                        ${active ? 'bg-danger/10' : ''}
                       `}
                     >
-                      <LogOut size={16} className="text-red-500" />
+                      <LogOut size={16} className="text-danger" />
                       <Typography
                         variant={TypographyVariant.BODY}
-                        className="text-red-600"
+                        className="text-danger"
                       >
                         Cerrar Sesión
                       </Typography>

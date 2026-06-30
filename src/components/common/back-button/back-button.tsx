@@ -14,7 +14,7 @@ export const BackButton: React.FC<BackButtonProps> = ({ onClick, label }) => {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-2 text-slate-400 hover:text-slate-600 transition-colors mb-6 group"
+      className="flex items-center gap-2 text-neutral-400 hover:text-neutral-600 transition-colors mb-6 group"
     >
       <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
       <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="text-[13px]">

@@ -21,19 +21,19 @@ export const CreateAppointmentContainer: React.FC = () => {
             <button
                 type="button"
                 onClick={navigation.common.back}
-                className="flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-colors mb-8 group"
+                className="flex items-center gap-2 text-neutral-400 hover:text-primary transition-colors mb-8 group"
             >
                 <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
                 <Typography variant={TypographyVariant.BODY_SEMIBOLD}>Volver a la Agenda</Typography>
             </button>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                <div className={`bg-white border border-slate-100 rounded-[40px] p-10 shadow-sm space-y-10 transition-all ${isLoading ? 'opacity-60 pointer-events-none scale-[0.99]' : ''}`}>
+                <div className={`bg-white border border-neutral-100 rounded-app-xl p-10 shadow-sm space-y-10 transition-all ${isLoading ? 'opacity-60 pointer-events-none scale-[0.99]' : ''}`}>
 
                     {/* SECCIÓN: PACIENTE */}
                     <div className="space-y-6">
-                        <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
-                            <div className="bg-blue-50 p-2 rounded-xl text-blue-600"><UserPlus size={20} /></div>
+                        <div className="flex items-center gap-3 border-b border-neutral-50 pb-4">
+                            <div className="bg-primary-soft p-2 rounded-xl text-primary"><UserPlus size={20} /></div>
                             <Typography variant={TypographyVariant.ACCENT}>Información del Paciente</Typography>
                         </div>
 
@@ -41,7 +41,7 @@ export const CreateAppointmentContainer: React.FC = () => {
                             <select
                                 required
                                 disabled={isLoading}
-                                className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 appearance-none cursor-pointer"
+                                className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-app-md text-sm outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer"
                                 value={formData.patientUuid}
                                 onChange={(e) => setFormData({ ...formData, patientUuid: e.target.value })}
                             >
@@ -55,7 +55,7 @@ export const CreateAppointmentContainer: React.FC = () => {
 
                             <div
                                 onClick={() => !isLoading && navigation.patients.create()}
-                                className="mt-2 flex items-center gap-2 text-blue-600 cursor-pointer hover:underline w-fit"
+                                className="mt-2 flex items-center gap-2 text-primary cursor-pointer hover:underline w-fit"
                             >
                                 <Plus size={14} />
                                 <Typography variant={TypographyVariant.CAPTION} className="font-bold">Nuevo Paciente</Typography>
@@ -65,17 +65,17 @@ export const CreateAppointmentContainer: React.FC = () => {
 
                     {/* SECCIÓN: ESPECIALIDAD Y SERVICIO */}
                     <div className="space-y-6">
-                        <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
-                            <div className="bg-purple-50 p-2 rounded-xl text-purple-600"><Stethoscope size={20} /></div>
+                        <div className="flex items-center gap-3 border-b border-neutral-50 pb-4">
+                            <div className="bg-accent/10 p-2 rounded-xl text-accent"><Stethoscope size={20} /></div>
                             <Typography variant={TypographyVariant.ACCENT}>Especialidad y Procedimiento</Typography>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <Typography variant={TypographyVariant.OVERLINE} className="ml-1 mb-2 block text-slate-400 font-bold">Área Médica</Typography>
+                                <Typography variant={TypographyVariant.OVERLINE} className="ml-1 mb-2 block text-neutral-400 font-bold">Área Médica</Typography>
                                 <select
                                     disabled={isLoading}
-                                    className="w-full p-4 bg-white border-2 border-slate-100 rounded-2xl text-sm font-bold text-blue-600 outline-none focus:border-blue-500 transition-all cursor-pointer"
+                                    className="w-full p-4 bg-white border-2 border-neutral-100 rounded-app-md text-sm font-bold text-primary outline-none focus:border-primary transition-all cursor-pointer"
                                     value={formData.speciality}
                                     onChange={(e) => setFormData({ ...formData, speciality: e.target.value as MedicalSpeciality, typeId: '' })}
                                 >
@@ -86,11 +86,11 @@ export const CreateAppointmentContainer: React.FC = () => {
                             </div>
 
                             <div>
-                                <Typography variant={TypographyVariant.OVERLINE} className="ml-1 mb-2 block text-slate-400 font-bold">Servicio</Typography>
+                                <Typography variant={TypographyVariant.OVERLINE} className="ml-1 mb-2 block text-neutral-400 font-bold">Servicio</Typography>
                                 <select
                                     required
                                     disabled={isLoading}
-                                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
+                                    className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-app-md text-sm outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
                                     value={formData.typeId}
                                     onChange={(e) => setFormData({ ...formData, typeId: e.target.value })}
                                 >
@@ -106,29 +106,29 @@ export const CreateAppointmentContainer: React.FC = () => {
                     {/* FECHA Y HORA */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-slate-400 font-bold">Fecha</Typography>
+                            <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-neutral-400 font-bold">Fecha</Typography>
                             <div className="relative">
-                                <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                                <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
                                 <input
                                     required
                                     type="date"
                                     disabled={isLoading}
                                     value={formData.date}
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
+                                    className="w-full pl-12 pr-4 py-4 bg-neutral-50 border border-neutral-100 rounded-app-md text-sm outline-none focus:ring-2 focus:ring-primary/20"
                                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                                 />
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-slate-400 font-bold">Hora de Inicio</Typography>
+                            <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-neutral-400 font-bold">Hora de Inicio</Typography>
                             <div className="relative">
-                                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
                                 <input
                                     required
                                     type="time"
                                     disabled={isLoading}
                                     value={formData.startTime}
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
+                                    className="w-full pl-12 pr-4 py-4 bg-neutral-50 border border-neutral-100 rounded-app-md text-sm outline-none focus:ring-2 focus:ring-primary/20"
                                     onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
                                 />
                             </div>
@@ -137,11 +137,11 @@ export const CreateAppointmentContainer: React.FC = () => {
 
                     {/* NOTAS */}
                     <div className="space-y-2">
-                        <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-slate-400 font-bold">Notas Adicionales</Typography>
+                        <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-neutral-400 font-bold">Notas Adicionales</Typography>
                         <textarea
                             rows={3}
                             disabled={isLoading}
-                            className="w-full p-5 bg-slate-50 border border-slate-100 rounded-3xl text-sm outline-none resize-none focus:ring-2 focus:ring-blue-500/10"
+                            className="w-full p-5 bg-neutral-50 border border-neutral-100 rounded-app-lg text-sm outline-none resize-none focus:ring-2 focus:ring-primary/10"
                             placeholder="Escribe aquí cualquier observación relevante..."
                             value={formData.notes}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -161,7 +161,7 @@ export const CreateAppointmentContainer: React.FC = () => {
                     <Button
                         type="submit"
                         variant={ButtonVariant.PRIMARY}
-                        className="rounded-2xl px-10 py-4 h-auto shadow-lg shadow-blue-500/20"
+                        className="rounded-app-md px-10 py-4 h-auto shadow-lg shadow-primary/20"
                         disabled={isLoading}
                     >
                         <div className="flex items-center gap-2">

@@ -16,7 +16,7 @@ export const InventoryManageContainer: React.FC<InventoryManageContainerProps> =
     if (isLoading) {
         return (
             <div className="flex justify-center py-32">
-                <Loader2 className="animate-spin text-blue-600" size={40} />
+                <Loader2 className="animate-spin text-primary" size={40} />
             </div>
         );
     }
@@ -27,85 +27,85 @@ export const InventoryManageContainer: React.FC<InventoryManageContainerProps> =
             <div className="flex justify-between items-center mb-8 px-2">
                 <button
                     onClick={() => common.back()}
-                    className="flex items-center gap-2 text-slate-400 hover:text-slate-600 transition-colors"
+                    className="flex items-center gap-2 text-neutral-400 hover:text-neutral-600 transition-colors"
                 >
                     <ArrowLeft size={20} />
                     <Typography variant={TypographyVariant.BODY_SEMIBOLD}>Cancelar</Typography>
                 </button>
 
-                <button className="flex items-center gap-2 text-red-400 hover:text-red-600 transition-colors opacity-50 cursor-not-allowed">
+                <button className="flex items-center gap-2 text-danger/60 hover:text-danger transition-colors opacity-50 cursor-not-allowed">
                     <Trash2 size={18} />
                     <Typography variant={TypographyVariant.CAPTION} className="font-bold">Eliminar Artículo</Typography>
                 </button>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-sm">
+            <div className="bg-white border border-neutral-200 rounded-app-xl overflow-hidden shadow-sm">
                 {/* 1. Identificación */}
-                <div className="p-8 md:p-10 border-b border-slate-100 space-y-6">
-                    <div className="flex items-center gap-2 text-blue-600">
+                <div className="p-8 md:p-10 border-b border-neutral-100 space-y-6">
+                    <div className="flex items-center gap-2 text-primary">
                         <Tag size={16} />
                         <Typography variant={TypographyVariant.OVERLINE}>Editando Identificación</Typography>
                     </div>
 
                     <div className="grid grid-cols-1 gap-5">
                         <div className="space-y-2">
-                            <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-slate-400">Nombre del Artículo</Typography>
+                            <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-neutral-400">Nombre del Artículo</Typography>
                             <input
                                 type="text"
                                 value={form.name}
                                 onChange={(e) => handleChange('name', e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl text-lg font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-all outline-none"
+                                className="w-full bg-neutral-50 border border-neutral-100 p-4 rounded-app-sm text-lg font-bold text-neutral-900 focus:bg-white focus:ring-2 focus:ring-primary/10 transition-all outline-none"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-slate-400">Modelo / Especificación</Typography>
+                            <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-neutral-400">Modelo / Especificación</Typography>
                             <input
                                 type="text"
                                 value={form.model}
                                 onChange={(e) => handleChange('model', e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl text-sm font-medium text-slate-600 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-all outline-none"
+                                className="w-full bg-neutral-50 border border-neutral-100 p-4 rounded-app-sm text-sm font-medium text-neutral-600 focus:bg-white focus:ring-2 focus:ring-primary/10 transition-all outline-none"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* 2. Inventario y Precio */}
-                <div className="p-8 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-6 border-b border-slate-100 bg-slate-50/30">
+                <div className="p-8 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-6 border-b border-neutral-100 bg-neutral-50/30">
                     <div className="space-y-2">
-                        <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-slate-400">Stock Actual</Typography>
+                        <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-neutral-400">Stock Actual</Typography>
                         <input
                             type="number"
                             value={form.stock.current}
                             onChange={(e) => handleChange('stock.current', Number(e.target.value))}
-                            className="w-full bg-white border border-slate-100 p-4 rounded-xl text-sm font-bold focus:ring-2 focus:ring-blue-500/10 outline-none"
+                            className="w-full bg-white border border-neutral-100 p-4 rounded-app-sm text-sm font-bold focus:ring-2 focus:ring-primary/10 outline-none"
                         />
                     </div>
                     <div className="space-y-2">
-                        <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-slate-400">Precio (₡)</Typography>
+                        <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-neutral-400">Precio (₡)</Typography>
                         <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₡</span>
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 font-bold text-sm">₡</span>
                             <input
                                 type="number"
                                 value={form.price}
                                 onChange={(e) => handleChange('price', Number(e.target.value))}
-                                className="w-full bg-white border border-slate-100 p-4 pl-10 rounded-xl text-sm font-bold focus:ring-2 focus:ring-blue-500/10 outline-none"
+                                className="w-full bg-white border border-neutral-100 p-4 pl-10 rounded-app-sm text-sm font-bold focus:ring-2 focus:ring-primary/10 outline-none"
                             />
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-slate-400">Stock Mínimo</Typography>
+                        <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-neutral-400">Stock Mínimo</Typography>
                         <input
                             type="number"
                             value={form.stock.min}
                             onChange={(e) => handleChange('stock.min', Number(e.target.value))}
-                            className="w-full bg-white border border-slate-100 p-4 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500/10 outline-none"
+                            className="w-full bg-white border border-neutral-100 p-4 rounded-app-sm text-sm font-medium focus:ring-2 focus:ring-primary/10 outline-none"
                         />
                     </div>
                 </div>
 
                 {/* 3. Descripción */}
                 <div className="p-8 md:p-10 space-y-4">
-                    <div className="flex items-center gap-2 text-slate-400">
+                    <div className="flex items-center gap-2 text-neutral-400">
                         <AlignLeft size={16} />
                         <Typography variant={TypographyVariant.BODY_SEMIBOLD}>Descripción</Typography>
                     </div>
@@ -113,7 +113,7 @@ export const InventoryManageContainer: React.FC<InventoryManageContainerProps> =
                         rows={4}
                         value={form.description}
                         onChange={(e) => handleChange('description', e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-medium text-slate-600 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-all outline-none resize-none"
+                        className="w-full bg-neutral-50 border border-neutral-100 p-4 rounded-app-md text-sm font-medium text-neutral-600 focus:bg-white focus:ring-2 focus:ring-primary/10 transition-all outline-none resize-none"
                     />
                 </div>
             </div>
@@ -124,7 +124,7 @@ export const InventoryManageContainer: React.FC<InventoryManageContainerProps> =
                     variant={ButtonVariant.PRIMARY}
                     onClick={handleUpdate}
                     disabled={isPending}
-                    className="w-full py-5 rounded-2xl shadow-xl shadow-blue-900/10"
+                    className="w-full py-5 rounded-app-md shadow-xl shadow-primary-dark/10"
                 >
                     {isPending ? <Loader2 className="animate-spin mr-2" /> : <Save size={20} />}
                     <Typography variant={TypographyVariant.BUTTON_TEXT}>

@@ -60,7 +60,7 @@ export function DashboardLayout({
   const isChildrenRenderProperty = children && typeof children === 'function';
 
   return (
-    <div className="flex flex-row h-screen w-screen overflow-hidden relative bg-slate-50">
+    <div className="flex flex-row h-screen w-screen overflow-hidden relative bg-neutral-50">
 
       {/* Success Alert */}
       <div className="absolute top-6 right-6 z-[100] pointer-events-none">
@@ -77,7 +77,7 @@ export function DashboardLayout({
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col flex-1 h-full bg-slate-50 md:border-l overflow-hidden">
+      <div className="flex flex-col flex-1 h-full bg-neutral-50 md:border-l overflow-hidden">
 
         {/* Header */}
         <Header title={pageTitle} />

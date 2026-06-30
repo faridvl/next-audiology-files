@@ -11,7 +11,7 @@ interface Props {
   patientUuid: string;
 }
 
-const inputClass = 'w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/30 text-sm outline-none focus:bg-white focus:border-blue-300 transition-colors';
+const inputClass = 'w-full px-4 py-3 rounded-app-sm border border-neutral-200 bg-neutral-50/30 text-sm outline-none focus:bg-white focus:border-primary/30 transition-colors';
 const textareaClass = `${inputClass} min-h-[100px]`;
 
 export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
@@ -37,46 +37,46 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigation.patients.consulta(patientUuid)}
-          className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors shrink-0"
+          className="w-10 h-10 rounded-app-sm bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors shrink-0"
         >
-          <ArrowLeft size={16} className="text-slate-500" />
+          <ArrowLeft size={16} className="text-neutral-500" />
         </button>
         <div>
-          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-blue-500">
+          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-primary">
             Control clínico
           </Typography>
-          <Typography variant={TypographyVariant.SUBTITLE} className="text-slate-800 leading-tight">
+          <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
             {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
           </Typography>
         </div>
       </div>
 
-      <div className="bg-white border border-slate-100 rounded-[1.8rem] p-5 md:p-8 space-y-6 shadow-sm">
+      <div className="bg-white border border-neutral-100 rounded-app-md p-5 md:p-8 space-y-6 shadow-sm">
 
         {/* OTOSCOPÍA (solo audiología) */}
         {isAudiology && (
           <section className="space-y-4">
-            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">
+            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1">
               Otoscopía
             </Typography>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-black text-blue-400 uppercase tracking-widest ml-1">
+                <label className="block text-[10px] font-black text-primary uppercase tracking-widest ml-1">
                   Oído derecho (OD)
                 </label>
                 <textarea
-                  className={`${textareaClass} border-blue-100 bg-blue-50/20 focus:border-blue-300`}
+                  className={`${textareaClass} border-primary-soft bg-primary-soft/20 focus:border-primary/30`}
                   placeholder="Hallazgos oído derecho..."
                   value={fields.otoscopyRight}
                   onChange={(e) => fields.setOtoscopyRight(e.target.value)}
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-black text-red-400 uppercase tracking-widest ml-1">
+                <label className="block text-[10px] font-black text-danger uppercase tracking-widest ml-1">
                   Oído izquierdo (OI)
                 </label>
                 <textarea
-                  className={`${textareaClass} border-red-100 bg-red-50/20 focus:border-red-300`}
+                  className={`${textareaClass} border-danger/20 bg-danger/5 focus:border-danger/30`}
                   placeholder="Hallazgos oído izquierdo..."
                   value={fields.otoscopyLeft}
                   onChange={(e) => fields.setOtoscopyLeft(e.target.value)}
@@ -88,8 +88,8 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
 
         {/* SELECTOR DE PLANTILLA */}
         {templates.length > 1 && (
-          <section className="space-y-2 pt-2 border-t border-slate-50">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+          <section className="space-y-2 pt-2 border-t border-neutral-50">
+            <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">
               Plantilla clínica
             </label>
             <select
@@ -106,18 +106,18 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
 
         {/* PLANTILLA CLÍNICA */}
         {activeTemplate && activeTemplate.fields.length > 0 && (
-          <section className="space-y-4 pt-2 border-t border-slate-50">
-            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">
+          <section className="space-y-4 pt-2 border-t border-neutral-50">
+            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1">
               {activeTemplate.name}
             </Typography>
             <div className="space-y-3">
               {activeTemplate.fields.map((field) => {
                 const currentValue = fields.fieldValues[field.id] ?? '';
                 return (
-                  <div key={field.id} className="bg-slate-50 rounded-2xl p-4 space-y-2">
-                    <label className="block text-xs font-bold text-slate-600">
+                  <div key={field.id} className="bg-neutral-50 rounded-app-md p-4 space-y-2">
+                    <label className="block text-xs font-bold text-neutral-600">
                       {field.label}
-                      {field.required && <span className="text-red-400 ml-1">*</span>}
+                      {field.required && <span className="text-danger ml-1">*</span>}
                     </label>
 
                     {field.fieldType === 'boolean' && (
@@ -127,12 +127,12 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
                             key={String(option)}
                             type="button"
                             onClick={() => fields.setFieldValue(field.id, option)}
-                            className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wide transition-all border ${
+                            className={`flex-1 py-2.5 rounded-app-sm text-xs font-black uppercase tracking-wide transition-all border ${
                               currentValue === option
                                 ? option
-                                  ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                                  : 'bg-red-50 border-red-300 text-red-600'
-                                : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'
+                                  ? 'bg-success/10 border-success/40 text-success-dark'
+                                  : 'bg-danger/10 border-danger/40 text-danger'
+                                : 'bg-white border-neutral-200 text-neutral-400 hover:border-neutral-300'
                             }`}
                           >
                             {option ? 'Sí' : 'No'}
@@ -190,9 +190,9 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
         )}
 
         {/* DIAGNÓSTICO */}
-        <section className="space-y-2 pt-2 border-t border-slate-50">
-          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-            Diagnóstico <span className="text-red-400">*</span>
+        <section className="space-y-2 pt-2 border-t border-neutral-50">
+          <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">
+            Diagnóstico <span className="text-danger">*</span>
           </label>
           <textarea
             className={`${textareaClass} min-h-[120px]`}
@@ -208,7 +208,7 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
         <Button variant={ButtonVariant.CANCEL} onClick={() => navigation.patients.consulta(patientUuid)} text="Cancelar" />
         <Button
           variant={ButtonVariant.PRIMARY}
-          className="!h-12 !px-10 !rounded-xl shadow-lg shadow-blue-200"
+          className="!h-12 !px-10 !rounded-app-sm shadow-lg shadow-primary-soft"
           onClick={handleSave}
           disabled={isPending}
         >

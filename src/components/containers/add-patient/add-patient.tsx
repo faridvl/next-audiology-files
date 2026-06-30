@@ -13,7 +13,7 @@ import { Button, ButtonVariant } from '@/components/common/button/button';
 export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
     const { initialValues, validationSchema, handleSubmit, isLoading, today } = usePatientForm(onShowSuccess);
 
-    const inputClasses = "w-full pl-11 pr-4 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 rounded-2xl outline-none transition-all font-semibold text-slate-700 text-sm";
+    const inputClasses = "w-full pl-11 pr-4 py-3 bg-neutral-50 border border-transparent focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 rounded-app-md outline-none transition-all font-semibold text-neutral-700 text-sm";
     const labelClasses = "ml-1 mb-1 block";
 
     const handlePhoneKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -25,15 +25,15 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
 
     return (
         <div className="max-w-3xl mx-auto my-8 p-4">
-            <div className="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[3rem] overflow-hidden border border-slate-100">
+            <div className="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-app-2xl overflow-hidden border border-neutral-100">
 
-                <div className="bg-slate-50/50 px-10 py-8 border-b border-slate-100 flex items-center justify-between">
+                <div className="bg-neutral-50/50 px-10 py-8 border-b border-neutral-100 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="bg-[#1E3A8A] p-3 rounded-2xl shadow-lg shadow-blue-900/20">
+                        <div className="bg-primary p-3 rounded-app-md shadow-lg shadow-primary-dark/20">
                             <UserIcon className="h-6 w-6 text-white" />
                         </div>
                         <div>
-                            <Typography variant={TypographyVariant.SUBTITLE} textColor="text-slate-800">
+                            <Typography variant={TypographyVariant.SUBTITLE} textColor="text-neutral-800">
                                 Registro de Paciente
                             </Typography>
                             <Typography variant={TypographyVariant.HELPER}>
@@ -64,9 +64,9 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                                             className={inputClasses}
                                             placeholder="Ej. Andrés"
                                         />
-                                        <UserIcon className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                                        <UserIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary transition-colors" />
                                     </div>
-                                    <ErrorMessage name="firstName" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-red-500" className="ml-2 mt-1">{msg}</Typography>} />
+                                    <ErrorMessage name="firstName" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>} />
                                 </div>
 
                                 {/* Apellido */}
@@ -79,9 +79,9 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                                             className={inputClasses}
                                             placeholder="Ej. Iniesta Luján"
                                         />
-                                        <UserIcon className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                                        <UserIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary transition-colors" />
                                     </div>
-                                    <ErrorMessage name="lastName" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-red-500" className="ml-2 mt-1">{msg}</Typography>} />
+                                    <ErrorMessage name="lastName" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>} />
                                 </div>
 
                                 {/* Cédula / ID */}
@@ -94,9 +94,9 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                                             className={inputClasses}
                                             placeholder="0-0000-0000"
                                         />
-                                        <IdentificationIcon className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500" />
+                                        <IdentificationIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary" />
                                     </div>
-                                    <ErrorMessage name="documentId" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-red-500" className="ml-2 mt-1">{msg}</Typography>} />
+                                    <ErrorMessage name="documentId" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>} />
                                 </div>
 
                                 {/* Fecha de Nacimiento */}
@@ -109,9 +109,9 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                                             max={today}
                                             className={inputClasses}
                                         />
-                                        <CalendarIcon className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500" />
+                                        <CalendarIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary" />
                                     </div>
-                                    <ErrorMessage name="birthDate" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-red-500" className="ml-2 mt-1">{msg}</Typography>} />
+                                    <ErrorMessage name="birthDate" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>} />
                                 </div>
 
                                 {/* Teléfono */}
@@ -125,9 +125,9 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                                             placeholder="+506 8888-8888"
                                             onKeyDown={handlePhoneKeyDown}
                                         />
-                                        <PhoneIcon className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500" />
+                                        <PhoneIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary" />
                                     </div>
-                                    <ErrorMessage name="phone" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-red-500" className="ml-2 mt-1">{msg}</Typography>} />
+                                    <ErrorMessage name="phone" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>} />
                                 </div>
 
                                 {/* Género con Listbox */}
@@ -143,17 +143,17 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                                         <div className="relative">
                                             <Listbox.Button className={`${inputClasses} flex justify-between items-center text-left pl-4`}>
                                                 <span>{values.gender ? (values.gender === 'male' ? 'Masculino' : 'Femenino') : 'Seleccionar...'}</span>
-                                                <ChevronUpDownIcon className="h-5 w-5 text-slate-400" />
+                                                <ChevronUpDownIcon className="h-5 w-5 text-neutral-400" />
                                             </Listbox.Button>
                                             <Transition leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
-                                                <Listbox.Options className="absolute z-20 mt-2 w-full bg-white border border-slate-100 shadow-2xl rounded-2xl py-2 focus:outline-none">
-                                                    <Listbox.Option value="male" className={({ active }) => `cursor-pointer py-3 px-5 text-sm ${active ? 'bg-blue-50 text-blue-600' : 'text-slate-700'}`}>Masculino</Listbox.Option>
-                                                    <Listbox.Option value="female" className={({ active }) => `cursor-pointer py-3 px-5 text-sm ${active ? 'bg-blue-50 text-blue-600' : 'text-slate-700'}`}>Femenino</Listbox.Option>
+                                                <Listbox.Options className="absolute z-20 mt-2 w-full bg-white border border-neutral-100 shadow-2xl rounded-app-md py-2 focus:outline-none">
+                                                    <Listbox.Option value="male" className={({ active }) => `cursor-pointer py-3 px-5 text-sm ${active ? 'bg-primary-soft text-primary' : 'text-neutral-700'}`}>Masculino</Listbox.Option>
+                                                    <Listbox.Option value="female" className={({ active }) => `cursor-pointer py-3 px-5 text-sm ${active ? 'bg-primary-soft text-primary' : 'text-neutral-700'}`}>Femenino</Listbox.Option>
                                                 </Listbox.Options>
                                             </Transition>
                                         </div>
                                     </Listbox>
-                                    <ErrorMessage name="gender" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-red-500" className="ml-2 mt-1">{msg}</Typography>} />
+                                    <ErrorMessage name="gender" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>} />
                                 </div>
 
                                 {/* Correo */}
@@ -166,9 +166,9 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                                             className={inputClasses}
                                             placeholder="paciente@ejemplo.com"
                                         />
-                                        <EnvelopeIcon className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500" />
+                                        <EnvelopeIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary" />
                                     </div>
-                                    <ErrorMessage name="email" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-red-500" className="ml-2 mt-1">{msg}</Typography>} />
+                                    <ErrorMessage name="email" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>} />
                                 </div>
 
                                 {/* Dirección */}
@@ -181,9 +181,9 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                                             className={inputClasses}
                                             placeholder="Ej. San José, Barrio Escalante, 200m norte del parque"
                                         />
-                                        <MapPinIcon className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500" />
+                                        <MapPinIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary" />
                                     </div>
-                                    <ErrorMessage name="address" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-red-500" className="ml-2 mt-1">{msg}</Typography>} />
+                                    <ErrorMessage name="address" render={msg => <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>} />
                                 </div>
                             </div>
 
@@ -191,7 +191,7 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                                 <Button
                                     variant={ButtonVariant.PRIMARY}
                                     type="submit"
-                                    className="w-full py-4 rounded-2xl text-base shadow-xl shadow-blue-900/10"
+                                    className="w-full py-4 rounded-app-md text-base shadow-xl shadow-primary-dark/10"
                                     disabled={isLoading}
                                 >
                                     {isLoading ? 'Procesando...' : 'Finalizar Registro del Paciente'}

@@ -21,7 +21,7 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
   } = usePatientEdit(patientUuid);
 
   const inputClasses =
-    'w-full pl-11 pr-4 py-3 bg-slate-50 border border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 rounded-2xl outline-none transition-all font-semibold text-slate-700 text-sm';
+    'w-full pl-11 pr-4 py-3 bg-neutral-50 border border-transparent focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 rounded-app-md outline-none transition-all font-semibold text-neutral-700 text-sm';
   const labelClasses = 'ml-1 mb-1 block';
 
   const handlePhoneKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -34,8 +34,8 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
   if (isLoadingPatient) {
     return (
       <div className="max-w-3xl mx-auto my-8 p-4 animate-pulse space-y-4">
-        <div className="h-8 bg-slate-100 rounded w-1/3" />
-        <div className="h-64 bg-slate-100 rounded-3xl" />
+        <div className="h-8 bg-neutral-100 rounded w-1/3" />
+        <div className="h-64 bg-neutral-100 rounded-app-lg" />
       </div>
     );
   }
@@ -44,18 +44,18 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
     <div className="max-w-3xl mx-auto my-8 p-4">
       <button
         onClick={handleCancel}
-        className="flex items-center gap-2 text-slate-400 hover:text-slate-900 font-medium text-xs uppercase tracking-widest transition-all mb-6"
+        className="flex items-center gap-2 text-neutral-400 hover:text-neutral-900 font-medium text-xs uppercase tracking-widest transition-all mb-6"
       >
         <ArrowLeft size={14} /> Volver al expediente
       </button>
 
-      <div className="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[3rem] overflow-hidden border border-slate-100">
-        <div className="bg-slate-50/50 px-10 py-8 border-b border-slate-100 flex items-center gap-4">
-          <div className="bg-[#1E3A8A] p-3 rounded-2xl shadow-lg shadow-blue-900/20">
+      <div className="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-app-2xl overflow-hidden border border-neutral-100">
+        <div className="bg-neutral-50/50 px-10 py-8 border-b border-neutral-100 flex items-center gap-4">
+          <div className="bg-primary p-3 rounded-app-md shadow-lg shadow-primary-dark/20">
             <UserIcon size={24} className="text-white" />
           </div>
           <div>
-            <Typography variant={TypographyVariant.SUBTITLE} textColor="text-slate-800">
+            <Typography variant={TypographyVariant.SUBTITLE} textColor="text-neutral-800">
               Editar Paciente
             </Typography>
             <Typography variant={TypographyVariant.HELPER}>
@@ -81,10 +81,10 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                   <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>Nombre</Typography>
                   <div className="relative group">
                     <Field name="firstName" maxLength={60} className={inputClasses} placeholder="Nombre" />
-                    <HeroUserIcon className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                    <HeroUserIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary transition-colors" />
                   </div>
                   <ErrorMessage name="firstName" render={(msg) => (
-                    <Typography variant={TypographyVariant.CAPTION} textColor="text-red-500" className="ml-2 mt-1">{msg}</Typography>
+                    <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>
                   )} />
                 </div>
 
@@ -93,10 +93,10 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                   <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>Apellido</Typography>
                   <div className="relative group">
                     <Field name="lastName" maxLength={60} className={inputClasses} placeholder="Apellido" />
-                    <HeroUserIcon className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                    <HeroUserIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary transition-colors" />
                   </div>
                   <ErrorMessage name="lastName" render={(msg) => (
-                    <Typography variant={TypographyVariant.CAPTION} textColor="text-red-500" className="ml-2 mt-1">{msg}</Typography>
+                    <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>
                   )} />
                 </div>
 
@@ -111,10 +111,10 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                       placeholder="+506 8888-8888"
                       onKeyDown={handlePhoneKeyDown}
                     />
-                    <PhoneIcon className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500" />
+                    <PhoneIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary" />
                   </div>
                   <ErrorMessage name="phone" render={(msg) => (
-                    <Typography variant={TypographyVariant.CAPTION} textColor="text-red-500" className="ml-2 mt-1">{msg}</Typography>
+                    <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>
                   )} />
                 </div>
 
@@ -137,10 +137,10 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                   <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>Correo Electrónico</Typography>
                   <div className="relative group">
                     <Field name="email" type="email" className={inputClasses} placeholder="paciente@ejemplo.com" />
-                    <EnvelopeIcon className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500" />
+                    <EnvelopeIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary" />
                   </div>
                   <ErrorMessage name="email" render={(msg) => (
-                    <Typography variant={TypographyVariant.CAPTION} textColor="text-red-500" className="ml-2 mt-1">{msg}</Typography>
+                    <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>
                   )} />
                 </div>
 
@@ -149,10 +149,10 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                   <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>Dirección</Typography>
                   <div className="relative group">
                     <Field name="address" maxLength={120} className={inputClasses} placeholder="Ej. San José, Barrio Escalante..." />
-                    <MapPinIcon className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-blue-500" />
+                    <MapPinIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary" />
                   </div>
                   <ErrorMessage name="address" render={(msg) => (
-                    <Typography variant={TypographyVariant.CAPTION} textColor="text-red-500" className="ml-2 mt-1">{msg}</Typography>
+                    <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>
                   )} />
                 </div>
               </div>
@@ -169,7 +169,7 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                 <Button
                   variant={ButtonVariant.PRIMARY}
                   type="submit"
-                  className="flex-1 py-4 rounded-2xl text-base shadow-xl shadow-blue-900/10"
+                  className="flex-1 py-4 rounded-app-md text-base shadow-xl shadow-primary-dark/10"
                   disabled={isSaving}
                 >
                   {isSaving ? 'Guardando...' : 'Guardar Cambios'}

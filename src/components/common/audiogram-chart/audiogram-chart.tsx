@@ -89,7 +89,7 @@ const SideChart: React.FC<SideChartProps> = ({ data, side, compact = false }) =>
                 <svg
                     viewBox="0 0 100 100"
                     preserveAspectRatio="xMidYMid meet"
-                    className="w-full border border-slate-200 bg-white"
+                    className="w-full border border-neutral-200 bg-white"
                     style={{ aspectRatio: '7/5' }}
                 >
                     {/* líneas horizontales de dB */}
@@ -143,7 +143,7 @@ const SideChart: React.FC<SideChartProps> = ({ data, side, compact = false }) =>
                     {DB_LEVELS.filter((_, i) => i % 2 === 0).map((db) => (
                         <span
                             key={db}
-                            className="text-[7px] font-bold text-slate-400 text-right pr-1 leading-none"
+                            className="text-[7px] font-bold text-neutral-400 text-right pr-1 leading-none"
                             style={{ position: 'absolute', top: `${toPercent(db, DB_MIN, DB_MAX)}%`, transform: 'translateY(-50%)' }}
                         >
                             {db}
@@ -155,7 +155,7 @@ const SideChart: React.FC<SideChartProps> = ({ data, side, compact = false }) =>
                 <div className="absolute left-0 right-0 flex justify-between pointer-events-none"
                     style={{ bottom: 0, paddingLeft: compact ? 28 : 36 }}>
                     {FREQUENCIES.map((hz) => (
-                        <span key={hz} className="text-[7px] font-bold text-slate-400 leading-none">
+                        <span key={hz} className="text-[7px] font-bold text-neutral-400 leading-none">
                             {hz >= 1000 ? `${hz / 1000}k` : hz}
                         </span>
                     ))}
@@ -195,7 +195,7 @@ export const AudiogramChart: React.FC<AudiogramChartProps> = ({
                         return (
                             <div
                                 key={side}
-                                className="flex items-center gap-3 p-3 rounded-xl border"
+                                className="flex items-center gap-3 p-3 rounded-app-sm border"
                                 style={{ borderColor: `${classification.color}30`, backgroundColor: `${classification.color}08` }}
                             >
                                 <div
@@ -203,7 +203,7 @@ export const AudiogramChart: React.FC<AudiogramChartProps> = ({
                                     style={{ backgroundColor: side === 'OD' ? '#EF4444' : '#3B82F6' }}
                                 />
                                 <div className="min-w-0">
-                                    <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                    <div className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
                                         {side === 'OD' ? 'Oído Derecho' : 'Oído Izquierdo'}
                                     </div>
                                     <div className="flex items-center gap-1.5 mt-0.5">
@@ -213,7 +213,7 @@ export const AudiogramChart: React.FC<AudiogramChartProps> = ({
                                         >
                                             {classification.label}
                                         </span>
-                                        <span className="text-[9px] text-slate-400 font-medium">
+                                        <span className="text-[9px] text-neutral-400 font-medium">
                                             PTA {classification.pta} dB
                                         </span>
                                     </div>
@@ -230,8 +230,8 @@ export const AudiogramChart: React.FC<AudiogramChartProps> = ({
             </div>
 
             {/* leyenda de zona normal */}
-            <div className="flex items-center gap-2 text-[9px] text-slate-400 font-medium">
-                <div className="w-4 h-2 rounded-sm bg-emerald-50 border border-emerald-200" />
+            <div className="flex items-center gap-2 text-[9px] text-neutral-400 font-medium">
+                <div className="w-4 h-2 rounded-sm bg-success/10 border border-success/30" />
                 Zona de audición normal (≤25 dB HL)
             </div>
         </div>

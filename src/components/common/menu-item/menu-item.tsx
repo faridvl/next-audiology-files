@@ -34,10 +34,10 @@ export function ToggleMenu({ actions, rowData }: ToggleMenuProps) {
                         {/* BUTTON */}
                         <MenuButton
                             className={tailwind(
-                                'p-2 rounded-xl transition-all outline-none',
+                                'p-2 rounded-app-sm transition-all outline-none',
                                 open
-                                    ? 'bg-slate-100 text-[#1E3A8A]'
-                                    : 'text-slate-400 hover:text-[#1E3A8A] hover:bg-slate-100'
+                                    ? 'bg-neutral-100 text-primary'
+                                    : 'text-neutral-400 hover:text-primary hover:bg-neutral-100'
                             )}
                         >
                             <MoreVertical size={18} strokeWidth={2.5} />
@@ -56,7 +56,7 @@ export function ToggleMenu({ actions, rowData }: ToggleMenuProps) {
                             >
                                 <MenuItems
                                     anchor="bottom end"
-                                    className="w-52 rounded-2xl bg-white shadow-xl border border-slate-100 z-[9999] overflow-hidden p-1.5"
+                                    className="w-52 rounded-app-md bg-white shadow-xl border border-neutral-100 z-[9999] overflow-hidden p-1.5"
                                 >
                                     {actions?.map((action, index) => {
                                         const isDanger = action.variant === 'danger';
@@ -67,11 +67,11 @@ export function ToggleMenu({ actions, rowData }: ToggleMenuProps) {
                                                     <button
                                                         onClick={() => action.onClick(rowData)}
                                                         className={tailwind(
-                                                            'flex w-full items-center gap-3 px-3 py-2 rounded-xl transition-colors',
+                                                            'flex w-full items-center gap-3 px-3 py-2 rounded-app-sm transition-colors',
                                                             active &&
                                                             (isDanger
-                                                                ? 'bg-red-50'
-                                                                : 'bg-slate-100')
+                                                                ? 'bg-danger/10'
+                                                                : 'bg-neutral-100')
                                                         )}
                                                     >
                                                         {action.icon}
@@ -81,10 +81,10 @@ export function ToggleMenu({ actions, rowData }: ToggleMenuProps) {
                                                             textColor={
                                                                 isDanger
                                                                     ? active
-                                                                        ? 'text-red-600'
-                                                                        : 'text-red-500'
+                                                                        ? 'text-danger'
+                                                                        : 'text-danger'
                                                                     : active
-                                                                        ? 'text-[#1E3A8A]'
+                                                                        ? 'text-primary'
                                                                         : undefined
                                                             }
                                                         >

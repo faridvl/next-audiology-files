@@ -28,7 +28,7 @@ export function Pagination({ currentPage, onPageChange, startIndex, endIndex, to
 
     return (
         <div className="flex items-center justify-between gap-4 flex-wrap">
-            <span className="text-[13px] text-slate-400 font-sans">
+            <span className="text-[13px] text-neutral-400 font-sans">
                 {t(TEXT.GENERAL.PAGINATION.SHOWING, { start: startIndex, end: endIndex, total: totalRows })}
             </span>
 
@@ -39,8 +39,8 @@ export function Pagination({ currentPage, onPageChange, startIndex, endIndex, to
                     className={tailwind(
                         'w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-150 text-sm font-medium',
                         currentPage === 1
-                            ? 'text-slate-300 cursor-not-allowed'
-                            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 active:scale-95'
+                            ? 'text-neutral-300 cursor-not-allowed'
+                            : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 active:scale-95'
                     )}
                     aria-label="Página anterior"
                 >
@@ -59,7 +59,7 @@ export function Pagination({ currentPage, onPageChange, startIndex, endIndex, to
                         }, [])
                         .map((entry, index) =>
                             entry === 'ellipsis' ? (
-                                <span key={`ellipsis-${index}`} className="w-8 h-8 flex items-center justify-center text-slate-300 text-sm">
+                                <span key={`ellipsis-${index}`} className="w-8 h-8 flex items-center justify-center text-neutral-300 text-sm">
                                     ···
                                 </span>
                             ) : (
@@ -69,8 +69,8 @@ export function Pagination({ currentPage, onPageChange, startIndex, endIndex, to
                                     className={tailwind(
                                         'w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium transition-all duration-150',
                                         entry === currentPage
-                                            ? 'bg-[#1E3A8A] text-white shadow-sm'
-                                            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 active:scale-95'
+                                            ? 'bg-primary text-white shadow-sm'
+                                            : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 active:scale-95'
                                     )}
                                 >
                                     {entry}
@@ -85,8 +85,8 @@ export function Pagination({ currentPage, onPageChange, startIndex, endIndex, to
                     className={tailwind(
                         'w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-150',
                         currentPage === totalPages || totalPages === 0
-                            ? 'text-slate-300 cursor-not-allowed'
-                            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700 active:scale-95'
+                            ? 'text-neutral-300 cursor-not-allowed'
+                            : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 active:scale-95'
                     )}
                     aria-label="Página siguiente"
                 >

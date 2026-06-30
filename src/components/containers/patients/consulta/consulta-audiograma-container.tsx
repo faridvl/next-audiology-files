@@ -69,21 +69,21 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid }) =>
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigation.patients.consulta(patientUuid)}
-          className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors shrink-0"
+          className="w-10 h-10 rounded-app-sm bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors shrink-0"
         >
-          <ArrowLeft size={16} className="text-slate-500" />
+          <ArrowLeft size={16} className="text-neutral-500" />
         </button>
         <div>
-          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-purple-500">
+          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-accent">
             Audiograma
           </Typography>
-          <Typography variant={TypographyVariant.SUBTITLE} className="text-slate-800 leading-tight">
+          <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
             {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
           </Typography>
         </div>
       </div>
 
-      <div className="bg-white border border-slate-100 rounded-[1.8rem] p-5 md:p-8 shadow-sm">
+      <div className="bg-white border border-neutral-100 rounded-app-md p-5 md:p-8 shadow-sm">
         <AudiometryCapture onChange={setAudiogramData} />
       </div>
 
@@ -91,7 +91,7 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid }) =>
         <Button variant={ButtonVariant.CANCEL} onClick={() => navigation.patients.consulta(patientUuid)} text="Cancelar" />
         <Button
           variant={ButtonVariant.PRIMARY}
-          className="!h-12 !px-10 !rounded-xl shadow-lg shadow-purple-200"
+          className="!h-12 !px-10 !rounded-app-sm shadow-lg shadow-accent/20"
           onClick={handleSave}
           disabled={isPending}
         >

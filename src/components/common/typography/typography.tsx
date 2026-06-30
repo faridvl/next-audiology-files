@@ -38,10 +38,10 @@ type VariantStyle = {
     component: ElementType;
 };
 
-const brandPrimary = 'text-[#1E3A8A]';
-const neutralDark = 'text-slate-900';
-const neutralBase = 'text-slate-700';
-const neutralLight = 'text-slate-500';
+const brandPrimary = 'text-primary';
+const neutralDark = 'text-neutral-900';
+const neutralBase = 'text-neutral-700';
+const neutralLight = 'text-neutral-500';
 
 const commonStylesClassName = 'font-sans tracking-tight';
 
@@ -138,7 +138,7 @@ function TextComponent({
                 variantClassName,
                 textColor || colorClassName,
                 !ignoreImplicitSpacing && spacingClassName,
-                { 'text-slate-400': disabled },
+                { 'text-neutral-400': disabled },
                 className,
             )}
         />

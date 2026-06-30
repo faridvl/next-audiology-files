@@ -41,26 +41,26 @@ export const LinkDeviceModal: React.FC<Props> = ({ patientUuid, currentLinkedPro
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm p-4">
-            <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl p-8 animate-in zoom-in-95 space-y-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-neutral-900/30 backdrop-blur-sm p-4">
+            <div className="bg-white w-full max-w-lg rounded-app-xl shadow-2xl p-8 animate-in zoom-in-95 space-y-6">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-50 rounded-xl">
-                            <Link size={18} className="text-blue-600" />
+                        <div className="p-2 bg-primary-soft rounded-xl">
+                            <Link size={18} className="text-primary" />
                         </div>
-                        <p className="text-sm font-black text-slate-900 uppercase tracking-widest">Vincular audífono</p>
+                        <p className="text-sm font-black text-neutral-900 uppercase tracking-widest">Vincular audífono</p>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                    <button onClick={onClose} className="p-2 hover:bg-neutral-100 rounded-full transition-colors">
                         <X size={18} />
                     </button>
                 </div>
 
                 <div className="relative">
-                    <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" />
                     <input
                         type="text"
                         placeholder="Buscar por nombre, SKU o modelo..."
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500/10 transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -68,9 +68,9 @@ export const LinkDeviceModal: React.FC<Props> = ({ patientUuid, currentLinkedPro
 
                 <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                     {isLoading ? (
-                        <div className="py-8 text-center text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Cargando inventario...</div>
+                        <div className="py-8 text-center text-neutral-400 text-xs font-bold uppercase tracking-widest animate-pulse">Cargando inventario...</div>
                     ) : filtered.length === 0 ? (
-                        <div className="py-8 text-center text-slate-400 text-xs font-bold uppercase tracking-widest">Sin resultados</div>
+                        <div className="py-8 text-center text-neutral-400 text-xs font-bold uppercase tracking-widest">Sin resultados</div>
                     ) : (
                         filtered.map((product) => {
                             const isSelected = selectedUuid === product.uuid;
@@ -78,19 +78,19 @@ export const LinkDeviceModal: React.FC<Props> = ({ patientUuid, currentLinkedPro
                                 <button
                                     key={product.uuid}
                                     onClick={() => setSelectedUuid(isSelected ? null : product.uuid)}
-                                    className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left ${
+                                    className={`w-full flex items-center gap-4 p-4 rounded-app-md border transition-all text-left ${
                                         isSelected
-                                            ? 'border-blue-300 bg-blue-50'
-                                            : 'border-slate-100 hover:border-slate-200 bg-white'
+                                            ? 'border-primary/30 bg-primary-soft'
+                                            : 'border-neutral-100 hover:border-neutral-200 bg-white'
                                     }`}
                                 >
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-bold text-slate-900 truncate">{product.name}</p>
-                                        <p className="text-[10px] text-slate-400 uppercase tracking-wide font-bold">
+                                        <p className="text-sm font-bold text-neutral-900 truncate">{product.name}</p>
+                                        <p className="text-[10px] text-neutral-400 uppercase tracking-wide font-bold">
                                             {product.sku}{product.model ? ` · ${product.model}` : ''}
                                         </p>
                                     </div>
-                                    {isSelected && <CheckCircle size={18} className="text-blue-600 shrink-0" />}
+                                    {isSelected && <CheckCircle size={18} className="text-primary shrink-0" />}
                                 </button>
                             );
                         })
@@ -100,7 +100,7 @@ export const LinkDeviceModal: React.FC<Props> = ({ patientUuid, currentLinkedPro
                 {currentLinkedProductUuid && (
                     <button
                         onClick={() => setSelectedUuid(null)}
-                        className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors"
+                        className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-danger/60 hover:text-danger transition-colors"
                     >
                         Quitar vínculo actual
                     </button>
@@ -109,14 +109,14 @@ export const LinkDeviceModal: React.FC<Props> = ({ patientUuid, currentLinkedPro
                 <div className="flex gap-3 pt-2">
                     <button
                         onClick={onClose}
-                        className="flex-1 py-3 rounded-xl border border-slate-200 text-xs font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-colors"
+                        className="flex-1 py-3 rounded-xl border border-neutral-200 text-xs font-black uppercase tracking-widest text-neutral-500 hover:bg-neutral-50 transition-colors"
                     >
                         Cancelar
                     </button>
                     <button
                         onClick={handleConfirm}
                         disabled={isPending || selectedUuid === currentLinkedProductUuid}
-                        className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 py-3 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-black uppercase tracking-widest transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isPending ? 'Guardando...' : 'Confirmar'}
                     </button>

@@ -40,10 +40,10 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
 
   const getIconStyle = (category: DocumentCategory) => {
     switch (category) {
-      case DocumentCategory.RECEIPT: return 'bg-emerald-50 text-emerald-600';
-      case DocumentCategory.WARRANTY: return 'bg-amber-50 text-amber-600';
-      case DocumentCategory.EXTERNAL_TEST: return 'bg-blue-50 text-blue-600';
-      default: return 'bg-slate-50 text-slate-600';
+      case DocumentCategory.RECEIPT: return 'bg-success/10 text-success';
+      case DocumentCategory.WARRANTY: return 'bg-warning/10 text-warning';
+      case DocumentCategory.EXTERNAL_TEST: return 'bg-primary-soft text-primary';
+      default: return 'bg-neutral-50 text-neutral-600';
     }
   };
 
@@ -51,13 +51,13 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
     <div className="flex flex-col gap-6 animate-in fade-in duration-500">
 
       {/* BARRA DE ACCIONES */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-neutral-50/50 p-4 rounded-app-md border border-neutral-100">
         <div className="relative group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={14} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-primary transition-colors" size={14} />
           <input
             type="text"
             placeholder="Buscar en archivos..."
-            className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-blue-500/5 transition-all w-full md:w-64 outline-none"
+            className="pl-9 pr-4 py-2 bg-white border border-neutral-200 rounded-app-sm text-xs focus:ring-4 focus:ring-primary/5 transition-all w-full md:w-64 outline-none"
             onChange={(event) => setSearchTerm(event.target.value)}
           />
         </div>
@@ -80,7 +80,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
             <>
               {/* Nombre del archivo seleccionado */}
               <span
-                className="text-[10px] font-bold text-slate-600 truncate max-w-[160px] bg-white border border-slate-200 px-3 py-2 rounded-xl cursor-pointer hover:border-blue-300 transition-all"
+                className="text-[10px] font-bold text-neutral-600 truncate max-w-[160px] bg-white border border-neutral-200 px-3 py-2 rounded-app-sm cursor-pointer hover:border-primary/40 transition-all"
                 title={pendingFile.name}
                 onClick={openFilePicker}
               >
@@ -91,7 +91,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
               <select
                 value={selectedCategory}
                 onChange={(event) => handleCategoryChange(event.target.value as DocumentCategoryApiValue)}
-                className="text-[10px] font-bold text-slate-700 bg-white border border-slate-200 px-3 py-2 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/5 transition-all"
+                className="text-[10px] font-bold text-neutral-700 bg-white border border-neutral-200 px-3 py-2 rounded-app-sm outline-none focus:ring-4 focus:ring-primary/5 transition-all"
               >
                 {getCategoryDisplayOptions().map((option) => (
                   <option key={option.value} value={option.value}>
@@ -104,7 +104,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
               <button
                 onClick={handleUpload}
                 disabled={isUploading}
-                className="flex items-center justify-center gap-1.5 bg-blue-600 text-white px-5 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-md shadow-blue-100 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-1.5 bg-primary text-white px-5 py-2 rounded-app-sm font-black text-[10px] uppercase tracking-widest hover:bg-primary-dark transition-all shadow-md shadow-primary-soft disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
                 {isUploading ? 'Subiendo...' : 'Confirmar'}
@@ -113,7 +113,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
               {/* Cancelar */}
               <button
                 onClick={() => handleFileSelected(null as unknown as File)}
-                className="text-[10px] font-bold text-slate-400 hover:text-red-500 px-3 py-2 rounded-xl transition-all"
+                className="text-[10px] font-bold text-neutral-400 hover:text-danger px-3 py-2 rounded-app-sm transition-all"
               >
                 Cancelar
               </button>
@@ -121,7 +121,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
           ) : (
             <button
               onClick={openFilePicker}
-              className="flex items-center justify-center gap-1.5 bg-slate-900 text-white px-5 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-md shadow-slate-200"
+              className="flex items-center justify-center gap-1.5 bg-neutral-900 text-white px-5 py-2 rounded-app-sm font-black text-[10px] uppercase tracking-widest hover:bg-primary transition-all shadow-md shadow-neutral-200"
             >
               <Upload size={14} /> Subir Archivo
             </button>
@@ -132,10 +132,10 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <aside className="lg:col-span-3">
           <nav className="flex lg:flex-col gap-1 overflow-x-auto no-scrollbar pb-2 lg:pb-0">
-            <span className="hidden lg:block text-slate-400 text-[9px] font-black uppercase tracking-[0.2em] ml-3 mb-2">Filtros</span>
+            <span className="hidden lg:block text-neutral-400 text-[9px] font-black uppercase tracking-[0.2em] ml-3 mb-2">Filtros</span>
             <button
               onClick={() => setFilter('ALL')}
-              className={`flex-none px-4 py-2 rounded-xl font-bold text-[11px] uppercase tracking-tight transition-all text-left ${filter === 'ALL' ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50'}`}
+              className={`flex-none px-4 py-2 rounded-app-sm font-bold text-[11px] uppercase tracking-tight transition-all text-left ${filter === 'ALL' ? 'bg-primary-soft text-primary' : 'text-neutral-500 hover:bg-neutral-50'}`}
             >
               Todos
             </button>
@@ -143,7 +143,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
               <button
                 key={category}
                 onClick={() => setFilter(category)}
-                className={`flex-none px-4 py-2 rounded-xl font-bold text-[11px] uppercase tracking-tight transition-all text-left ${filter === category ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50'}`}
+                className={`flex-none px-4 py-2 rounded-app-sm font-bold text-[11px] uppercase tracking-tight transition-all text-left ${filter === category ? 'bg-primary-soft text-primary' : 'text-neutral-500 hover:bg-neutral-50'}`}
               >
                 {category}
               </button>
@@ -154,27 +154,27 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
         <main className="lg:col-span-9">
           {isLoading ? (
             <div className="py-20 text-center">
-              <Loader2 className="mx-auto text-blue-400 animate-spin mb-2" size={28} />
-              <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Cargando documentos...</p>
+              <Loader2 className="mx-auto text-primary-light animate-spin mb-2" size={28} />
+              <p className="text-[10px] text-neutral-400 font-black uppercase tracking-widest">Cargando documentos...</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
               {filteredDocuments.map((document) => (
-                <div key={document.id} className="bg-white border border-slate-100 p-3.5 rounded-2xl flex items-center justify-between hover:border-blue-200 transition-all group shadow-sm hover:shadow-md">
+                <div key={document.id} className="bg-white border border-neutral-100 p-3.5 rounded-app-md flex items-center justify-between hover:border-primary/30 transition-all group shadow-sm hover:shadow-md">
                   <div className="flex items-center gap-3">
-                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${getIconStyle(document.category)}`}>
+                    <div className={`h-10 w-10 rounded-app-sm flex items-center justify-center shrink-0 ${getIconStyle(document.category)}`}>
                       {getIcon(document.category)}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[11px] font-black text-slate-800 leading-tight group-hover:text-blue-600 transition-colors truncate">
+                      <p className="text-[11px] font-black text-neutral-800 leading-tight group-hover:text-primary transition-colors truncate">
                         {document.name}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">
+                        <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-tight">
                           {document.date} • {document.size}
                         </span>
                         {document.controlId && (
-                          <div className="flex items-center gap-1 bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded text-[8px] font-black uppercase border border-slate-100">
+                          <div className="flex items-center gap-1 bg-neutral-50 text-neutral-500 px-1.5 py-0.5 rounded text-[8px] font-black uppercase border border-neutral-100">
                             <LinkIcon size={8} /> Ref: {document.controlId}
                           </div>
                         )}
@@ -186,14 +186,14 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
                       href={document.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 text-slate-300 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                      className="p-2 text-neutral-300 hover:text-primary hover:bg-primary-soft rounded-lg transition-all"
                       title="Ver documento"
                     >
                       <Eye size={16} />
                     </a>
                     <button
                       onClick={() => handleDelete(document.id)}
-                      className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                      className="p-2 text-neutral-300 hover:text-danger hover:bg-danger/10 rounded-lg transition-all"
                       title="Eliminar"
                     >
                       <Trash2 size={16} />
@@ -203,9 +203,9 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
               ))}
 
               {filteredDocuments.length === 0 && (
-                <div className="col-span-full py-20 text-center bg-white rounded-3xl border border-dashed border-slate-200">
-                  <FileText className="mx-auto text-slate-200 mb-2" size={32} />
-                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">No se encontraron archivos</p>
+                <div className="col-span-full py-20 text-center bg-white rounded-app-lg border border-dashed border-neutral-200">
+                  <FileText className="mx-auto text-neutral-200 mb-2" size={32} />
+                  <p className="text-[10px] text-neutral-400 font-black uppercase tracking-widest">No se encontraron archivos</p>
                 </div>
               )}
             </div>

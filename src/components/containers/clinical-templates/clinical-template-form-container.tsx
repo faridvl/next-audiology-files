@@ -46,18 +46,18 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
     <div className="max-w-3xl mx-auto py-10 px-6 space-y-8">
       {/* ENCABEZADO */}
       <div>
-        <h1 className="text-xl font-black text-slate-900 tracking-tight">
+        <h1 className="text-xl font-black text-neutral-900 tracking-tight">
           {isEditMode ? 'Editar plantilla' : 'Nueva plantilla clínica'}
         </h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className="text-sm text-neutral-400 mt-1">
           Define los campos personalizados que aparecerán en el formulario de control médico.
         </p>
       </div>
 
       {/* INFO BÁSICA */}
-      <div className="bg-white border border-slate-100 rounded-2xl p-6 space-y-4 shadow-sm">
+      <div className="bg-white border border-neutral-100 rounded-app-md p-6 space-y-4 shadow-sm">
         <div className="space-y-2">
-          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+          <label className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
             Nombre de la plantilla
           </label>
           <input
@@ -65,17 +65,17 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
             value={templateName}
             onChange={(event) => setTemplateName(event.target.value)}
             placeholder="Ej. Audiología General"
-            className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 transition-colors"
+            className="w-full px-4 py-3 border border-neutral-200 rounded-app-sm text-sm outline-none focus:border-primary transition-colors"
           />
         </div>
         <div className="space-y-2">
-          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+          <label className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
             Especialidad
           </label>
           <select
             value={templateSpeciality}
             onChange={(event) => setTemplateSpeciality(event.target.value)}
-            className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 transition-colors bg-white"
+            className="w-full px-4 py-3 border border-neutral-200 rounded-app-sm text-sm outline-none focus:border-primary transition-colors bg-white"
           >
             {specialityOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -88,12 +88,12 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
 
       {/* CAMPOS ACTUALES */}
       <div className="space-y-3">
-        <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
+        <h2 className="text-sm font-bold text-neutral-700 uppercase tracking-wider">
           Campos de la plantilla ({fields.length})
         </h2>
 
         {fields.length === 0 && (
-          <p className="text-sm text-slate-300 italic py-4 text-center">
+          <p className="text-sm text-neutral-300 italic py-4 text-center">
             No hay campos aún. Agrega el primero desde el panel inferior.
           </p>
         )}
@@ -101,13 +101,13 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
         {fields.map((field: ClinicalFieldDefinition, index: number) => (
           <div
             key={field.id}
-            className="flex items-center gap-3 p-4 bg-white border border-slate-100 rounded-xl shadow-sm"
+            className="flex items-center gap-3 p-4 bg-white border border-neutral-100 rounded-app-sm shadow-sm"
           >
             <div className="flex flex-col gap-1">
               <button
                 onClick={() => handleMoveFieldUp(field.id)}
                 disabled={index === 0}
-                className="p-1 text-slate-300 hover:text-slate-600 disabled:opacity-30 transition-colors"
+                className="p-1 text-neutral-300 hover:text-neutral-600 disabled:opacity-30 transition-colors"
                 title="Subir"
               >
                 <ArrowUp size={14} />
@@ -115,7 +115,7 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
               <button
                 onClick={() => handleMoveFieldDown(field.id)}
                 disabled={index === fields.length - 1}
-                className="p-1 text-slate-300 hover:text-slate-600 disabled:opacity-30 transition-colors"
+                className="p-1 text-neutral-300 hover:text-neutral-600 disabled:opacity-30 transition-colors"
                 title="Bajar"
               >
                 <ArrowDown size={14} />
@@ -123,18 +123,18 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-sm text-slate-900 truncate">{field.label}</p>
+              <p className="font-bold text-sm text-neutral-900 truncate">{field.label}</p>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[10px] text-slate-400 uppercase tracking-wide">
+                <span className="text-[10px] text-neutral-400 uppercase tracking-wide">
                   {FIELD_TYPE_LABELS[field.fieldType] ?? field.fieldType}
                 </span>
                 {field.required && (
-                  <span className="text-[10px] font-bold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-bold text-primary bg-primary-soft px-1.5 py-0.5 rounded">
                     Obligatorio
                   </span>
                 )}
                 {field.options && field.options.length > 0 && (
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[10px] text-neutral-400">
                     Opciones: {field.options.join(', ')}
                   </span>
                 )}
@@ -143,7 +143,7 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
 
             <button
               onClick={() => handleRemoveField(field.id)}
-              className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+              className="p-2 text-neutral-300 hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
               title="Eliminar campo"
             >
               <Trash2 size={14} />
@@ -153,14 +153,14 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
       </div>
 
       {/* AGREGAR CAMPO */}
-      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
-        <h3 className="text-sm font-bold text-slate-600 uppercase tracking-wider">
+      <div className="bg-neutral-50 border border-neutral-200 rounded-app-md p-6 space-y-4">
+        <h3 className="text-sm font-bold text-neutral-600 uppercase tracking-wider">
           Agregar campo
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+            <label className="text-xs font-bold text-neutral-400 uppercase tracking-wide">
               Nombre del campo
             </label>
             <input
@@ -170,12 +170,12 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
                 setNewFieldDraft({ ...newFieldDraft, label: event.target.value })
               }
               placeholder="Ej. Otoscopia OD"
-              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white outline-none focus:border-blue-500 transition-colors"
+              className="w-full px-3 py-2.5 border border-neutral-200 rounded-lg text-sm bg-white outline-none focus:border-primary transition-colors"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+            <label className="text-xs font-bold text-neutral-400 uppercase tracking-wide">
               Tipo de campo
             </label>
             <select
@@ -186,7 +186,7 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
                   fieldType: event.target.value as typeof newFieldDraft.fieldType,
                 })
               }
-              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white outline-none focus:border-blue-500 transition-colors"
+              className="w-full px-3 py-2.5 border border-neutral-200 rounded-lg text-sm bg-white outline-none focus:border-primary transition-colors"
             >
               {fieldTypeOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -199,7 +199,7 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
 
         {newFieldDraft.fieldType === 'select' && (
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+            <label className="text-xs font-bold text-neutral-400 uppercase tracking-wide">
               Opciones (separadas por coma)
             </label>
             <input
@@ -209,7 +209,7 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
                 setNewFieldDraft({ ...newFieldDraft, selectOptions: event.target.value })
               }
               placeholder="Ej. Normal, Alterado, Pendiente"
-              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white outline-none focus:border-blue-500 transition-colors"
+              className="w-full px-3 py-2.5 border border-neutral-200 rounded-lg text-sm bg-white outline-none focus:border-primary transition-colors"
             />
           </div>
         )}
@@ -222,16 +222,16 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
             onChange={(event) =>
               setNewFieldDraft({ ...newFieldDraft, required: event.target.checked })
             }
-            className="w-4 h-4 rounded border-slate-300"
+            className="w-4 h-4 rounded border-neutral-300"
           />
-          <label htmlFor="field-required" className="text-sm text-slate-600">
+          <label htmlFor="field-required" className="text-sm text-neutral-600">
             Campo obligatorio
           </label>
         </div>
 
         <button
           onClick={handleAddField}
-          className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-sm font-bold transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white rounded-lg text-sm font-bold transition-colors"
         >
           <Plus size={14} />
           Agregar campo
@@ -239,10 +239,10 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
       </div>
 
       {/* ACCIONES */}
-      <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+      <div className="flex justify-end gap-3 pt-4 border-t border-neutral-100">
         <button
           onClick={handleCancel}
-          className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition-colors"
+          className="flex items-center gap-2 px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-app-sm text-sm font-bold transition-colors"
         >
           <X size={14} />
           Cancelar
@@ -250,7 +250,7 @@ export const ClinicalTemplateFormContainer: React.FC<Props> = ({ templateId }) =
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white rounded-xl text-sm font-bold transition-colors shadow-md shadow-blue-200"
+          className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white rounded-app-sm text-sm font-bold transition-colors shadow-md shadow-primary-soft"
         >
           <Save size={14} />
           {isSaving ? 'Guardando...' : 'Guardar plantilla'}

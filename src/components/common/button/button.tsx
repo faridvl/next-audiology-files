@@ -34,7 +34,7 @@ export function Button({
 }: ButtonProps) {
 
     const baseStyle =
-        'flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100';
+        'flex items-center justify-center gap-2 px-5 py-2.5 rounded-app-sm text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100';
 
     const variantStyles: { [key in ButtonVariant]: VariantStyle } = {
         [ButtonVariant.PRIMARY]: {
@@ -46,9 +46,9 @@ export function Button({
 
         [ButtonVariant.DANGER]: {
             className: `${baseStyle}
-                bg-red-600 text-white
-                hover:bg-red-700
-                focus:ring-red-500/40`,
+                bg-danger text-white
+                hover:bg-danger/90
+                focus:ring-danger/40`,
         },
 
         [ButtonVariant.ALERT]: {
@@ -60,8 +60,8 @@ export function Button({
 
         [ButtonVariant.CANCEL]: {
             className: `${baseStyle}
-                bg-slate-100 text-slate-700
-                hover:bg-slate-200
+                bg-neutral-100 text-neutral-700
+                hover:bg-neutral-200
                 focus:ring-slate-300`,
         },
     };

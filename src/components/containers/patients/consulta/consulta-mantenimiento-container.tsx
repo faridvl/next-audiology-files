@@ -12,7 +12,7 @@ interface Props {
   patientUuid: string;
 }
 
-const inputClass = 'w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/30 text-sm outline-none focus:bg-white focus:border-amber-300 transition-colors';
+const inputClass = 'w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm outline-none focus:bg-white focus:border-warning/40 transition-colors';
 
 export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid }) => {
   const navigation = useNavigation();
@@ -59,25 +59,25 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigation.patients.consulta(patientUuid)}
-          className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors shrink-0"
+          className="w-10 h-10 rounded-xl bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors shrink-0"
         >
-          <ArrowLeft size={16} className="text-slate-500" />
+          <ArrowLeft size={16} className="text-neutral-500" />
         </button>
         <div>
-          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-amber-500">
+          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-warning">
             Mantenimiento
           </Typography>
-          <Typography variant={TypographyVariant.SUBTITLE} className="text-slate-800 leading-tight">
+          <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
             {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
           </Typography>
         </div>
       </div>
 
-      <div className="bg-white border border-slate-100 rounded-[1.8rem] p-5 md:p-8 space-y-6 shadow-sm">
+      <div className="bg-white border border-neutral-100 rounded-app-md p-5 md:p-8 space-y-6 shadow-sm">
 
         <div className="space-y-2">
-          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-            ¿Qué se realizó? <span className="text-red-400">*</span>
+          <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">
+            ¿Qué se realizó? <span className="text-danger">*</span>
           </label>
           <textarea
             className={`${inputClass} min-h-[140px]`}
@@ -88,7 +88,7 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
         </div>
 
         <div className="space-y-3">
-          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+          <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">
             Próximo mantenimiento
           </label>
           <div className="flex flex-wrap gap-2">
@@ -97,7 +97,7 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
                 key={days}
                 type="button"
                 onClick={() => setQuickDate(days)}
-                className="px-4 py-2 bg-amber-50 border border-amber-200 rounded-xl text-[10px] font-bold text-amber-600 hover:bg-amber-100 transition-all"
+                className="px-4 py-2 bg-warning/10 border border-warning/30 rounded-app-sm text-[10px] font-bold text-warning hover:bg-warning/20 transition-all"
               >
                 {label}
               </button>
@@ -110,7 +110,7 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
             className={inputClass}
           />
           {nextMaintenanceAt && (
-            <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-slate-400 ml-1">
+            <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 ml-1">
               Próximo:{' '}
               {new Date(nextMaintenanceAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
             </Typography>
@@ -122,7 +122,7 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
         <Button variant={ButtonVariant.CANCEL} onClick={() => navigation.patients.consulta(patientUuid)} text="Cancelar" />
         <Button
           variant={ButtonVariant.PRIMARY}
-          className="!h-12 !px-10 !rounded-xl shadow-lg shadow-amber-200"
+          className="!h-12 !px-10 !rounded-xl shadow-lg shadow-warning/20"
           onClick={handleSave}
           disabled={isPending}
         >

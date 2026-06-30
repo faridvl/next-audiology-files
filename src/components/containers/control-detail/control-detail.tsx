@@ -44,9 +44,9 @@ interface HeaderCellProps {
 }
 
 const HeaderCell: React.FC<HeaderCellProps> = ({ label, value, className = '' }) => (
-    <div className={`p-5 border-r border-slate-100 last:border-r-0 ${className}`}>
-        <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</Typography>
-        <Typography variant={TypographyVariant.BODY_BOLD} className="text-xs font-bold text-slate-900 tracking-tight uppercase">{value}</Typography>
+    <div className={`p-5 border-r border-neutral-100 last:border-r-0 ${className}`}>
+        <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black text-neutral-400 uppercase tracking-widest mb-1">{label}</Typography>
+        <Typography variant={TypographyVariant.BODY_BOLD} className="text-xs font-bold text-neutral-900 tracking-tight uppercase">{value}</Typography>
     </div>
 );
 
@@ -69,8 +69,8 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
         return (
             <div className="max-w-5xl mx-auto py-12 px-6">
                 <div className="animate-pulse space-y-4">
-                    <div className="h-8 bg-slate-100 rounded w-1/3" />
-                    <div className="h-64 bg-slate-100 rounded-2xl" />
+                    <div className="h-8 bg-neutral-100 rounded w-1/3" />
+                    <div className="h-64 bg-neutral-100 rounded-app-md" />
                 </div>
             </div>
         );
@@ -78,7 +78,7 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
 
     if (isError || !data) {
         return (
-            <div className="max-w-5xl mx-auto py-12 px-6 text-center text-slate-400">
+            <div className="max-w-5xl mx-auto py-12 px-6 text-center text-neutral-400">
                 No se pudo cargar el control médico.
             </div>
         );
@@ -96,16 +96,16 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                 <div className="flex justify-between items-center mb-8 no-print">
                     <button
                         onClick={() => navigation.patients.detail(patientId)}
-                        className="flex items-center gap-2 text-slate-400 hover:text-slate-900 font-medium text-xs uppercase tracking-widest transition-all"
+                        className="flex items-center gap-2 text-neutral-400 hover:text-neutral-900 font-medium text-xs uppercase tracking-widest transition-all"
                     >
                         <ArrowLeft size={14} /> Volver al Registro del Paciente
                     </button>
                 </div>
-                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-10 text-center space-y-3">
-                    <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-black text-amber-700 uppercase tracking-widest">
+                <div className="bg-warning/10 border border-warning/30 rounded-app-md p-10 text-center space-y-3">
+                    <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-black text-warning uppercase tracking-widest">
                         Acceso restringido
                     </Typography>
-                    <Typography variant={TypographyVariant.CAPTION} className="text-xs text-amber-600">
+                    <Typography variant={TypographyVariant.CAPTION} className="text-xs text-warning">
                         No tienes permiso para ver este control. Este registro pertenece a la especialidad{' '}
                         <span className="font-bold">{controlSpeciality}</span> y tu especialidad es{' '}
                         <span className="font-bold">{userSpecialty}</span>.
@@ -149,19 +149,19 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
         if (unknownEntries.length === 0) return null;
 
         return (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-slate-50 pt-8">
-                <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-neutral-50 pt-8">
+                <div className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] self-start pt-1">
                     Campos Adicionales
                 </div>
                 <div className="md:col-span-3">
                     <table className="w-full text-sm border-collapse">
                         <tbody>
                             {unknownEntries.map(([key, value]) => (
-                                <tr key={key} className="border-b border-slate-50 last:border-b-0">
-                                    <td className="py-2 pr-4 font-bold text-slate-500 text-xs uppercase tracking-wide w-1/3">
+                                <tr key={key} className="border-b border-neutral-50 last:border-b-0">
+                                    <td className="py-2 pr-4 font-bold text-neutral-500 text-xs uppercase tracking-wide w-1/3">
                                         {formatFieldLabel(key)}
                                     </td>
-                                    <td className="py-2 text-slate-700">
+                                    <td className="py-2 text-neutral-700">
                                         {formatFieldValue(value)}
                                     </td>
                                 </tr>
@@ -188,7 +188,7 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
             <div className="flex justify-between items-center no-print">
                 <button
                     onClick={() => navigation.patients.detail(patientId)}
-                    className="flex items-center gap-2 text-slate-400 hover:text-slate-900 font-medium text-xs uppercase tracking-widest transition-all"
+                    className="flex items-center gap-2 text-neutral-400 hover:text-neutral-900 font-medium text-xs uppercase tracking-widest transition-all"
                 >
                     <ArrowLeft size={14} /> Volver al Registro del Paciente
                 </button>
@@ -198,23 +198,23 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
             </div>
 
             {/* EXPEDIENTE MÉDICO */}
-            <div className="bg-white border border-slate-300 shadow-sm rounded-none">
+            <div className="bg-white border border-neutral-300 shadow-sm rounded-none">
 
                 {/* ENCABEZADO HOSPITALARIO */}
-                <div className="p-10 border-b-4 border-slate-900 flex justify-between items-start bg-slate-50">
+                <div className="p-10 border-b-4 border-neutral-900 flex justify-between items-start bg-neutral-50">
                     <div className="space-y-1">
-                        <Typography variant={TypographyVariant.HEADER} className="text-xl font-black text-slate-900 tracking-tighter uppercase">{institutionName}</Typography>
-                        <Typography variant={TypographyVariant.CAPTION} className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Sistema de Gestión de Expedientes Digitales</Typography>
+                        <Typography variant={TypographyVariant.HEADER} className="text-xl font-black text-neutral-900 tracking-tighter uppercase">{institutionName}</Typography>
+                        <Typography variant={TypographyVariant.CAPTION} className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.3em]">Sistema de Gestión de Expedientes Digitales</Typography>
                     </div>
                     <div className="text-right">
-                        <div className="inline-block bg-slate-900 text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase">
+                        <div className="inline-block bg-neutral-900 text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase">
                             Copia de Archivo
                         </div>
                     </div>
                 </div>
 
                 {/* BANNER DE DATOS DEL PACIENTE */}
-                <div className="bg-white grid grid-cols-2 md:grid-cols-4 border-b border-slate-200">
+                <div className="bg-white grid grid-cols-2 md:grid-cols-4 border-b border-neutral-200">
                     <HeaderCell label="Paciente" value={data.patient.fullName} className="col-span-2" />
                     <HeaderCell label="Identificación" value={data.patient.documentId} />
                     <HeaderCell label="Género" value={data.patient.gender} />
@@ -229,11 +229,11 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
 
                     {/* ESPECIALISTA */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2">
-                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
+                        <div className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] self-start pt-1">
                             Especialista
                         </div>
                         <div className="md:col-span-3">
-                            <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-bold text-slate-900 uppercase tracking-tight">
+                            <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-bold text-neutral-900 uppercase tracking-tight">
                                 {specialistName}
                             </Typography>
                         </div>
@@ -241,11 +241,11 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
 
                     {/* ESPECIALIDAD */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2">
-                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
+                        <div className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] self-start pt-1">
                             Especialidad
                         </div>
                         <div className="md:col-span-3">
-                            <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-bold text-slate-900 uppercase tracking-tight">
+                            <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-bold text-neutral-900 uppercase tracking-tight">
                                 {specialityLabel}
                             </Typography>
                         </div>
@@ -253,18 +253,18 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
 
                     {/* HALLAZGOS */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2">
-                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
+                        <div className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] self-start pt-1">
                             Notas Clínicas
                         </div>
-                        <div className="md:col-span-3 text-slate-600 text-sm leading-relaxed text-justify">
+                        <div className="md:col-span-3 text-neutral-600 text-sm leading-relaxed text-justify">
                             {renderFindings()}
                         </div>
                     </div>
 
                     {/* AUDIOGRAMA */}
                     {audiogram && (
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-4 border-t border-slate-50 pt-8">
-                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-4 border-t border-neutral-50 pt-8">
+                            <div className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] self-start pt-1">
                                 Audiograma
                             </div>
                             <div className="md:col-span-3">
@@ -277,29 +277,29 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                     {renderGenericFindings()}
 
                     {/* DIAGNÓSTICO */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-slate-50 pt-8">
-                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-neutral-50 pt-8">
+                        <div className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] self-start pt-1">
                             Diagnóstico
                         </div>
                         <div className="md:col-span-3">
-                            <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-bold text-slate-900 leading-snug">
+                            <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-bold text-neutral-900 leading-snug">
                                 {data.control.diagnosis}
                             </Typography>
                         </div>
                     </div>
 
                     {/* NOTA DE CORRECCIÓN */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-slate-50 pt-8 no-print">
-                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-neutral-50 pt-8 no-print">
+                        <div className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] self-start pt-1">
                             Nota de Corrección
                         </div>
                         <div className="md:col-span-3 space-y-3">
                             {data.control.correctionNotes && !isEditingNote && (
-                                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                                    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-2 block">
+                                <div className="bg-warning/10 border border-warning/30 rounded-app-sm p-4">
+                                    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black text-warning uppercase tracking-widest mb-2 block">
                                         Corrección registrada
                                     </Typography>
-                                    <Typography variant={TypographyVariant.BODY} className="text-sm text-amber-900 leading-relaxed">
+                                    <Typography variant={TypographyVariant.BODY} className="text-sm text-warning leading-relaxed">
                                         {data.control.correctionNotes}
                                     </Typography>
                                 </div>
@@ -307,7 +307,7 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                             {!isEditingNote ? (
                                 <button
                                     onClick={() => { setNoteText(data.control.correctionNotes ?? ''); setIsEditingNote(true); }}
-                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-700 transition-colors border border-dashed border-slate-200 px-4 py-2 rounded-xl hover:border-slate-400"
+                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:text-neutral-700 transition-colors border border-dashed border-neutral-200 px-4 py-2 rounded-app-sm hover:border-neutral-400"
                                 >
                                     <PenLine size={12} />
                                     {data.control.correctionNotes ? 'Editar nota' : 'Agregar nota de corrección'}
@@ -319,7 +319,7 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                                         value={noteText}
                                         onChange={(e) => setNoteText(e.target.value)}
                                         rows={4}
-                                        className="w-full border border-amber-300 bg-amber-50 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-amber-200 resize-none"
+                                        className="w-full border border-warning/40 bg-warning/10 rounded-app-sm p-4 text-sm focus:outline-none focus:ring-2 focus:ring-warning/20 resize-none"
                                         placeholder="Describe la corrección o aclaración a este registro..."
                                     />
                                     <div className="flex gap-2">
@@ -334,13 +334,13 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                                                     toast.error('Error al guardar la nota');
                                                 }
                                             }}
-                                            className="flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-700 disabled:opacity-50 transition-all"
+                                            className="flex items-center gap-2 bg-warning text-white px-4 py-2 rounded-app-sm text-[10px] font-black uppercase tracking-widest hover:bg-warning/80 disabled:opacity-50 transition-all"
                                         >
                                             <Check size={12} /> Guardar
                                         </button>
                                         <button
                                             onClick={() => setIsEditingNote(false)}
-                                            className="flex items-center gap-2 text-slate-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:text-slate-700 transition-colors"
+                                            className="flex items-center gap-2 text-neutral-400 px-4 py-2 rounded-app-sm text-[10px] font-black uppercase tracking-widest hover:text-neutral-700 transition-colors"
                                         >
                                             <X size={12} /> Cancelar
                                         </button>
@@ -351,16 +351,16 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                     </div>
 
                     {/* PLAN */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-slate-50 pt-8">
-                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] self-start pt-1">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-2 border-t border-neutral-50 pt-8">
+                        <div className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] self-start pt-1">
                             Plan Médico
                         </div>
                         <div className="md:col-span-3">
                             <ul className="space-y-3">
                                 {data.control.plan.map((item, planItemIndex) => (
-                                    <li key={planItemIndex} className="text-sm text-slate-600 flex items-start gap-3">
-                                        <span className="text-[10px] font-black text-slate-300 pt-0.5">{planItemIndex + 1}.</span>
-                                        <Typography variant={TypographyVariant.BODY} className="text-sm text-slate-600">{item}</Typography>
+                                    <li key={planItemIndex} className="text-sm text-neutral-600 flex items-start gap-3">
+                                        <span className="text-[10px] font-black text-neutral-300 pt-0.5">{planItemIndex + 1}.</span>
+                                        <Typography variant={TypographyVariant.BODY} className="text-sm text-neutral-600">{item}</Typography>
                                     </li>
                                 ))}
                             </ul>
@@ -369,8 +369,8 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                 </div>
 
                 {/* PIE DE PÁGINA TÉCNICO */}
-                <div className="bg-slate-50 p-6 text-center border-t border-slate-200">
-                    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">
+                <div className="bg-neutral-50 p-6 text-center border-t border-neutral-200">
+                    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] text-neutral-400 font-bold uppercase tracking-[0.2em]">
                         Propiedad Privada del Paciente - Confidencialidad bajo Ley de Protección de Datos
                     </Typography>
                 </div>

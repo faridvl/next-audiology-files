@@ -21,7 +21,7 @@ export const MedicalHistorySidebar: React.FC<{ patientId: string }> = ({ patient
                     <Typography variant={TypographyVariant.SUBTITLE}>Historial Clínico</Typography>
                     <button
                         onClick={toggleSortOrder}
-                        className="p-2 hover:bg-slate-100 rounded-xl transition-all relative flex items-center gap-2 text-slate-400 hover:text-blue-600"
+                        className="p-2 hover:bg-neutral-100 rounded-app-sm transition-all relative flex items-center gap-2 text-neutral-400 hover:text-primary"
                     >
                         <Settings size={18} />
                         <span className="text-[10px] font-bold uppercase">{sortOrder}</span>
@@ -29,11 +29,11 @@ export const MedicalHistorySidebar: React.FC<{ patientId: string }> = ({ patient
                 </div>
 
                 <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={16} />
                     <input
                         type="text"
                         placeholder="Buscar en lo cargado..."
-                        className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-xs outline-none focus:ring-4 focus:ring-blue-500/5 transition-all"
+                        className="w-full pl-11 pr-4 py-3 bg-white border border-neutral-200 rounded-app-md text-xs outline-none focus:ring-4 focus:ring-primary/5 transition-all"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -41,10 +41,10 @@ export const MedicalHistorySidebar: React.FC<{ patientId: string }> = ({ patient
             </div>
 
             {/* TABS (Filtro de cliente) */}
-            <div className="flex border-b border-slate-100 mb-4 overflow-x-auto no-scrollbar min-h-[45px]">
+            <div className="flex border-b border-neutral-100 mb-4 overflow-x-auto no-scrollbar min-h-[45px]">
                 <button
                     onClick={() => setSelectedSpec('ALL')}
-                    className={`px-4 py-3 text-[10px] font-bold uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${selectedSpec === 'ALL' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400'}`}
+                    className={`px-4 py-3 text-[10px] font-bold uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${selectedSpec === 'ALL' ? 'border-primary text-primary' : 'border-transparent text-neutral-400'}`}
                 >
                     Todos
                 </button>
@@ -52,7 +52,7 @@ export const MedicalHistorySidebar: React.FC<{ patientId: string }> = ({ patient
                     <button
                         key={spec}
                         onClick={() => setSelectedSpec(spec)}
-                        className={`px-4 py-3 text-[10px] font-bold uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${selectedSpec === spec ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400'}`}
+                        className={`px-4 py-3 text-[10px] font-bold uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${selectedSpec === spec ? 'border-primary text-primary' : 'border-transparent text-neutral-400'}`}
                     >
                         {spec}
                     </button>
@@ -62,22 +62,22 @@ export const MedicalHistorySidebar: React.FC<{ patientId: string }> = ({ patient
             {/* LISTADO */}
             <div className="flex-1 overflow-y-auto pr-2 space-y-4 no-scrollbar pb-6">
                 {isLoading ? (
-                    <div className="p-10 text-center animate-pulse text-slate-300 font-bold uppercase text-[10px]">Iniciando...</div>
+                    <div className="p-10 text-center animate-pulse text-neutral-300 font-bold uppercase text-[10px]">Iniciando...</div>
                 ) : (
                     <>
                         {records.map((control) => (
                             <div
                                 key={control.uuid}
                                 onClick={() => navigation.patients.viewControl(patientId, control.uuid)}
-                                className="group p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-200 transition-all cursor-pointer"
+                                className="group p-4 bg-white border border-neutral-100 rounded-app-md shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer"
                             >
                                 <div className="flex justify-between items-start mb-2">
-                                    <span className="text-[9px] font-black px-2 py-0.5 rounded bg-slate-100 text-slate-500 uppercase">
+                                    <span className="text-[9px] font-black px-2 py-0.5 rounded bg-neutral-100 text-neutral-500 uppercase">
                                         {control.header.speciality}
                                     </span>
-                                    <span className="text-[10px] text-slate-400">{new Date(control.createdAt).toLocaleDateString()}</span>
+                                    <span className="text-[10px] text-neutral-400">{new Date(control.createdAt).toLocaleDateString()}</span>
                                 </div>
-                                <p className="text-xs text-slate-600 line-clamp-2 italic leading-relaxed leading-relaxed">
+                                <p className="text-xs text-neutral-600 line-clamp-2 italic leading-relaxed leading-relaxed">
                                     {control.clinicalData.diagnosis}
                                 </p>
                             </div>
@@ -88,10 +88,10 @@ export const MedicalHistorySidebar: React.FC<{ patientId: string }> = ({ patient
                             <button
                                 onClick={loadMore}
                                 disabled={isFetching}
-                                className="w-full py-4 border-2 border-dashed border-slate-100 rounded-2xl text-[10px] font-bold text-slate-400 hover:text-blue-600 hover:border-blue-100 transition-all uppercase tracking-widest flex items-center justify-center gap-2"
+                                className="w-full py-4 border-2 border-dashed border-neutral-100 rounded-app-md text-[10px] font-bold text-neutral-400 hover:text-primary hover:border-primary-soft transition-all uppercase tracking-widest flex items-center justify-center gap-2"
                             >
                                 {isFetching ? (
-                                    <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                                    <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                                 ) : (
                                     "Cargar más registros de la base de datos"
                                 )}
@@ -99,7 +99,7 @@ export const MedicalHistorySidebar: React.FC<{ patientId: string }> = ({ patient
                         )}
 
                         {records.length === 0 && !isFetching && (
-                            <div className="py-20 text-center text-slate-300 text-[10px] font-bold uppercase tracking-widest">
+                            <div className="py-20 text-center text-neutral-300 text-[10px] font-bold uppercase tracking-widest">
                                 No hay resultados con los filtros actuales
                             </div>
                         )}
@@ -114,8 +114,8 @@ const TabButton = ({ label, isActive, onClick }: { label: string, isActive: bool
     <button
         onClick={onClick}
         className={`px-4 py-3 text-[10px] font-bold uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${isActive
-            ? 'border-blue-600 text-blue-600'
-            : 'border-transparent text-slate-400 hover:text-slate-600'
+            ? 'border-primary text-primary'
+            : 'border-transparent text-neutral-400 hover:text-neutral-600'
             }`}
     >
         {label}

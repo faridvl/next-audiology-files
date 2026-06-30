@@ -48,24 +48,24 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                             key={days}
                             type="button"
                             onClick={() => methods.setQuickDate(days)}
-                            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all"
+                            className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 rounded-lg text-[10px] font-bold text-neutral-500 hover:bg-primary-soft hover:text-primary hover:border-primary-soft transition-all"
                         >
                             {days === 7 ? '+1 Sem' : days === 30 ? '+1 Mes' : days === 90 ? '+3 Meses' : '+6 Meses'}
                         </button>
                     ))}
                 </div>
                 <div className="relative">
-                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={16} />
                     <input
                         type="date"
                         value={formData.nextMaintenanceDate}
                         onChange={(event) => setters.setFormData({ ...formData, nextMaintenanceDate: event.target.value })}
-                        className="w-full pl-12 pr-4 py-3 bg-white rounded-xl border border-slate-200 text-sm font-medium outline-none focus:border-blue-500 transition-colors"
+                        className="w-full pl-12 pr-4 py-3 bg-white rounded-app-sm border border-neutral-200 text-sm font-medium outline-none focus:border-primary transition-colors"
                     />
                 </div>
             </div>
             <textarea
-                className="w-full p-4 bg-slate-50/50 rounded-xl border border-slate-200 text-sm min-h-[100px] outline-none focus:bg-white focus:border-blue-500"
+                className="w-full p-4 bg-neutral-50/50 rounded-app-sm border border-neutral-200 text-sm min-h-[100px] outline-none focus:bg-white focus:border-primary"
                 placeholder={t(TEXT.CONTROLS.NEW.FOLLOW_UP.NOTES_PLACEHOLDER)}
                 value={formData.nextControlNotes}
                 onChange={(event) => setters.setFormData({ ...formData, nextControlNotes: event.target.value })}
@@ -77,13 +77,13 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
     if (!resolvedSpecialty) {
         return (
             <div className="max-w-2xl mx-auto py-12 px-6">
-                <div className="flex items-center gap-3 p-6 bg-amber-50 border border-amber-200 rounded-2xl">
-                    <AlertCircle className="text-amber-600 shrink-0" size={20} />
+                <div className="flex items-center gap-3 p-6 bg-warning/10 border border-warning/30 rounded-app-md">
+                    <AlertCircle className="text-warning shrink-0" size={20} />
                     <div>
-                        <Typography variant={TypographyVariant.BODY_BOLD} className="text-amber-800">
+                        <Typography variant={TypographyVariant.BODY_BOLD} className="text-warning">
                             Sin especialidad asignada
                         </Typography>
-                        <Typography variant={TypographyVariant.CAPTION} className="text-amber-600 text-xs mt-0.5">
+                        <Typography variant={TypographyVariant.CAPTION} className="text-warning text-xs mt-0.5">
                             Tu cuenta no tiene una especialidad médica configurada. Contacta al administrador.
                         </Typography>
                     </div>
@@ -96,16 +96,16 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
         <>
             {/* MODAL DE SEGUIMIENTO */}
             {isFollowUpModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/20 backdrop-blur-sm p-4">
-                    <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl p-8 animate-in zoom-in-95">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-neutral-900/30 backdrop-blur-sm p-4">
+                    <div className="bg-white w-full max-w-lg rounded-app-xl shadow-2xl p-8 animate-in zoom-in-95">
                         <div className="flex justify-between items-center mb-6">
                             <Typography variant={TypographyVariant.SUBTITLE}>{t(TEXT.CONTROLS.NEW.FOLLOW_UP.TITLE)}</Typography>
-                            <button onClick={() => setters.setIsFollowUpModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full">
+                            <button onClick={() => setters.setIsFollowUpModalOpen(false)} className="p-2 hover:bg-neutral-100 rounded-full">
                                 <X size={20} />
                             </button>
                         </div>
                         <FollowUpFields />
-                        <Button variant={ButtonVariant.PRIMARY} className="w-full mt-6 !h-12 !rounded-xl" onClick={() => setters.setIsFollowUpModalOpen(false)}>
+                        <Button variant={ButtonVariant.PRIMARY} className="w-full mt-6 !h-12 !rounded-app-sm" onClick={() => setters.setIsFollowUpModalOpen(false)}>
                             {t(TEXT.CONTROLS.NEW.FOLLOW_UP.CONFIRM_BUTTON)}
                         </Button>
                     </div>
@@ -120,16 +120,16 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => navigation.patients.detail(patientId)}
-                                className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors"
+                                className="w-10 h-10 rounded-app-sm bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors"
                                 title="Volver al paciente"
                             >
-                                <ArrowRight size={16} className="rotate-180 text-slate-500" />
+                                <ArrowRight size={16} className="rotate-180 text-neutral-500" />
                             </button>
                             <div>
-                                <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
                                     Nuevo control
                                 </Typography>
-                                <Typography variant={TypographyVariant.SUBTITLE} className="text-slate-800">
+                                <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800">
                                     {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
                                 </Typography>
                             </div>
@@ -137,39 +137,39 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setters.setIsFollowUpModalOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-blue-100 bg-blue-50 text-blue-600 text-xs font-bold hover:bg-blue-100 transition-colors"
+                                className="flex items-center gap-2 px-4 py-2 rounded-app-sm border border-primary-soft bg-primary-soft text-primary text-xs font-bold hover:bg-primary-soft/70 transition-colors"
                             >
                                 <Clock size={13} />
                                 Agendar seguimiento
                             </button>
                             <button
                                 onClick={() => setters.setShowHistory(!showHistory)}
-                                className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-bold transition-colors ${showHistory
-                                    ? 'border-slate-800 bg-slate-800 text-white'
-                                    : 'border-slate-200 text-slate-500 hover:border-slate-300'}`}
+                                className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-app-sm border text-xs font-bold transition-colors ${showHistory
+                                    ? 'border-neutral-800 bg-neutral-800 text-white'
+                                    : 'border-neutral-200 text-neutral-500 hover:border-neutral-300'}`}
                             >
                                 Historial
                             </button>
                         </div>
                     </div>
 
-                    <div className="space-y-6 bg-white border border-slate-100 p-5 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-xl shadow-slate-200/20">
+                    <div className="space-y-6 bg-white border border-neutral-100 p-5 md:p-10 rounded-app-xl md:rounded-app-2xl shadow-xl shadow-neutral-200/20">
 
                         {/* BADGE DE ESPECIALIDAD — informativo, no editable */}
                         <div
-                            className="flex items-center gap-3 px-4 py-3 rounded-2xl border"
+                            className="flex items-center gap-3 px-4 py-3 rounded-app-md border"
                             style={{ backgroundColor: specialityMeta.bg, borderColor: `${specialityMeta.color}25` }}
                         >
                             <Stethoscope size={16} style={{ color: specialityMeta.color }} />
                             <div className="flex-1 min-w-0">
-                                <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
                                     Especialidad del registro
                                 </Typography>
                                 <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm" style={{ color: specialityMeta.color }}>
                                     {specialityMeta.label}
                                 </Typography>
                             </div>
-                            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] text-slate-400 italic hidden sm:block">
+                            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] text-neutral-400 italic hidden sm:block">
                                 Asignada a tu cuenta
                             </Typography>
                         </div>
@@ -178,8 +178,8 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                         <section className="space-y-4 pt-2">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Activity size={16} className="text-slate-400" />
-                                    <Typography variant={TypographyVariant.CAPTION} className="font-black uppercase tracking-wider text-slate-500 text-[10px]">
+                                    <Activity size={16} className="text-neutral-400" />
+                                    <Typography variant={TypographyVariant.CAPTION} className="font-black uppercase tracking-wider text-neutral-500 text-[10px]">
                                         {t(TEXT.CONTROLS.NEW.EXAMINATION.LABEL_PREFIX)} {specialityMeta.label}
                                     </Typography>
                                 </div>
@@ -187,9 +187,9 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                     <button
                                         type="button"
                                         onClick={() => setters.setShowAudiogram(!showAudiogram)}
-                                        className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-xl border transition-all ${showAudiogram
-                                            ? 'bg-red-50 text-red-500 border-red-100'
-                                            : 'border-dashed border-slate-200 text-slate-400 hover:border-blue-300 hover:text-blue-600'}`}
+                                        className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-app-sm border transition-all ${showAudiogram
+                                            ? 'bg-danger/10 text-danger border-danger/20'
+                                            : 'border-dashed border-neutral-200 text-neutral-400 hover:border-primary/30 hover:text-primary'}`}
                                     >
                                         {showAudiogram
                                             ? t(TEXT.CONTROLS.NEW.EXAMINATION.REMOVE_AUDIOMETRY)
@@ -203,22 +203,22 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
-                                            <Typography variant={TypographyVariant.CAPTION} className="text-[10px] font-black uppercase tracking-widest text-red-400 ml-1">
+                                            <Typography variant={TypographyVariant.CAPTION} className="text-[10px] font-black uppercase tracking-widest text-danger ml-1">
                                                 Otoscopía — Oído Derecho
                                             </Typography>
                                             <textarea
-                                                className="w-full p-4 rounded-2xl border border-red-100 bg-red-50/20 text-sm min-h-[100px] outline-none focus:bg-white focus:border-red-300 transition-colors"
+                                                className="w-full p-4 rounded-app-md border border-danger/20 bg-danger/5 text-sm min-h-[100px] outline-none focus:bg-white focus:border-danger/30 transition-colors"
                                                 placeholder={t(TEXT.CONTROLS.NEW.EXAMINATION.OTOSCOPY_RIGHT)}
                                                 value={formData.otoscopyRight}
                                                 onChange={(event) => setters.setFormData({ ...formData, otoscopyRight: event.target.value })}
                                             />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <Typography variant={TypographyVariant.CAPTION} className="text-[10px] font-black uppercase tracking-widest text-blue-400 ml-1">
+                                            <Typography variant={TypographyVariant.CAPTION} className="text-[10px] font-black uppercase tracking-widest text-primary-light ml-1">
                                                 Otoscopía — Oído Izquierdo
                                             </Typography>
                                             <textarea
-                                                className="w-full p-4 rounded-2xl border border-blue-100 bg-blue-50/20 text-sm min-h-[100px] outline-none focus:bg-white focus:border-blue-300 transition-colors"
+                                                className="w-full p-4 rounded-app-md border border-primary-soft bg-primary-soft/30 text-sm min-h-[100px] outline-none focus:bg-white focus:border-primary/30 transition-colors"
                                                 placeholder={t(TEXT.CONTROLS.NEW.EXAMINATION.OTOSCOPY_LEFT)}
                                                 value={formData.otoscopyLeft}
                                                 onChange={(event) => setters.setFormData({ ...formData, otoscopyLeft: event.target.value })}
@@ -235,7 +235,7 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
 
                             {apiSpeciality === MedicalSpeciality.DENTAL && (
                                 <textarea
-                                    className="w-full p-5 rounded-2xl border border-emerald-100 bg-emerald-50/20 text-sm min-h-[130px] outline-none focus:bg-white focus:border-emerald-300 transition-colors"
+                                    className="w-full p-5 rounded-app-md border border-success/20 bg-success/5 text-sm min-h-[130px] outline-none focus:bg-white focus:border-success/30 transition-colors"
                                     placeholder="Hallazgos odontológicos, estado de piezas dentales, encías..."
                                     value={formData.generalFindings}
                                     onChange={(event) => setters.setFormData({ ...formData, generalFindings: event.target.value })}
@@ -244,7 +244,7 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
 
                             {apiSpeciality === MedicalSpeciality.GENERAL && (
                                 <textarea
-                                    className="w-full p-5 rounded-2xl border border-slate-100 bg-slate-50/30 text-sm min-h-[130px] outline-none focus:bg-white focus:border-slate-300 transition-colors"
+                                    className="w-full p-5 rounded-app-md border border-neutral-100 bg-neutral-50/30 text-sm min-h-[130px] outline-none focus:bg-white focus:border-neutral-300 transition-colors"
                                     placeholder={`${t(TEXT.CONTROLS.NEW.EXAMINATION.LABEL_PREFIX)} ${specialityMeta.label}...`}
                                     value={formData.generalFindings}
                                     onChange={(event) => setters.setFormData({ ...formData, generalFindings: event.target.value })}
@@ -254,19 +254,19 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
 
                         {/* CAMPOS DINÁMICOS DE PLANTILLA CLÍNICA */}
                         {activeTemplate && activeTemplate.fields.length > 0 && (
-                            <section className="space-y-4 pt-4 border-t border-slate-50">
-                                <Typography variant={TypographyVariant.CAPTION} className="text-slate-400 font-black uppercase tracking-wider text-[10px] ml-1">
+                            <section className="space-y-4 pt-4 border-t border-neutral-50">
+                                <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400 font-black uppercase tracking-wider text-[10px] ml-1">
                                     {activeTemplate.name}
                                 </Typography>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {activeTemplate.fields.map((field) => {
                                         const currentValue = dynamicFieldValues[field.id] ?? '';
-                                        const inputClass = 'w-full px-4 py-3 rounded-xl border border-slate-100 bg-slate-50/30 text-sm outline-none focus:bg-white focus:border-blue-300 transition-colors';
+                                        const inputClass = 'w-full px-4 py-3 rounded-app-sm border border-neutral-100 bg-neutral-50/30 text-sm outline-none focus:bg-white focus:border-primary/40 transition-colors';
                                         return (
                                             <div key={field.id} className={field.fieldType === 'textarea' ? 'col-span-2' : ''}>
-                                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                                                <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1.5">
                                                     {field.label}
-                                                    {field.required && <span className="text-red-400 ml-1">*</span>}
+                                                    {field.required && <span className="text-danger ml-1">*</span>}
                                                 </label>
                                                 {field.fieldType === 'textarea' && (
                                                     <textarea className={`${inputClass} min-h-[90px]`} placeholder={field.label} value={String(currentValue)}
@@ -288,8 +288,8 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                                     <div className="flex items-center gap-3 py-2">
                                                         <input type="checkbox" id={`field-${field.id}`} checked={Boolean(currentValue)}
                                                             onChange={(event) => setters.setDynamicFieldValue(field.id, event.target.checked)}
-                                                            className="w-4 h-4 rounded border-slate-300" />
-                                                        <label htmlFor={`field-${field.id}`} className="text-sm text-slate-600">{field.label}</label>
+                                                            className="w-4 h-4 rounded border-neutral-300" />
+                                                        <label htmlFor={`field-${field.id}`} className="text-sm text-neutral-600">{field.label}</label>
                                                     </div>
                                                 )}
                                                 {field.fieldType === 'select' && field.options && (
@@ -309,15 +309,15 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                         )}
 
                         {/* DIAGNÓSTICO */}
-                        <section className="space-y-3 pt-4 border-t border-slate-50">
+                        <section className="space-y-3 pt-4 border-t border-neutral-50">
                             <div className="flex items-center gap-2 ml-1">
-                                <StickyNote size={14} className="text-slate-400" />
-                                <Typography variant={TypographyVariant.CAPTION} className="font-black uppercase tracking-wider text-slate-400 text-[10px]">
+                                <StickyNote size={14} className="text-neutral-400" />
+                                <Typography variant={TypographyVariant.CAPTION} className="font-black uppercase tracking-wider text-neutral-400 text-[10px]">
                                     {t(TEXT.CONTROLS.NEW.DIAGNOSIS.LABEL)}
                                 </Typography>
                             </div>
                             <textarea
-                                className="w-full p-6 rounded-[2rem] border border-slate-100 bg-slate-50/30 text-sm min-h-[140px] outline-none focus:bg-white focus:ring-4 focus:ring-slate-50 transition-all"
+                                className="w-full p-6 rounded-app-xl border border-neutral-100 bg-neutral-50/30 text-sm min-h-[140px] outline-none focus:bg-white focus:ring-4 focus:ring-neutral-50 transition-all"
                                 placeholder={t(TEXT.CONTROLS.NEW.DIAGNOSIS.PLACEHOLDER)}
                                 value={formData.diagnosis}
                                 onChange={(event) => setters.setFormData({ ...formData, diagnosis: event.target.value })}
@@ -325,22 +325,22 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                         </section>
 
                         {/* SEGUIMIENTO */}
-                        <section className="p-6 rounded-[2rem] border border-dashed border-blue-100 bg-blue-50/20 space-y-4">
+                        <section className="p-6 rounded-app-xl border border-dashed border-primary-soft bg-primary-soft/20 space-y-4">
                             <div className="flex items-center gap-2">
-                                <Clock size={16} className="text-blue-500" />
-                                <Typography variant={TypographyVariant.BODY_BOLD} className="text-blue-800 text-sm">
+                                <Clock size={16} className="text-primary" />
+                                <Typography variant={TypographyVariant.BODY_BOLD} className="text-primary-dark text-sm">
                                     {t(TEXT.CONTROLS.NEW.SCHEDULING.TITLE)}
                                 </Typography>
                             </div>
                             <FollowUpFields />
                         </section>
 
-                        <div className="flex justify-end gap-3 pt-4 border-t border-slate-50">
+                        <div className="flex justify-end gap-3 pt-4 border-t border-neutral-50">
                             <Button variant={ButtonVariant.CANCEL} text={t(TEXT.CONTROLS.NEW.BUTTONS.CANCEL)} />
                             <Button
                                 onClick={methods.handleSave}
                                 variant={ButtonVariant.PRIMARY}
-                                className="!h-12 !px-10 !rounded-xl shadow-lg shadow-blue-200"
+                                className="!h-12 !px-10 !rounded-app-sm shadow-lg shadow-primary-soft"
                                 disabled={isPending}
                             >
                                 <Save size={16} />
@@ -357,15 +357,15 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                             <Typography variant={TypographyVariant.SUBTITLE}>{t(TEXT.CONTROLS.NEW.HISTORY.TITLE)}</Typography>
                             <button
                                 onClick={() => navigation.patients.detail(patientId)}
-                                className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 hover:text-blue-600 transition-colors"
+                                className="flex items-center gap-1.5 text-[10px] font-black uppercase text-neutral-400 hover:text-primary transition-colors"
                             >
                                 Ver todo <ArrowRight size={12} />
                             </button>
                         </div>
 
                         {!historyData?.data?.length ? (
-                            <div className="py-10 text-center border-2 border-dashed border-slate-100 rounded-2xl">
-                                <Typography variant={TypographyVariant.CAPTION} className="text-slate-300 text-xs font-bold uppercase tracking-widest">
+                            <div className="py-10 text-center border-2 border-dashed border-neutral-100 rounded-app-md">
+                                <Typography variant={TypographyVariant.CAPTION} className="text-neutral-300 text-xs font-bold uppercase tracking-widest">
                                     Sin registros previos
                                 </Typography>
                             </div>
@@ -378,7 +378,7 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                     <div
                                         key={record.uuid}
                                         onClick={() => navigation.patients.viewControl(patientId, record.uuid)}
-                                        className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm group hover:border-blue-200 transition-all cursor-pointer"
+                                        className="p-4 bg-white rounded-app-md border border-neutral-100 shadow-sm group hover:border-primary/30 transition-all cursor-pointer"
                                     >
                                         <div className="flex items-center justify-between mb-2">
                                             <span
@@ -387,11 +387,11 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                             >
                                                 {recordMeta.label}
                                             </span>
-                                            <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-slate-400">
+                                            <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400">
                                                 {new Date(record.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
                                             </Typography>
                                         </div>
-                                        <Typography variant={TypographyVariant.CAPTION} className="text-xs text-slate-500 line-clamp-2 leading-relaxed italic">
+                                        <Typography variant={TypographyVariant.CAPTION} className="text-xs text-neutral-500 line-clamp-2 leading-relaxed italic">
                                             {record.clinicalData?.diagnosis || 'Sin diagnóstico registrado'}
                                         </Typography>
                                     </div>

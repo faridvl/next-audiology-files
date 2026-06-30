@@ -25,7 +25,7 @@ export const PdfDownloadButton: React.FC<Props> = ({ controlUuid, patientUuid })
     return (
       <button
         disabled
-        className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-400 rounded-lg text-xs font-bold uppercase tracking-widest cursor-not-allowed"
+        className="flex items-center gap-2 px-4 py-2 bg-neutral-100 text-neutral-400 rounded-lg text-xs font-bold uppercase tracking-widest cursor-not-allowed"
       >
         <Download size={14} />
         {isLoading ? 'Preparando PDF...' : 'PDF no disponible'}
@@ -47,8 +47,8 @@ export const PdfDownloadButton: React.FC<Props> = ({ controlUuid, patientUuid })
           download={fileName}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-colors ${
             loading || !url
-              ? 'bg-slate-100 text-slate-400 cursor-not-allowed pointer-events-none'
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
+              ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed pointer-events-none'
+              : 'bg-primary hover:bg-primary-dark text-white'
           }`}
         >
           <Download size={14} />
