@@ -12,6 +12,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
+import { Alert, AlertVariant } from '@/components/common/alerts/alert';
 import { useNavigation } from '@/hooks/use-navigation';
 import { useAppointmentTypesQuery, AppointmentType, FETCH_APPOINTMENT_TYPES_KEY } from '@/shared/api/querys/appointment-types-query';
 import { useDeleteAppointmentTypeMutation } from '@/shared/api/mutations/appointment-types/delete-appointment-type-mutation';
@@ -31,6 +32,7 @@ const DEFAULT_COLOR = 'bg-neutral-50 text-neutral-600';
 export const AppointmentTypesContainer: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [confirmDeleteUuid, setConfirmDeleteUuid] = useState<string | null>(null);
+  const [conflictAlert, setConflictAlert] = useState<string | null>(null);
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const { data: appointmentTypes, isLoading } = useAppointmentTypesQuery();
@@ -47,12 +49,24 @@ export const AppointmentTypesContainer: React.FC = () => {
         setConfirmDeleteUuid(null);
         queryClient.invalidateQueries({ queryKey: [FETCH_APPOINTMENT_TYPES_KEY] });
       },
-      onError: () => toast.error('Error al eliminar el tipo de cita.'),
+      onError: (error: unknown) => {
+        setConfirmDeleteUuid(null);
+        const message = error instanceof Error ? error.message : 'Error al eliminar el tipo de cita.';
+        setConflictAlert(message);
+      },
     });
   };
 
   return (
     <div className="flex flex-col h-full gap-5 p-6 bg-[#F8FAFC]">
+      {conflictAlert && (
+        <Alert
+          variant={AlertVariant.WARNING}
+          title="No se puede eliminar"
+          message={conflictAlert}
+          onClose={() => setConflictAlert(null)}
+        />
+      )}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-0.5">
           <Typography variant={TypographyVariant.HEADER} className="text-2xl font-black text-neutral-900">
