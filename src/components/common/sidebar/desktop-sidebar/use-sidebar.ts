@@ -17,7 +17,7 @@ export function useSidebar() {
 
   const userRoleLabel = useMemo(() => {
     if (!user?.role) return t('menu.sidebar.footer.loadingRole');
-    return t(`users.roles.${user.role}`, { defaultValue: user.role });
+    return t(`users.create.roles.${user.role}`, { defaultValue: user.role });
   }, [user?.role, t]);
 
   const businessName = useMemo(() => tenant?.businessName ?? 'Zynka', [tenant]);
@@ -42,6 +42,8 @@ export function useSidebar() {
     userRoleLabel,
     businessName,
     initials,
+    avatarUrl: user?.avatarUrl ?? null,
+    tenantLogoUrl: tenant?.logoUrl ?? null,
     filteredNavigation,
     isLoading: !isMounted || sessionLoading,
   };

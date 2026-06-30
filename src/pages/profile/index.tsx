@@ -88,7 +88,7 @@ const ProfileSettingsPage: React.FC = () => {
         setAvatarPreview(URL.createObjectURL(file));
         try {
             await uploadAvatar(file);
-            queryClient.invalidateQueries({ queryKey: ['auth-me'] });
+            await queryClient.invalidateQueries({ queryKey: ['auth-me'], refetchType: 'all' });
             toast.success(t(TEXT.PROFILE.AVATAR.UPLOAD_SUCCESS));
         } catch {
             setAvatarPreview(null);

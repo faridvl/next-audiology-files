@@ -9,7 +9,7 @@ import { useSidebar } from './use-sidebar';
 export default function DesktopSidebar() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { userRoleLabel, businessName, initials, isLoading, filteredNavigation } = useSidebar();
+  const { userRoleLabel, businessName, initials, avatarUrl, tenantLogoUrl, isLoading, filteredNavigation } = useSidebar();
 
   return (
     <div className="flex h-full max-h-screen flex-col bg-white border-r border-neutral-100">
@@ -18,8 +18,12 @@ export default function DesktopSidebar() {
       <div className="flex h-[80px] items-center px-8 mb-2">
         <Link href={routesPrivate.dashboard} className="flex items-center gap-3 group">
 
-          <div className="h-10 w-10 bg-primary rounded-app-md flex items-center justify-center text-white font-extrabold text-sm tracking-tight transition-all duration-300 group-hover:scale-105">
-            Z
+          <div className="h-10 w-10 bg-primary rounded-app-md flex items-center justify-center text-white font-extrabold text-sm tracking-tight transition-all duration-300 group-hover:scale-105 overflow-hidden">
+            {tenantLogoUrl ? (
+              <img src={tenantLogoUrl} alt="Logo" className="h-full w-full object-cover" />
+            ) : (
+              'Z'
+            )}
           </div>
 
           <div className="flex flex-col">
@@ -90,15 +94,19 @@ export default function DesktopSidebar() {
           href="/settings"
           className="flex items-center gap-3 px-4 py-3 bg-neutral-50 hover:bg-white rounded-app-md border border-neutral-100 hover:border-primary/30 hover:shadow-md hover:shadow-primary/5 transition-all duration-300 group cursor-pointer"
         >
-          <div className="h-9 w-9 rounded-app-sm bg-primary group-hover:bg-primary-dark flex items-center justify-center font-bold text-white text-[11px] flex-shrink-0 transition-colors shadow-sm">
-            {isLoading ? '?' : initials}
+          <div className="h-9 w-9 rounded-app-sm bg-primary group-hover:bg-primary-dark flex items-center justify-center font-bold text-white text-[11px] flex-shrink-0 transition-colors shadow-sm overflow-hidden">
+            {isLoading ? '?' : avatarUrl ? (
+              <img src={avatarUrl} alt={initials} className="h-full w-full object-cover" />
+            ) : (
+              initials
+            )}
           </div>
 
           <div className="flex flex-col min-w-0 flex-1">
             <Typography variant={TypographyVariant.CAPTION} className="font-bold text-neutral-800 truncate group-hover:text-primary-dark transition-colors">
               {isLoading ? t('menu.sidebar.footer.loading') : businessName}
             </Typography>
-            <Typography variant={TypographyVariant.OVERLINE} className="truncate text-neutral-400">
+            <Typography variant={TypographyVariant.HELPER} className="truncate text-neutral-400">
               {isLoading ? t('menu.sidebar.footer.loadingRole') : userRoleLabel}
             </Typography>
           </div>
