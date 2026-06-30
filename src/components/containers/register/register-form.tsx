@@ -103,6 +103,43 @@ const PASSWORD_RULES = [
   { regex: /[^A-Za-z0-9]/, label: 'Al menos un símbolo' },
 ];
 
+const PasswordField: React.FC = () => {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="relative">
+      <Key className="absolute left-4 top-[38px] text-neutral-300" size={16} />
+      <Typography variant={TypographyVariant.OVERLINE} as="label" className="ml-1 mb-1 block text-[11px] font-bold tracking-widest uppercase text-neutral-500">
+        Contraseña
+      </Typography>
+      <Field name="password">
+        {({ field, meta }: { field: { value: string; name: string; onChange: React.ChangeEventHandler; onBlur: React.FocusEventHandler }; meta: { touched: boolean; error?: string } }) => (
+          <div className="relative">
+            <input
+              {...field}
+              type={show ? 'text' : 'password'}
+              placeholder="Crea una contraseña segura"
+              className={`w-full pl-11 pr-10 py-3.5 bg-neutral-50 border-2 rounded-app-md outline-none transition-all font-semibold text-sm text-neutral-800 placeholder:font-normal placeholder:text-neutral-400 ${
+                meta.touched && meta.error
+                  ? 'border-danger/30 bg-danger/5 focus:border-danger'
+                  : 'border-neutral-100 focus:border-primary focus:bg-white focus:shadow-sm'
+              }`}
+            />
+            <button
+              type="button"
+              onClick={() => setShow((previous) => !previous)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-neutral-300 hover:text-primary transition-colors"
+              tabIndex={-1}
+            >
+              {show ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+        )}
+      </Field>
+      <ErrorMessage name="password" component="p" className="text-danger text-[10px] mt-1 ml-2 font-bold italic" />
+    </div>
+  );
+};
+
 const PasswordStrength: React.FC<{ password: string }> = ({ password }) => {
   if (!password) return null;
   const passed = PASSWORD_RULES.filter((rule) => rule.regex.test(password));
@@ -324,40 +361,7 @@ export const RegisterForm: React.FC = () => {
                   />
 
                   <div>
-                    <div className="relative">
-                      <Key className="absolute left-4 top-[38px] text-neutral-300" size={16} />
-                      <Typography variant={TypographyVariant.OVERLINE} as="label" className="ml-1 mb-1 block text-[11px] font-bold tracking-widest uppercase text-neutral-500">
-                        Contraseña
-                      </Typography>
-                      <Field name="password">
-                        {({ field, meta }: { field: { value: string; name: string; onChange: React.ChangeEventHandler; onBlur: React.FocusEventHandler }; meta: { touched: boolean; error?: string } }) => {
-                          const [show, setShow] = useState(false);
-                          return (
-                            <div className="relative">
-                              <input
-                                {...field}
-                                type={show ? 'text' : 'password'}
-                                placeholder="Crea una contraseña segura"
-                                className={`w-full pl-11 pr-10 py-3.5 bg-neutral-50 border-2 rounded-app-md outline-none transition-all font-semibold text-sm text-neutral-800 placeholder:font-normal placeholder:text-neutral-400 ${
-                                  meta.touched && meta.error
-                                    ? 'border-danger/30 bg-danger/5 focus:border-danger'
-                                    : 'border-neutral-100 focus:border-primary focus:bg-white focus:shadow-sm'
-                                }`}
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setShow(!show)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-neutral-300 hover:text-primary transition-colors"
-                                tabIndex={-1}
-                              >
-                                {show ? <EyeOff size={16} /> : <Eye size={16} />}
-                              </button>
-                            </div>
-                          );
-                        }}
-                      </Field>
-                      <ErrorMessage name="password" component="p" className="text-danger text-[10px] mt-1 ml-2 font-bold italic" />
-                    </div>
+                    <PasswordField />
                     <PasswordStrength password={values.password} />
                   </div>
                 </div>
