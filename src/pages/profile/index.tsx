@@ -10,7 +10,7 @@ import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { UserRole } from '@/types/auth/auth';
+import { UserRole, UserSpecialty } from '@/types/auth/auth';
 import { useSession } from '@/hooks/use-session';
 import { TEXT } from '@/static/texts/i18n';
 import { useUpdateUserMutation } from '@/shared/api/mutations/users/update-user-mutation';
@@ -188,7 +188,7 @@ const ProfileSettingsPage: React.FC = () => {
                                                 />
                                             </FormField>
 
-                                            <FormField label={t('users.create.form.password')} icon={Lock}>
+                                            <FormField label={t(TEXT.PROFILE.FIELDS.NEW_PASSWORD)} icon={Lock}>
                                                 <input type="password" className={inputStyles} placeholder={t(TEXT.PROFILE.FIELDS.PASSWORD_PLACEHOLDER)} />
                                             </FormField>
 
@@ -207,12 +207,16 @@ const ProfileSettingsPage: React.FC = () => {
                                     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                             <FormField label={t('users.create.form.specialty')} icon={Briefcase}>
-                                                <input
+                                                <select
                                                     className={inputStyles}
-                                                    placeholder={t('users.create.form.specialtyPlaceholder')}
                                                     value={specialty}
                                                     onChange={(event) => setSpecialty(event.target.value)}
-                                                />
+                                                >
+                                                    <option value="">{t(TEXT.PROFILE.FIELDS.SPECIALTY_NONE)}</option>
+                                                    <option value={UserSpecialty.AUDIOLOGY}>{t(TEXT.USERS.EDIT.SPECIALTY.AUDIOLOGY)}</option>
+                                                    <option value={UserSpecialty.DENTAL}>{t(TEXT.USERS.EDIT.SPECIALTY.DENTAL)}</option>
+                                                    <option value={UserSpecialty.GENERAL}>{t(TEXT.USERS.EDIT.SPECIALTY.GENERAL)}</option>
+                                                </select>
                                             </FormField>
 
                                             <FormField label={t(TEXT.PROFILE.FIELDS.PROFESSIONAL_ID)} icon={ShieldCheck}>

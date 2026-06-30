@@ -471,8 +471,10 @@ export const TEXT = {
       UPLOAD_ERROR: 'profile.avatar.uploadError',
     },
     FIELDS: {
+      NEW_PASSWORD: 'profile.fields.newPassword',
       PASSWORD_PLACEHOLDER: 'profile.fields.passwordPlaceholder',
       LOADING_PLACEHOLDER: 'profile.fields.loadingPlaceholder',
+      SPECIALTY_NONE: 'profile.fields.specialtyNone',
       PROFESSIONAL_ID: 'profile.fields.professionalId',
       PROFESSIONAL_ID_PLACEHOLDER: 'profile.fields.professionalIdPlaceholder',
       UNIVERSITY: 'profile.fields.university',
@@ -553,6 +555,34 @@ export const TEXT = {
       UPDATE_ERROR: 'settings.toasts.updateError',
       LOGO_SUCCESS: 'settings.toasts.logoSuccess',
       LOGO_ERROR: 'settings.toasts.logoError',
+    },
+  },
+  REPORT_TEMPLATE: {
+    INFO_TITLE: 'reportTemplate.infoTitle',
+    INFO_SUBTITLE: 'reportTemplate.infoSubtitle',
+    CONTENT_HINT: 'reportTemplate.contentHint',
+    SECTIONS: {
+      GENERAL: 'reportTemplate.sections.general',
+      CONTENT: 'reportTemplate.sections.content',
+    },
+    CATEGORIES: {
+      CLINICAL_CONTROL: 'reportTemplate.categories.CLINICAL_CONTROL',
+      AUDIOGRAM: 'reportTemplate.categories.AUDIOGRAM',
+      MAINTENANCE: 'reportTemplate.categories.MAINTENANCE',
+      GENERAL: 'reportTemplate.categories.GENERAL',
+    },
+    FIELDS: {
+      TITLE_LABEL: 'reportTemplate.fields.titleLabel',
+      TITLE_PLACEHOLDER: 'reportTemplate.fields.titlePlaceholder',
+      CATEGORY_LABEL: 'reportTemplate.fields.categoryLabel',
+      DESCRIPTION_LABEL: 'reportTemplate.fields.descriptionLabel',
+      DESCRIPTION_PLACEHOLDER: 'reportTemplate.fields.descriptionPlaceholder',
+      CONTENT_LABEL: 'reportTemplate.fields.contentLabel',
+      CONTENT_PLACEHOLDER: 'reportTemplate.fields.contentPlaceholder',
+    },
+    BUTTONS: {
+      DISCARD: 'reportTemplate.buttons.discard',
+      SAVE: 'reportTemplate.buttons.save',
     },
   },
   AUTH: {

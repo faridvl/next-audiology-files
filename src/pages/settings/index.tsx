@@ -11,8 +11,8 @@ import { useUpdateTenantMutation } from '@/shared/api/mutations/tenants/update-t
 import { useUploadLogoMutation } from '@/shared/api/mutations/identity/use-upload-logo-mutation';
 import { toast } from 'sonner';
 import {
-  Building2, CreditCard, PenTool, Check,
-  MapPin, FileText, Globe, Upload, Loader2, X
+  Building2, CreditCard, Check,
+  MapPin, Globe, Upload, Loader2, X
 } from 'lucide-react';
 
 const specialityLabels: Record<string, string> = {
@@ -202,38 +202,7 @@ const BusinessSettingsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* SECCIÓN 3: LEGAL */}
-          <div className="bg-white border border-neutral-100 rounded-app-xl p-8 shadow-sm">
-            <SectionHeader icon={FileText} title={t(TEXT.SETTINGS.SECTIONS.LEGAL)} />
-
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <CompactInput label={t(TEXT.SETTINGS.LEGAL.LICENSE_LABEL)} placeholder={t(TEXT.SETTINGS.LEGAL.LICENSE_PLACEHOLDER)} />
-              <CompactInput label={t(TEXT.SETTINGS.LEGAL.NOTIFICATION_EMAIL_LABEL)} placeholder={t(TEXT.SETTINGS.LEGAL.NOTIFICATION_EMAIL_PLACEHOLDER)} />
-            </div>
-
-            <div className="p-4 border-2 border-dashed border-neutral-100 rounded-2xl flex items-center justify-between bg-neutral-50/50 group hover:border-primary/20 transition-all cursor-pointer">
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-white rounded-xl shadow-sm">
-                  <PenTool size={18} className="text-neutral-400 group-hover:text-primary" />
-                </div>
-                <div>
-                  <Typography variant={TypographyVariant.BODY_BOLD} className="!text-neutral-700 !text-xs">
-                    {t(TEXT.SETTINGS.LEGAL.SIGNATURE_TITLE)}
-                  </Typography>
-                  <Typography variant={TypographyVariant.CAPTION} className="!text-[10px] italic">
-                    {t(TEXT.SETTINGS.LEGAL.SIGNATURE_SUBTITLE)}
-                  </Typography>
-                </div>
-              </div>
-              <button className="bg-white border border-neutral-200 px-4 py-2 rounded-xl transition-all hover:bg-neutral-50 shadow-sm">
-                <Typography variant={TypographyVariant.OVERLINE} className="!text-primary !text-[9px]">
-                  {t(TEXT.SETTINGS.LEGAL.SIGNATURE_UPLOAD_BUTTON)}
-                </Typography>
-              </button>
-            </div>
-          </div>
-
-          {/* SECCIÓN 4: SUSCRIPCIÓN */}
+          {/* SECCIÓN 3: SUSCRIPCIÓN */}
           <div className="bg-white border border-neutral-100 rounded-app-xl p-6 shadow-sm flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 bg-neutral-900 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-neutral-200">

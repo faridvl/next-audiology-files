@@ -9,8 +9,8 @@
 ## 🎯 Próximo paso
 
 **Branch activo:** `main`  
-**Última etapa completada:** Refactor UI área de consulta: layout full-width, historial integrado en Control Clínico, fix payload DENTAL→GENERAL, audiograma UI profesional, resize-none en textareas.  
-**Siguiente:** Investigar error 500 en upload de documentos (problema en StorageService/R2 en API). Probar flujo completo con usuarios.
+**Última etapa completada:** Settings/Profile/ReportTemplate: sección Legal oculta en Settings, specialty como Select en Profile, label "Nueva Contraseña", esqueleto profesional en `/report-template/create`.  
+**Siguiente:** Investigar error 500 en upload de logo (`POST /upload/tenants/:uuid/logo`) — problema en StorageService/R2 en API, no en el site.
 
 ---
 
@@ -63,6 +63,10 @@
 ---
 
 ## ✅ Completado (últimas etapas)
+
+- **Settings / Profile / Report Template:** Sección "Validación y Firmas" oculta en Settings (sin endpoint en API). Perfil: specialty cambiada a `<select>` con `UserSpecialty` enum (AUDIOLOGY/DENTAL/GENERAL), label "Contraseña Temporal" → "Nueva Contraseña". `/report-template/create`: esqueleto completo con secciones Datos Generales (título, categoría, descripción) y Contenido (textarea grande con hint de variables). Claves i18n agregadas en `es.json` e `i18n.ts`.
+
+- **Módulo Usuarios — mejoras UX:** Listado sin InfoTooltip, búsqueda funcional (placeholder correcto), columna Teléfono agregada (`phoneNumber` en `User` type). Página de detalle renombrada a "Detalle de Usuario". Edición rediseñada con secciones separadas (Datos Personales / Acceso / Perfil Profesional), campo teléfono editable, especialidad como `<select>` usando `UserSpecialty` enum (AUDIOLOGY / DENTAL / GENERAL). TypeScript limpio. Claves i18n `users.detail.*` y `users.edit.*` en `es.json` + `i18n.ts`.
 
 - **Refactor UI consulta médica:** Layout full-width (sin `max-w-2xl`) en Control, Audiograma, Mantenimiento y Resumen. `MedicalHistorySidebar` integrado en Control Clínico (columna lateral XL). Fix 400 en `POST /medical-controls`: `DENTAL` specialty mapeada a `GENERAL` (API no tiene schema DENTAL aún). `resize-none` en todos los textareas de la consulta. Audiograma rediseñado con frecuencia header compartido, inputs con color-coding por oído (rojo/azul), indicadores de valor lleno, footer con leyenda.
 - **Edad del paciente en header:** Calculada desde `birthDate` con `calculateAge()`. Se muestra junto a cédula/teléfono/correo en el header de la ficha. Clave i18n `patients.detail.ageYears`.

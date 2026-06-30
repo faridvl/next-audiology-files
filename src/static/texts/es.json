@@ -520,8 +520,10 @@
       "uploadError": "No se pudo actualizar la foto de perfil."
     },
     "fields": {
+      "newPassword": "Nueva Contraseña",
       "passwordPlaceholder": "••••••••",
       "loadingPlaceholder": "Cargando...",
+      "specialtyNone": "Sin especialidad",
       "professionalId": "Cédula Profesional",
       "professionalIdPlaceholder": "Ej. 1234567",
       "university": "Universidad",
@@ -544,6 +546,34 @@
     "toasts": {
       "updateSuccess": "Perfil actualizado correctamente",
       "updateError": "Error al actualizar el perfil"
+    }
+  },
+  "reportTemplate": {
+    "infoTitle": "Plantillas de Reporte",
+    "infoSubtitle": "Define la estructura del documento que se generará en PDF al finalizar una consulta.",
+    "sections": {
+      "general": "Datos Generales",
+      "content": "Contenido de la Plantilla"
+    },
+    "categories": {
+      "CLINICAL_CONTROL": "Control Clínico",
+      "AUDIOGRAM": "Audiograma",
+      "MAINTENANCE": "Mantenimiento",
+      "GENERAL": "General"
+    },
+    "fields": {
+      "titleLabel": "Título de la Plantilla",
+      "titlePlaceholder": "Ej. Informe de Control Auditivo Inicial",
+      "categoryLabel": "Categoría",
+      "descriptionLabel": "Descripción breve",
+      "descriptionPlaceholder": "Describe el propósito de esta plantilla (máx. 300 caracteres)",
+      "contentLabel": "Contenido",
+      "contentPlaceholder": "Redacta aquí el cuerpo del reporte. Puedes usar variables como {{nombrePaciente}}, {{fecha}}, {{diagnostico}}..."
+    },
+    "contentHint": "El contenido puede incluir variables dinámicas que serán reemplazadas al generar el PDF.",
+    "buttons": {
+      "discard": "Limpiar",
+      "save": "Guardar Plantilla"
     }
   },
   "settings": {
