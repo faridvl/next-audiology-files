@@ -31,8 +31,12 @@ export const ApiServiceClient = (baseUrl: string) => {
     }
 
     if (response.status === 401) {
-      handleSessionExpired();
-      throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
+      if (token) {
+        handleSessionExpired();
+        throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
+      }
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'unauthorized');
     }
 
     if (response.status === 204) return null;

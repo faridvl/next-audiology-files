@@ -1,20 +1,15 @@
-import React from 'react';
-import Head from 'next/head';
-import { authorizeServerSidePage } from '@/hocs/auth';
-import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
-import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
-import { DashboardContainer } from '@/components/containers/dashboard/dashboard';
+import { GetServerSidePropsContext } from 'next';
+import { CookiesManager } from '@/shared/utils/cookies-manager';
+import { routesPublic } from '@/shared/navigation/routes';
 
-const DashboardPage: React.FC = () => {
-  return (
-    <>
-      <Head><title>Panel de Control | Sistema Médico</title></Head>
-      <DashboardLayout isMainPage contentStyle={BoxedLayoutStyle.FULL} title="Inicio">
-        <DashboardContainer />
-      </DashboardLayout>
-    </>
-  );
-};
+const DashboardPage = () => null;
 
-export const getServerSideProps = authorizeServerSidePage();
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const token = CookiesManager.getAccessToken(context);
+  if (!token) {
+    return { redirect: { destination: routesPublic.login, permanent: false } };
+  }
+  return { redirect: { destination: '/patients', permanent: false } };
+}
+
 export default DashboardPage;

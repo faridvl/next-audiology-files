@@ -8,7 +8,7 @@ type CookieConfig = Cookies.CookieAttributes;
 
 export class CookiesManager {
   private static readonly config: CookieConfig = {
-    expires: 1 / 24, // 1 hora
+    expires: 7, // 7 días
     path: '/',
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
