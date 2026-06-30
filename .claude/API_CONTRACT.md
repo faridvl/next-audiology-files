@@ -57,10 +57,13 @@ Full API contract: `C:\Users\Personal\Desktop\standard-saas-api\.claude\ENDPOINT
 | GET | `/medical-controls/patient/:uuid` | `querys/get-medical-controls-query.ts` | Listado paginado |
 | GET | `/medical-controls/:uuid` | `querys/medical-controls-query.ts` | Detail |
 | GET | `/maintenance/patient/:uuid` | `querys/maintenance-query.ts` | Para `warrantyExpiration` en patient detail |
-| POST | `/products` | `mutations/inventory/inventory-mutation.ts` | |
+| POST | `/products` | `mutations/inventory/inventory-mutation.ts` | Body incluye `brand` (opcional) |
 | GET | `/products` | `querys/inventory/inventory-query.ts` | `?includeInactive` |
 | GET | `/products/:uuid` | `querys/inventory/get-product-query.ts` | |
-| PATCH | `/products/:uuid` | `mutations/inventory/inventory-mutation.ts` | |
+| PATCH | `/products/:uuid` | `mutations/inventory/inventory-mutation.ts` | Body incluye `brand` (opcional) |
+| POST | `/products/:uuid/units/bulk` | `mutations/inventory/product-unit-mutation.ts` | Crea N unidades (seriales) de golpe |
+| GET | `/products/:uuid/units` | `querys/inventory/product-units-query.ts` | `?status=AVAILABLE\|ASSIGNED\|DAMAGED\|RETIRED` |
+| PATCH | `/product-units/:uuid` | `mutations/inventory/product-unit-mutation.ts` | status: AVAILABLE\|DAMAGED\|RETIRED |
 
 ## Endpoints disponibles en API que el site aún no consume
 

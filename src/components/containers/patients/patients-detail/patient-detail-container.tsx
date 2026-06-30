@@ -39,8 +39,9 @@ import { usePatientBackgroundQuery } from "@/shared/api/querys/patient-backgroun
 import { useUpsertPatientBackgroundMutation } from "@/shared/api/mutations/patients/upsert-background-mutation";
 import { UpsertPatientBackgroundPayload, PatientBackgroundEntity } from "@/types/patients/patient-background.types";
 import { usePatientDevicesQuery } from "@/shared/api/querys/patient-devices-query";
-import { useCreatePatientDeviceMutation } from "@/shared/api/mutations/patients/create-patient-device-mutation";
 import { useDeactivatePatientDeviceMutation } from "@/shared/api/mutations/patients/deactivate-patient-device-mutation";
+import { useUpdateProductUnitMutation } from "@/shared/api/mutations/inventory/product-unit-mutation";
+import { ProductUnitStatus } from "@/types/inventory/product.types";
 import { PatientDevice } from "@/types/patients/patient-device.types";
 import { toast } from "sonner";
 import { useAppointmentTypesQuery, AppointmentType } from "@/shared/api/querys/appointment-types-query";
@@ -48,7 +49,8 @@ import { useCreateAppointmentMutation } from "@/shared/api/mutations/appointment
 import { useUpdateAppointmentMutation } from "@/shared/api/mutations/appointments/update-appointment-mutation";
 import { AppointmentStatus } from "@/types/appointments/appointment";
 import { FETCH_APPOINTMENT_BY_PATIENT_KEY } from "@/shared/api/querys/get-appoinment-by-patient-query";
-import { ChevronDown, ChevronUp, Trash2, Headphones, Plus, Save, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, Headphones, Plus, RotateCcw, ShieldCheck, Barcode, X, Save } from "lucide-react";
+import { AssignDeviceUnitModal } from "./assign-device-unit-modal";
 import { useTranslation } from "react-i18next";
 import { TEXT } from "@/static/texts/i18n";
 
@@ -215,11 +217,10 @@ const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { data: devices, isLoading } = usePatientDevicesQuery(patientUuid);
-  const { executeCreateDevice, isPending: isCreating } = useCreatePatientDeviceMutation(patientUuid);
   const { executeDeactivateDevice } = useDeactivatePatientDeviceMutation(patientUuid);
+  const { executeUpdateUnit } = useUpdateProductUnitMutation();
   const [isOpen, setIsOpen] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ side: 'OD' as PatientDevice['side'], brand: '', model: '', serialNumber: '', warrantyUntil: '' });
+  const [showAssignModal, setShowAssignModal] = useState(false);
 
   const SIDE_LABELS: Record<string, string> = {
     OD: t(TEXT.PATIENTS.DETAIL.DEVICES.SIDE_OD),
@@ -227,27 +228,24 @@ const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
     AMBOS: t(TEXT.PATIENTS.DETAIL.DEVICES.SIDE_AMBOS),
   };
 
-  const handleCreate = () => {
-    executeCreateDevice(
-      { side: form.side, brand: form.brand || undefined, model: form.model || undefined, serialNumber: form.serialNumber || undefined, warrantyUntil: form.warrantyUntil || undefined },
-      {
-        onSuccess: () => {
-          toast.success(t(TEXT.PATIENTS.DETAIL.DEVICES.REGISTER_SUCCESS));
-          setShowForm(false);
-          setForm({ side: 'OD', brand: '', model: '', serialNumber: '', warrantyUntil: '' });
-          queryClient.invalidateQueries({ queryKey: ['fetchPatientDevices', patientUuid] });
-        },
-        onError: () => toast.error(t(TEXT.PATIENTS.DETAIL.DEVICES.REGISTER_ERROR)),
-      },
-    );
-  };
+  const handleReturn = (device: PatientDevice) => {
+    if (!window.confirm('¿Devolver este audífono? La unidad quedará disponible en inventario.')) return;
 
-  const handleDeactivate = (deviceUuid: string) => {
-    if (!window.confirm(t(TEXT.PATIENTS.DETAIL.DEVICES.DELETE_CONFIRM))) return;
-    executeDeactivateDevice(deviceUuid, {
+    executeDeactivateDevice(device.uuid, {
       onSuccess: () => {
-        toast.success(t(TEXT.PATIENTS.DETAIL.DEVICES.DELETE_SUCCESS));
-        queryClient.invalidateQueries({ queryKey: ['fetchPatientDevices', patientUuid] });
+        if (device.productUnitUuid) {
+          executeUpdateUnit(
+            { unitUuid: device.productUnitUuid, payload: { status: ProductUnitStatus.AVAILABLE } },
+            {
+              onSettled: () => {
+                queryClient.invalidateQueries({ queryKey: ['fetchPatientDevices', patientUuid] });
+              },
+            },
+          );
+        } else {
+          queryClient.invalidateQueries({ queryKey: ['fetchPatientDevices', patientUuid] });
+        }
+        toast.success('Audífono devuelto correctamente.');
       },
       onError: () => toast.error(t(TEXT.PATIENTS.DETAIL.DEVICES.DELETE_ERROR)),
     });
@@ -255,78 +253,130 @@ const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
 
   const activeDevices = (devices ?? []) as PatientDevice[];
 
-  const fieldPlaceholders: Record<string, string> = {
-    brand: t(TEXT.PATIENTS.DETAIL.DEVICES.BRAND_PLACEHOLDER),
-    model: t(TEXT.PATIENTS.DETAIL.DEVICES.MODEL_PLACEHOLDER),
-    serialNumber: t(TEXT.PATIENTS.DETAIL.DEVICES.SERIAL_NUMBER_PLACEHOLDER),
-  };
+  const formatWarrantyDate = (dateStr: string) =>
+    new Date(dateStr).toLocaleDateString('es-CR', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  const isWarrantyExpired = (dateStr: string) => new Date(dateStr) < new Date();
 
   return (
-    <div className="bg-white rounded-app-md border border-neutral-100 shadow-sm overflow-hidden">
-      <button onClick={() => setIsOpen((o) => !o)} className="w-full flex items-center justify-between p-5 hover:bg-neutral-50 transition-colors">
-        <div className="flex items-center gap-3">
-          <Headphones className="h-4 w-4 text-neutral-500" />
-          <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">{t(TEXT.PATIENTS.DETAIL.DEVICES.TITLE)}</Typography>
-          {!isLoading && <Typography variant={TypographyVariant.CAPTION} inline className="px-2 py-0.5 bg-neutral-100 text-neutral-500 rounded-lg font-black">{activeDevices.length}</Typography>}
-        </div>
-        {isOpen ? <ChevronUp className="h-4 w-4 text-neutral-400" /> : <ChevronDown className="h-4 w-4 text-neutral-400" />}
-      </button>
+    <>
+      {showAssignModal && (
+        <AssignDeviceUnitModal
+          patientUuid={patientUuid}
+          onClose={() => setShowAssignModal(false)}
+          onSuccess={() => setShowAssignModal(false)}
+        />
+      )}
 
-      {isOpen && (
-        <div className="px-5 pb-5 border-t border-neutral-100 space-y-3 mt-4">
-          {isLoading ? (
-            <Typography variant={TypographyVariant.HELPER} className="text-center py-4">{t(TEXT.PATIENTS.DETAIL.DEVICES.LOADING)}</Typography>
-          ) : activeDevices.length === 0 ? (
-            <Typography variant={TypographyVariant.HELPER} className="italic text-center py-4">{t(TEXT.PATIENTS.DETAIL.DEVICES.EMPTY)}</Typography>
-          ) : (
-            activeDevices.map((device) => (
-              <div key={device.uuid} className="flex items-center justify-between p-3.5 bg-neutral-50 rounded-app-md border border-neutral-100">
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                    <Typography variant={TypographyVariant.OVERLINE} inline className="bg-primary-soft text-primary-dark px-2 py-0.5 rounded-lg">{SIDE_LABELS[device.side]}</Typography>
-                    {device.brand && <Typography variant={TypographyVariant.CAPTION} inline className="font-bold text-neutral-700">{device.brand} {device.model}</Typography>}
+      <div className="bg-white rounded-app-md border border-neutral-100 shadow-sm overflow-hidden">
+        <button onClick={() => setIsOpen((o) => !o)} className="w-full flex items-center justify-between p-5 hover:bg-neutral-50 transition-colors">
+          <div className="flex items-center gap-3">
+            <Headphones className="h-4 w-4 text-neutral-500" />
+            <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">{t(TEXT.PATIENTS.DETAIL.DEVICES.TITLE)}</Typography>
+            {!isLoading && <Typography variant={TypographyVariant.CAPTION} inline className="px-2 py-0.5 bg-neutral-100 text-neutral-500 rounded-lg font-black">{activeDevices.length}</Typography>}
+          </div>
+          {isOpen ? <ChevronUp className="h-4 w-4 text-neutral-400" /> : <ChevronDown className="h-4 w-4 text-neutral-400" />}
+        </button>
+
+        {isOpen && (
+          <div className="px-5 pb-5 border-t border-neutral-100 space-y-3 mt-4">
+            {isLoading ? (
+              <Typography variant={TypographyVariant.HELPER} className="text-center py-4">{t(TEXT.PATIENTS.DETAIL.DEVICES.LOADING)}</Typography>
+            ) : activeDevices.length === 0 ? (
+              <Typography variant={TypographyVariant.HELPER} className="italic text-center py-4">{t(TEXT.PATIENTS.DETAIL.DEVICES.EMPTY)}</Typography>
+            ) : (
+              activeDevices.map((device) => (
+                <div key={device.uuid} className="bg-neutral-50 rounded-app-md border border-neutral-100 overflow-hidden">
+                  {/* Foto del dispositivo si existe */}
+                  {device.photoUrl && (
+                    <div className="w-full h-28 bg-neutral-100 overflow-hidden">
+                      <img
+                        src={device.photoUrl}
+                        alt={`${device.brand ?? ''} ${device.model ?? ''}`}
+                        className="w-full h-full object-contain p-2"
+                      />
+                    </div>
+                  )}
+                  <div className="p-3.5 space-y-2">
+                    {/* Oído + nombre */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Typography variant={TypographyVariant.OVERLINE} inline className="bg-primary-soft text-primary-dark px-2 py-0.5 rounded-lg">
+                            {SIDE_LABELS[device.side]}
+                          </Typography>
+                          {device.brand && (
+                            <Typography variant={TypographyVariant.CAPTION} inline className="font-bold text-neutral-700">
+                              {device.brand}{device.model ? ` ${device.model}` : ''}
+                            </Typography>
+                          )}
+                        </div>
+
+                        {/* Serial */}
+                        {device.serialNumber && (
+                          <div className="flex items-center gap-1.5">
+                            <Barcode size={11} className="text-neutral-400 shrink-0" />
+                            <Typography variant={TypographyVariant.CAPTION} className="text-neutral-500 font-mono">
+                              {device.serialNumber}
+                            </Typography>
+                          </div>
+                        )}
+
+                        {/* Garantía */}
+                        {device.warrantyUntil && (
+                          <div className="flex items-center gap-1.5">
+                            <ShieldCheck size={11} className={isWarrantyExpired(device.warrantyUntil) ? 'text-danger shrink-0' : 'text-success shrink-0'} />
+                            <Typography variant={TypographyVariant.CAPTION} className={isWarrantyExpired(device.warrantyUntil) ? 'text-danger' : 'text-neutral-500'}>
+                              Garantía hasta {formatWarrantyDate(device.warrantyUntil)}
+                              {isWarrantyExpired(device.warrantyUntil) && ' (vencida)'}
+                            </Typography>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Acciones */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => handleReturn(device)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 text-neutral-400 hover:text-primary hover:bg-primary-soft rounded-app-sm transition-all text-[10px] font-black uppercase tracking-widest"
+                          title="Devolver audífono"
+                        >
+                          <RotateCcw size={11} />
+                          <span>Devolver</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (!window.confirm(t(TEXT.PATIENTS.DETAIL.DEVICES.DELETE_CONFIRM))) return;
+                            executeDeactivateDevice(device.uuid, {
+                              onSuccess: () => {
+                                toast.success(t(TEXT.PATIENTS.DETAIL.DEVICES.DELETE_SUCCESS));
+                                queryClient.invalidateQueries({ queryKey: ['fetchPatientDevices', patientUuid] });
+                              },
+                              onError: () => toast.error(t(TEXT.PATIENTS.DETAIL.DEVICES.DELETE_ERROR)),
+                            });
+                          }}
+                          className="p-1.5 text-neutral-300 hover:text-danger hover:bg-danger/10 rounded-app-sm transition-all"
+                          title="Eliminar registro"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  {device.serialNumber && <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400 font-medium">{t(TEXT.PATIENTS.DETAIL.DEVICES.SERIAL_NUMBER)} {device.serialNumber}</Typography>}
-                  {device.warrantyUntil && <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400">{t(TEXT.PATIENTS.DETAIL.DEVICES.WARRANTY_UNTIL)} {new Date(device.warrantyUntil).toLocaleDateString('es-ES')}</Typography>}
                 </div>
-                <button onClick={() => handleDeactivate(device.uuid)} className="p-2 text-neutral-300 hover:text-danger hover:bg-danger/10 rounded-app-sm transition-all">
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            ))
-          )}
+              ))
+            )}
 
-          {showForm ? (
-            <div className="p-4 bg-primary-soft/30 rounded-app-md border border-primary-soft space-y-3">
-              <div className="grid grid-cols-3 gap-2">
-                {(['OD', 'OI', 'AMBOS'] as const).map((s) => (
-                  <button key={s} onClick={() => setForm((f) => ({ ...f, side: s }))} className={`py-2 rounded-app-sm font-black text-[10px] uppercase tracking-widest transition-all ${form.side === s ? 'bg-primary text-white' : 'bg-white text-neutral-500 border border-neutral-200'}`}>
-                    {SIDE_LABELS[s]}
-                  </button>
-                ))}
-              </div>
-              {['brand', 'model', 'serialNumber'].map((field) => (
-                <input key={field} placeholder={fieldPlaceholders[field]} value={(form as Record<string, string>)[field]} onChange={(e) => setForm((f) => ({ ...f, [field]: e.target.value }))} className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-app-sm text-xs outline-none focus:border-primary/50 transition-all" />
-              ))}
-              <div>
-                <Typography variant={TypographyVariant.OVERLINE} as="label" className="mb-1 block">{t(TEXT.PATIENTS.DETAIL.DEVICES.WARRANTY_LABEL)}</Typography>
-                <input type="date" value={form.warrantyUntil} onChange={(e) => setForm((f) => ({ ...f, warrantyUntil: e.target.value }))} className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-app-sm text-xs outline-none focus:border-primary/50 transition-all" />
-              </div>
-              <div className="flex justify-end gap-2">
-                <button onClick={() => setShowForm(false)} className="px-4 py-2 text-neutral-400 font-black text-[10px] uppercase tracking-widest hover:text-neutral-600 transition-colors">{t(TEXT.GENERAL.BUTTONS.CANCEL)}</button>
-                <button onClick={handleCreate} disabled={isCreating} className="flex items-center gap-1.5 px-5 py-2 bg-primary hover:bg-primary-dark text-white rounded-app-sm font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50">
-                  <Save size={12} /> {isCreating ? t(TEXT.PATIENTS.DETAIL.DEVICES.SAVING) : t(TEXT.PATIENTS.DETAIL.DEVICES.REGISTER_BUTTON)}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button onClick={() => setShowForm(true)} className="w-full flex items-center justify-center gap-1.5 py-2.5 border border-dashed border-neutral-200 rounded-app-md text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:border-primary/40 hover:text-primary transition-all">
+            <button
+              onClick={() => setShowAssignModal(true)}
+              className="w-full flex items-center justify-center gap-1.5 py-2.5 border border-dashed border-neutral-200 rounded-app-md text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:border-primary/40 hover:text-primary transition-all"
+            >
               <Plus size={12} /> {t(TEXT.PATIENTS.DETAIL.DEVICES.ADD)}
             </button>
-          )}
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

@@ -3,7 +3,9 @@ import { env } from '@/shared/api/config';
 import { useApiMutation } from '../use-api-mutation';
 import { Product } from '@/types/inventory/product.types';
 
-export type ProductApiPayload = Omit<Product, 'uuid' | 'tenantUuid' | 'isActive' | 'createdAt'>;
+export type ProductApiPayload = Omit<Product, 'uuid' | 'tenantUuid' | 'isActive' | 'createdAt' | 'stock'> & {
+  stock: { min: number };
+};
 
 export function useCreateProductMutation() {
   const {

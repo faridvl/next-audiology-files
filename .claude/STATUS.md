@@ -9,8 +9,13 @@
 ## 🎯 Próximo paso
 
 **Branch activo:** `main`  
-**Última etapa completada:** Settings/Profile/ReportTemplate: sección Legal oculta en Settings, specialty como Select en Profile, label "Nueva Contraseña", esqueleto profesional en `/report-template/create`.  
-**Siguiente:** Investigar error 500 en upload de logo (`POST /upload/tenants/:uuid/logo`) — problema en StorageService/R2 en API, no en el site.
+**Última etapa completada:** Rediseño de inventario por número de serie — Fases 3–6 completas en site (`next-audiology-files`). Tipos, queries, mutations y UI del flujo de seriales y asignación de audífonos implementados. TypeScript limpio.
+
+**Siguiente:** Integración y pruebas del flujo completo:
+- Verificar que `POST /products/:uuid/units/bulk` persiste los seriales al crear un producto
+- Verificar modal de asignación: seleccionar producto → unidad disponible → oído → confirmar (`POST /patients/:uuid/devices`)
+- Verificar "Devolver": llama `DELETE /patients/:uuid/devices/:uuid` + `PATCH /product-units/:uuid` con `status: AVAILABLE`
+- Considerar vincular desde la tabla de unidades en `/inventory/:uuid` al paciente asignado (link a ficha)
 
 ---
 
@@ -63,6 +68,8 @@
 ---
 
 ## ✅ Completado (últimas etapas)
+
+- **Inventario por número de serie — Fases 3–6 (site):** Tipos `ProductUnit` + `ProductUnitStatus` enum. Query `useProductUnitsQuery`. Mutations `useCreateProductUnitsBulkMutation` + `useUpdateProductUnitMutation`. Formulario `/inventory/create` con campo `brand` y tabla dinámica de seriales (bulk al guardar). Detalle `/inventory/:uuid` con tabla de unidades (serial, estado badge, garantía, paciente asignado). Modal `AssignDeviceUnitModal` de 3 pasos (producto → unidad AVAILABLE → oído). `DevicesPanel` usa el nuevo modal; tarjeta enriquecida con foto, serial, garantía con color vencida/vigente, botón "Devolver" que libera la unidad en inventario.
 
 - **Settings / Profile / Report Template:** Sección "Validación y Firmas" oculta en Settings (sin endpoint en API). Perfil: specialty cambiada a `<select>` con `UserSpecialty` enum (AUDIOLOGY/DENTAL/GENERAL), label "Contraseña Temporal" → "Nueva Contraseña". `/report-template/create`: esqueleto completo con secciones Datos Generales (título, categoría, descripción) y Contenido (textarea grande con hint de variables). Claves i18n agregadas en `es.json` e `i18n.ts`.
 

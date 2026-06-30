@@ -6,9 +6,11 @@ export interface PatientDevice {
   tenantUuid: string;
   side: DeviceSide;
   productUuid?: string | null;
+  productUnitUuid?: string | null;
   brand?: string | null;
   model?: string | null;
   serialNumber?: string | null;
+  photoUrl?: string | null;
   purchaseDate?: string | null;
   warrantyUntil?: string | null;
   notes?: string | null;
@@ -18,6 +20,7 @@ export interface PatientDevice {
 
 export interface CreatePatientDevicePayload {
   side: DeviceSide;
+  productUnitUuid?: string;
   brand?: string;
   model?: string;
   serialNumber?: string;

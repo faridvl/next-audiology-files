@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 import { useProductDetailQuery } from '@/shared/api/querys/inventory/get-product-query';
+import { useProductUnitsQuery } from '@/shared/api/querys/inventory/product-units-query';
 
 export function useInventoryDetail(productId: string) {
   const { data: product, isLoading, isError } = useProductDetailQuery(productId);
+  const { data: units, isLoading: isLoadingUnits } = useProductUnitsQuery(productId);
 
   const formattedProduct = useMemo(() => {
     if (!product) return null;
@@ -20,7 +22,9 @@ export function useInventoryDetail(productId: string) {
 
   return {
     product: formattedProduct,
+    units: units ?? [],
     isLoading,
+    isLoadingUnits,
     isError,
   };
 }
