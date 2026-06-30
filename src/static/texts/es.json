@@ -19,15 +19,20 @@
   },
   "menu": {
     "sidebar": {
-      "business": {
-        "name": "Zynka"
+      "nav": {
+        "dashboard": "Inicio",
+        "appointments": "Agenda",
+        "patients": "Pacientes",
+        "clinicalTemplates": "Plantillas",
+        "inventory": "Inventario",
+        "appointmentTypes": "Tipos de Cita",
+        "users": "Usuarios",
+        "reportTemplate": "Reportes"
       },
-      "files": "Expedientes",
-      "patients": "Pacientes",
-      "dashboard": "Dashboard",
-      "customers": "Clientes",
-      "about": "Nosotros",
-      "settings": "Ajustes"
+      "footer": {
+        "loading": "Cargando...",
+        "loadingRole": "..."
+      }
     }
   },
   "pdf": {

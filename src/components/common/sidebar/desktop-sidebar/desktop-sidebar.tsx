@@ -1,13 +1,15 @@
 import React from 'react';
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useTranslation } from 'react-i18next';
 import { TypographyVariant, Typography } from "../../typography/typography";
 import { routesPrivate } from "@/shared/navigation/routes";
 import { useSidebar } from './use-sidebar';
 
 export default function DesktopSidebar() {
   const router = useRouter();
-  const { userName, userRole, businessName, initials, isLoading, filteredNavigation } = useSidebar();
+  const { t } = useTranslation();
+  const { userRoleLabel, businessName, initials, isLoading, filteredNavigation } = useSidebar();
 
   return (
     <div className="flex h-full max-h-screen flex-col bg-white border-r border-neutral-100">
@@ -16,7 +18,6 @@ export default function DesktopSidebar() {
       <div className="flex h-[80px] items-center px-8 mb-2">
         <Link href={routesPrivate.dashboard} className="flex items-center gap-3 group">
 
-          {/* Logo Box */}
           <div className="h-10 w-10 bg-primary rounded-app-md flex items-center justify-center text-white font-extrabold text-sm tracking-tight transition-all duration-300 group-hover:scale-105">
             Z
           </div>
@@ -40,7 +41,9 @@ export default function DesktopSidebar() {
       <div className="flex-1 overflow-auto px-3">
         <nav className="space-y-1">
           {filteredNavigation.map((item) => {
-            const isActive = router.pathname.startsWith(item.route);
+            const isActive =
+              router.pathname === item.route ||
+              router.pathname.startsWith(item.route + '/');
             const Icon = item.icon;
 
             return (
@@ -59,30 +62,27 @@ export default function DesktopSidebar() {
                   <div className="absolute left-0 w-1 h-5 bg-primary rounded-r-full" />
                 )}
 
-                {Icon && (
-                  <Icon
-                    size={18}
-                    strokeWidth={isActive ? 2.5 : 2}
-                    className={
-                      isActive
-                        ? "text-primary"
-                        : "text-neutral-400 group-hover:text-neutral-600"
-                    }
-                  />
-                )}
+                <Icon
+                  size={18}
+                  strokeWidth={isActive ? 2.5 : 2}
+                  className={
+                    isActive
+                      ? "text-primary"
+                      : "text-neutral-400 group-hover:text-neutral-600"
+                  }
+                />
 
                 <Typography
                   variant={isActive ? TypographyVariant.BODY_SEMIBOLD : TypographyVariant.BODY}
                   className={`text-[13.5px] ${isActive ? "text-primary" : ""}`}
                 >
-                  {item.labelKey}
+                  {t(item.labelKey)}
                 </Typography>
               </Link>
             );
           })}
         </nav>
       </div>
-
 
       {/* User Section (Footer) */}
       <div className="px-3 py-6 mt-auto border-t border-neutral-100">
@@ -96,10 +96,10 @@ export default function DesktopSidebar() {
 
           <div className="flex flex-col min-w-0 flex-1">
             <Typography variant={TypographyVariant.CAPTION} className="font-bold text-neutral-800 truncate group-hover:text-primary-dark transition-colors">
-              {isLoading ? 'Cargando...' : businessName}
+              {isLoading ? t('menu.sidebar.footer.loading') : businessName}
             </Typography>
             <Typography variant={TypographyVariant.OVERLINE} className="truncate text-neutral-400">
-              {isLoading ? '...' : userRole}
+              {isLoading ? t('menu.sidebar.footer.loadingRole') : userRoleLabel}
             </Typography>
           </div>
 

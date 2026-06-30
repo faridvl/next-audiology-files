@@ -1,75 +1,83 @@
-import { INavigationPath } from '@/types/system/navigation-path';
+import { INavigationPath, NavigationMenuKey } from '@/types/system/navigation-path';
 import { routesPrivate } from '../navigation/routes';
 import { UserRole } from '@/types/auth/auth';
 import {
+  LayoutDashboard,
   CalendarDays,
   Users,
+  FileText,
   Package,
-  ShieldCheck,
+  ListChecks,
+  UserCog,
   LayoutTemplate,
-  ClipboardList,
-  Stethoscope,
 } from 'lucide-react';
 
-// Recepcionista = STAFF: ve Inicio, Agenda, Inventario. Sin acceso al expediente clínico.
-// Médico = DOCTOR: ve todo clínico. Sin Usuarios ni Reportes.
-// Admin/Owner = OWNER | ADMIN: acceso completo.
 const ADMIN_ROLES = [UserRole.OWNER, UserRole.ADMIN];
 const CLINICAL_ROLES = [UserRole.OWNER, UserRole.ADMIN, UserRole.DOCTOR];
 
-// Orden operativo: lo que el clínico necesita primero → al fondo la administración
+/**
+ * Orden operativo: flujo diario del clínico primero, administración al fondo.
+ * allowedRoles ausente = visible para todos los roles.
+ */
 export const NAVIGATION_PATHS: INavigationPath[] = [
   {
-    menuKey: 'appointments',
+    menuKey: NavigationMenuKey.DASHBOARD,
+    default: true,
+    icon: LayoutDashboard,
+    labelKey: 'menu.sidebar.nav.dashboard',
+    route: routesPrivate.dashboard,
+  },
+  {
+    menuKey: NavigationMenuKey.APPOINTMENTS,
     default: false,
     icon: CalendarDays,
-    labelKey: 'Agenda',
+    labelKey: 'menu.sidebar.nav.appointments',
     route: routesPrivate.appointments.index,
   },
   {
-    menuKey: 'patients',
-    default: true,
+    menuKey: NavigationMenuKey.PATIENTS,
+    default: false,
     icon: Users,
-    labelKey: 'Pacientes',
+    labelKey: 'menu.sidebar.nav.patients',
     route: routesPrivate.patients.index,
     allowedRoles: CLINICAL_ROLES,
   },
   {
-    menuKey: 'clinicalTemplates',
+    menuKey: NavigationMenuKey.CLINICAL_TEMPLATES,
     default: false,
-    icon: Stethoscope,
-    labelKey: 'Plantillas',
+    icon: FileText,
+    labelKey: 'menu.sidebar.nav.clinicalTemplates',
     route: routesPrivate.clinicalTemplates.index,
     allowedRoles: CLINICAL_ROLES,
   },
   {
-    menuKey: 'inventory',
+    menuKey: NavigationMenuKey.INVENTORY,
     default: false,
     icon: Package,
-    labelKey: 'Inventario',
+    labelKey: 'menu.sidebar.nav.inventory',
     route: routesPrivate.inventory.index,
   },
   {
-    menuKey: 'appointmentType',
+    menuKey: NavigationMenuKey.APPOINTMENT_TYPES,
     default: false,
-    icon: ClipboardList,
-    labelKey: 'Tipos de Cita',
+    icon: ListChecks,
+    labelKey: 'menu.sidebar.nav.appointmentTypes',
     route: routesPrivate.appointmentType.index,
     allowedRoles: ADMIN_ROLES,
   },
   {
-    menuKey: 'users',
+    menuKey: NavigationMenuKey.USERS,
     default: false,
-    icon: ShieldCheck,
-    labelKey: 'Usuarios',
+    icon: UserCog,
+    labelKey: 'menu.sidebar.nav.users',
     route: routesPrivate.users.index,
     allowedRoles: ADMIN_ROLES,
   },
   {
-    menuKey: 'report-template',
+    menuKey: NavigationMenuKey.REPORT_TEMPLATE,
     default: false,
     icon: LayoutTemplate,
-    labelKey: 'Reportes',
+    labelKey: 'menu.sidebar.nav.reportTemplate',
     route: routesPrivate.reportTemplate.create,
     allowedRoles: ADMIN_ROLES,
   },
