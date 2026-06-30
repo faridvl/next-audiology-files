@@ -59,12 +59,14 @@ export const useAppointmentDetail = (appointment: AppointmentUI, onStatusChange?
   };
 
   const handleWhatsAppRedirect = (): void => {
+    const phone = patientInfo?.phone || appointment.phone;
+    if (!phone || phone === 'N/A') {
+      toast.error('El paciente no tiene número de teléfono registrado');
+      return;
+    }
     const appointmentDate = appointment.date instanceof Date ? appointment.date : new Date();
     const message = `Hola ${appointment.patient}, confirmamos tu cita de ${appointment.type} para el ${format(appointmentDate, 'dd/MM/yyyy')}.`;
-
-    const phone = patientInfo?.phone || appointment.phone || '88165808';
     const cleanPhone = phone.replace(/\D/g, '');
-
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
   };
 

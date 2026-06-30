@@ -1,5 +1,12 @@
 import { CookiesManager } from '../utils/cookies-manager';
 
+const handleSessionExpired = () => {
+  CookiesManager.clearAll();
+  if (typeof window !== 'undefined') {
+    window.location.href = '/login?expired=true';
+  }
+};
+
 export const ApiServiceClient = (baseUrl: string) => {
   const fetcher = async (endpoint: string, options: RequestInit = {}) => {
     const token = CookiesManager.getAccessToken();
@@ -21,6 +28,11 @@ export const ApiServiceClient = (baseUrl: string) => {
       });
     } catch {
       throw new Error('No se pudo conectar con el servidor. Verifica tu conexión o intenta más tarde.');
+    }
+
+    if (response.status === 401) {
+      handleSessionExpired();
+      throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
     }
 
     if (response.status === 204) return null;
