@@ -7,6 +7,13 @@ import { AppointmentStatus } from '@/types/appointments/appointment';
 import { usePatientsQuery } from '@/shared/api/querys/patients-query';
 import { useAppointmentTypesQuery, AppointmentType } from '@/shared/api/querys/appointment-types-query';
 import { useSession } from '@/hooks/use-session';
+import { UserSpecialty } from '@/types/auth/auth';
+
+const userSpecialtyToMedicalSpeciality: Record<UserSpecialty, MedicalSpeciality> = {
+  [UserSpecialty.AUDIOLOGY]: MedicalSpeciality.AUDIOLOGY,
+  [UserSpecialty.DENTAL]: MedicalSpeciality.DENTAL,
+  [UserSpecialty.GENERAL]: MedicalSpeciality.GENERAL,
+};
 
 export const useCreateAppointment = () => {
   const navigation = useNavigation();
@@ -30,7 +37,9 @@ export const useCreateAppointment = () => {
   const { data: patientsData, isLoading: isLoadingPatients } = usePatientsQuery(1, 100, debouncedPatientSearch);
   const { data: appointmentTypes, isLoading: isLoadingTypes } = useAppointmentTypesQuery();
 
-  const userSpeciality = (user?.specialty as MedicalSpeciality) ?? MedicalSpeciality.GENERAL;
+  const userSpeciality = user?.specialty
+    ? userSpecialtyToMedicalSpeciality[user.specialty]
+    : MedicalSpeciality.GENERAL;
 
   const [formData, setFormData] = useState({
     patientUuid: '',
@@ -43,7 +52,7 @@ export const useCreateAppointment = () => {
 
   useEffect(() => {
     if (user?.specialty) {
-      setFormData((prev) => ({ ...prev, speciality: user.specialty as MedicalSpeciality }));
+      setFormData((prev) => ({ ...prev, speciality: userSpecialtyToMedicalSpeciality[user.specialty!] ?? MedicalSpeciality.GENERAL }));
     }
   }, [user?.specialty]);
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     X, StickyNote, MessageSquare, CalendarCheck, ExternalLink,
-    Mail, Fingerprint, Loader2, Apple, PhoneOff, CheckCircle2, Phone
+    Mail, Fingerprint, Loader2, Apple, PhoneOff, CheckCircle2, Phone, Trash2
 } from 'lucide-react';
 import { Typography, TypographyVariant } from "@/components/common/typography/typography";
 import { Button, ButtonVariant } from "@/components/common/button/button";
@@ -26,9 +26,11 @@ export const AppointmentDetailPanel: React.FC<Props> = ({ appointment, onClose, 
         handleAppleCalendarDownload,
         handleQuickConfirm,
         handleQuickNoAnswer,
+        handleDelete,
         patientInfo,
         isLoading,
         isActionPending,
+        isDeleting,
         localStatus,
     } = useAppointmentDetail(appointment, onStatusChange);
     const navigation = useNavigation();
@@ -234,6 +236,21 @@ export const AppointmentDetailPanel: React.FC<Props> = ({ appointment, onClose, 
                     >
                         <ExternalLink size={13} /> Gestionar Cita
                     </Button>
+                    {!isConfirmed && (
+                        <Button
+                            variant={ButtonVariant.CANCEL}
+                            className="w-full py-2.5 rounded-app-sm border-none bg-danger/5 text-danger hover:bg-danger/10 transition-all font-bold uppercase text-[10px] tracking-wider gap-2"
+                            disabled={isDeleting}
+                            onClick={() => {
+                                if (window.confirm('¿Eliminar esta cita? Esta acción no se puede deshacer.')) {
+                                    handleDelete(onClose);
+                                }
+                            }}
+                        >
+                            {isDeleting ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                            Eliminar Cita
+                        </Button>
+                    )}
                 </div>
             </div>
         </div>

@@ -151,6 +151,13 @@ export const TEXT = {
         FOLLOW_UP_LOG: 'appointments.manage.form.followUpLog',
         FOLLOW_UP_LOG_PLACEHOLDER: 'appointments.manage.form.followUpLogPlaceholder',
       },
+      LOCKED_CONFIRMED: 'appointments.manage.lockedConfirmed',
+      DELETE: {
+        BUTTON: 'appointments.manage.delete.button',
+        CONFIRM: 'appointments.manage.delete.confirm',
+        SUCCESS: 'appointments.manage.delete.success',
+        ERROR: 'appointments.manage.delete.error',
+      },
     },
   },
   PATIENTS: {

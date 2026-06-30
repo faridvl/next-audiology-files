@@ -23,7 +23,13 @@ import { Button, ButtonVariant } from "@/components/common/button/button";
 import { MedicalSpeciality } from "@/types/medical-controls/medical-control.types";
 import { ClinicalControl, ControlType } from "@/types/otros/clinical";
 import { useSession } from "@/hooks/use-session";
-import { UserRole } from "@/types/auth/auth";
+import { UserRole, UserSpecialty } from "@/types/auth/auth";
+
+const userSpecialtyToMedicalSpeciality: Record<UserSpecialty, MedicalSpeciality> = {
+  [UserSpecialty.AUDIOLOGY]: MedicalSpeciality.AUDIOLOGY,
+  [UserSpecialty.DENTAL]: MedicalSpeciality.DENTAL,
+  [UserSpecialty.GENERAL]: MedicalSpeciality.GENERAL,
+};
 import { LinkDeviceModal } from "./link-device-modal";
 import { AudiogramChart, classifyHearingLoss } from "@/components/common/audiogram-chart/audiogram-chart";
 import { useState } from "react";
@@ -386,7 +392,7 @@ function AppointmentModal({ patientUuid, existingAppointment, onClose, onSaved }
         {
           patientUUID: patientUuid,
           typeUUID: form.typeId,
-          speciality: (user?.specialty ?? 'GENERAL') as string,
+          speciality: user?.specialty ? userSpecialtyToMedicalSpeciality[user.specialty] : MedicalSpeciality.GENERAL,
           status: AppointmentStatus.PENDING,
           date: new Date(`${form.date}T00:00:00.000Z`).toISOString(),
           startTime: startDateTime.toISOString(),

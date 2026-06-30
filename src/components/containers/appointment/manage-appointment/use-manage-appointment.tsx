@@ -6,6 +6,7 @@ import { AppointmentStatus } from '@/types/appointments/appointment';
 import { CallAttemptEntry } from '@/types/appointments/call-attempt.types';
 import { useAppointmentQuery } from '@/shared/api/querys/get-appointment-query';
 import { useUpdateAppointmentMutation } from '@/shared/api/mutations/appointments/update-appointment-mutation';
+import { useDeleteAppointmentMutation } from '@/shared/api/mutations/appointments/delete-appointment-mutation';
 import { useQueryClient } from '@tanstack/react-query';
 import { FETCH_APPOINTMENTS_KEY } from '@/shared/api/querys/appointments-query';
 import { FETCH_APPOINTMENT_KEY } from '@/shared/api/querys/get-appointment-query';
@@ -55,6 +56,9 @@ export const useManageAppointment = (appointmentId: string) => {
 
     const { data: appointment, isLoading } = useAppointmentQuery(appointmentId);
     const { executeUpdateAppointment, isPending, error } = useUpdateAppointmentMutation();
+    const { executeDeleteAppointment, isPending: isDeleting } = useDeleteAppointmentMutation();
+
+    const isConfirmed = appointment?.status === AppointmentStatus.CONFIRMED;
 
     const [formData, setFormData] = useState({
         date: '',
@@ -90,6 +94,10 @@ export const useManageAppointment = (appointmentId: string) => {
     };
 
     const handleNoAnswer = () => {
+        if (isConfirmed) {
+            toast.error('La cita ya está confirmada y no puede ser editada');
+            return;
+        }
         if (!formData.date) {
             toast.error('La cita no tiene fecha válida para reprogramar');
             return;
@@ -132,15 +140,28 @@ export const useManageAppointment = (appointmentId: string) => {
         );
     };
 
+    const handleDelete = () => {
+        executeDeleteAppointment(appointmentId, {
+            onSuccess: () => {
+                toast.success('Cita eliminada correctamente');
+                navigation.appointments.list();
+            },
+            onError: () => toast.error('No se pudo eliminar la cita'),
+        });
+    };
+
     return {
         formData,
         setFormData,
         isLoading,
         isPending,
+        isDeleting,
+        isConfirmed,
         appointment,
         callAttempts,
         handleNoAnswer,
         handleConfirm,
+        handleDelete,
         navigation
     };
 };

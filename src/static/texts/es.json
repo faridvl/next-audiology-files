@@ -201,6 +201,13 @@
         "adjustTime": "Ajustar Hora",
         "followUpLog": "Bitácora de Seguimiento",
         "followUpLogPlaceholder": "Ej: Se llamó 3 veces, el paciente indica que confirmará en la tarde..."
+      },
+      "lockedConfirmed": "Esta cita ya está confirmada y no puede ser editada ni eliminada.",
+      "delete": {
+        "button": "Eliminar Cita",
+        "confirm": "¿Eliminar esta cita? Esta acción no se puede deshacer.",
+        "success": "Cita eliminada correctamente",
+        "error": "No se pudo eliminar la cita"
       }
     }
   },

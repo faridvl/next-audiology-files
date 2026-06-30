@@ -6,10 +6,12 @@ import { HistoryNote } from '@/types/appointments/history-note.types';
 import { AppointmentStatus } from '@/types/appointments/appointment';
 import { useAppointmentByPatientQuery } from '@/shared/api/querys/get-appoinment-by-patient-query';
 import { useUpdateAppointmentMutation } from '@/shared/api/mutations/appointments/update-appointment-mutation';
+import { useDeleteAppointmentMutation } from '@/shared/api/mutations/appointments/delete-appointment-mutation';
 
 export const useAppointmentDetail = (appointment: AppointmentUI, onStatusChange?: () => void) => {
   const { data, isLoading } = useAppointmentByPatientQuery(appointment.patientUUID);
   const { executeUpdateAppointment, isPending: isActionPending } = useUpdateAppointmentMutation();
+  const { executeDeleteAppointment, isPending: isDeleting } = useDeleteAppointmentMutation();
   const [localStatus, setLocalStatus] = useState<AppointmentStatus>(appointment.status);
 
   const patientInfo = data?.patient || null;
@@ -119,14 +121,26 @@ export const useAppointmentDetail = (appointment: AppointmentUI, onStatusChange?
     URL.revokeObjectURL(url);
   };
 
+  const handleDelete = (onSuccess: () => void): void => {
+    executeDeleteAppointment(appointment.id, {
+      onSuccess: () => {
+        toast.success('Cita eliminada correctamente');
+        onSuccess();
+      },
+      onError: () => toast.error('No se pudo eliminar la cita'),
+    });
+  };
+
   return {
     isLoading,
     isActionPending,
+    isDeleting,
     localStatus,
     patientInfo,
     historyNotes,
     handleQuickConfirm,
     handleQuickNoAnswer,
+    handleDelete,
     handleWhatsAppRedirect,
     handleGoogleCalendar,
     handleAppleCalendarDownload,
