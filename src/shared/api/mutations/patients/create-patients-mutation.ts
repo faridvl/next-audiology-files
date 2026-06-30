@@ -22,7 +22,7 @@ export function useCreatePatientMutation() {
     executeCreatePatient,
     isPending,
     isSuccess,
-    error: !!error,
+    error,
     reset,
   };
 }

@@ -185,6 +185,7 @@
       "searchPlaceholder": "Buscar por nombre...",
       "columns": {
         "patient": "Paciente",
+        "documentId": "Cédula / ID",
         "phone": "Teléfono",
         "registeredAt": "Fecha Registro"
       },

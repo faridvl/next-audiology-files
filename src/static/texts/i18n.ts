@@ -136,6 +136,7 @@ export const TEXT = {
       SEARCH_PLACEHOLDER: 'patients.list.searchPlaceholder',
       COLUMNS: {
         PATIENT: 'patients.list.columns.patient',
+        DOCUMENT_ID: 'patients.list.columns.documentId',
         PHONE: 'patients.list.columns.phone',
         REGISTERED_AT: 'patients.list.columns.registeredAt',
       },
