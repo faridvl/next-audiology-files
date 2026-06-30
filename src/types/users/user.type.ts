@@ -4,6 +4,7 @@ export interface User {
   fullName: string;
   role: string;
   specialty?: string;
+  phoneNumber?: string;
   status: 'ACTIVE' | 'INACTIVE';
   createdAt: string;
 }

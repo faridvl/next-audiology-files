@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    Search, Info, UserPlus, Mail, CheckCircle2,
+    Search, UserPlus, Mail, Phone, CheckCircle2,
     XCircle, Edit, Trash2
 } from 'lucide-react';
 
@@ -16,39 +16,6 @@ import { useUsersContainer, ROLES_FILTER } from './use-user-list';
 import { User } from '@/types/users/user.type';
 import { TEXT } from '@/static/texts/i18n';
 
-interface InfoTooltipProps {
-    title: string;
-    description: string;
-}
-
-/**
- * Componente local para mostrar información de seguridad al hacer hover
- */
-export function InfoTooltip({ title, description }: InfoTooltipProps) {
-    const [show, setShow] = useState(false);
-
-    return (
-        <div className="relative inline-block">
-            <button
-                onMouseEnter={() => setShow(true)}
-                onMouseLeave={() => setShow(false)}
-                className="p-1.5 text-primary bg-primary-soft rounded-full hover:bg-primary-soft/70 transition-colors"
-            >
-                <Info size={16} />
-            </button>
-            {show && (
-                <div className="absolute left-8 top-0 w-64 p-3 bg-neutral-900 text-white text-[10px] rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in duration-200 border border-neutral-700">
-                    <Typography variant={TypographyVariant.OVERLINE} className="font-bold mb-1 border-b border-neutral-700 pb-1 text-primary-light block">
-                        {title}
-                    </Typography>
-                    <Typography variant={TypographyVariant.CAPTION} className="text-neutral-300 leading-relaxed">
-                        {description}
-                    </Typography>
-                </div>
-            )}
-        </div>
-    );
-}
 
 export function UsersContainer() {
     const { t } = useTranslation();
@@ -87,6 +54,14 @@ export function UsersContainer() {
                             <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400">{user.email}</Typography>
                         </div>
                     </div>
+                </div>
+            ),
+            phoneDisplay: (
+                <div className="flex items-center gap-1.5">
+                    <Phone size={13} className="text-neutral-400 shrink-0" />
+                    <Typography variant={TypographyVariant.CAPTION} className="text-neutral-600">
+                        {user.phoneNumber || '—'}
+                    </Typography>
                 </div>
             ),
             roleDisplay: (
@@ -132,15 +107,9 @@ export function UsersContainer() {
         <div className="max-w-[1400px] mx-auto px-4 md:px-6 pb-20">
             {/* Header */}
             <div className="flex justify-between items-center mb-6 md:mb-8">
-                <div className="flex items-center gap-3">
-                    <Typography variant={TypographyVariant.SUBTITLE}>
-                        {t(TEXT.USERS.CREATE.LAYOUT_TITLE)}
-                    </Typography>
-                    <InfoTooltip
-                        title="Seguridad de Acceso"
-                        description={t(TEXT.USERS.CREATE.DESCRIPTION)}
-                    />
-                </div>
+                <Typography variant={TypographyVariant.SUBTITLE}>
+                    {t(TEXT.USERS.LIST.TITLE)}
+                </Typography>
 
                 <Button variant={ButtonVariant.PRIMARY} onClick={() => navigation.users.create()}>
                     <UserPlus size={18} className="mr-0 md:mr-2" />
@@ -154,10 +123,10 @@ export function UsersContainer() {
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={16} />
                     <input
                         type="text"
-                        placeholder={t(TEXT.USERS.CREATE.FORM.FULL_NAME_PLACEHOLDER)}
+                        placeholder={t(TEXT.USERS.LIST.SEARCH_PLACEHOLDER)}
                         className="w-full pl-10 pr-4 py-2 bg-neutral-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-soft transition-all"
                         value={searchTerm}
-                        onChange={(e) => handleSearch(e.target.value)}
+                        onChange={(event) => handleSearch(event.target.value)}
                     />
                 </div>
 

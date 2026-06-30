@@ -4,12 +4,49 @@ import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
-import { ChevronLeft, Save, User, Mail, ShieldCheck, Briefcase, Loader2 } from 'lucide-react';
+import {
+    ChevronLeft, Save, User, Mail, ShieldCheck,
+    Stethoscope, Phone, Loader2
+} from 'lucide-react';
 import { useNavigation } from '@/hooks/use-navigation';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { useGetUserQuery } from '@/shared/api/querys/get-user-query';
 import { useUpdateUserMutation } from '@/shared/api/mutations/users/update-user-mutation';
+import { UserSpecialty } from '@/types/auth/auth';
 import { toast } from 'sonner';
+
+const SPECIALTY_OPTIONS: { value: UserSpecialty; label: string }[] = [
+    { value: UserSpecialty.AUDIOLOGY, label: 'Audiología' },
+    { value: UserSpecialty.DENTAL, label: 'Odontología' },
+    { value: UserSpecialty.GENERAL, label: 'Medicina General' },
+];
+
+interface FieldRowProps {
+    label: string;
+    icon: React.ReactNode;
+    children: React.ReactNode;
+    readOnly?: boolean;
+}
+
+function FieldRow({ label, icon, children, readOnly }: FieldRowProps) {
+    return (
+        <div className="flex flex-col gap-1.5">
+            <Typography variant={TypographyVariant.OVERLINE} className="ml-1 text-neutral-500">
+                {label}
+            </Typography>
+            <div className={`relative flex items-center rounded-2xl border transition-all ${readOnly
+                    ? 'bg-neutral-50 border-neutral-100'
+                    : 'bg-white border-neutral-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10'
+                }`}>
+                <span className="absolute left-4 text-neutral-400">{icon}</span>
+                {children}
+            </div>
+        </div>
+    );
+}
+
+const inputClass = "w-full pl-12 pr-4 py-3 bg-transparent border-none rounded-2xl text-sm outline-none text-neutral-700";
+const readOnlyClass = "w-full pl-12 pr-4 py-3 bg-transparent border-none rounded-2xl text-sm outline-none text-neutral-400 cursor-not-allowed";
 
 const EditUserPage = () => {
     const router = useRouter();
@@ -24,7 +61,7 @@ const EditUserPage = () => {
         fullName: '',
         email: '',
         role: '',
-        specialty: '',
+        specialty: '' as UserSpecialty | '',
         phoneNumber: '',
     });
 
@@ -34,7 +71,7 @@ const EditUserPage = () => {
                 fullName: userDetail.fullName ?? '',
                 email: userDetail.email ?? '',
                 role: userDetail.role ?? '',
-                specialty: userDetail.specialty ?? '',
+                specialty: (userDetail.specialty as UserSpecialty) ?? '',
                 phoneNumber: userDetail.phoneNumber ?? '',
             });
         }
@@ -59,103 +96,134 @@ const EditUserPage = () => {
             uuid: userUuid,
             fullName: formData.fullName,
             phoneNumber: formData.phoneNumber,
-            specialty: formData.specialty,
+            specialty: formData.specialty || undefined,
         });
     };
 
     if (isLoading) {
         return (
-            <div className="h-screen flex items-center justify-center">
-                <Loader2 className="animate-spin text-blue-600" size={40} />
-            </div>
+            <DashboardLayout contentStyle={BoxedLayoutStyle.FULL} title="Editar Usuario">
+                <div className="h-screen flex items-center justify-center">
+                    <Loader2 className="animate-spin text-primary" size={40} />
+                </div>
+            </DashboardLayout>
         );
     }
 
     return (
         <DashboardLayout contentStyle={BoxedLayoutStyle.FULL} title="Editar Usuario">
-            <div className="max-w-3xl mx-auto px-6">
+            <div className="max-w-3xl mx-auto px-6 pb-20">
 
                 <button
                     onClick={() => navigation.common.back()}
-                    className="flex items-center gap-2 text-slate-400 hover:text-slate-600 transition-colors mb-6 font-bold text-sm group"
+                    className="flex items-center gap-2 text-neutral-400 hover:text-neutral-600 transition-colors mb-8 font-bold text-sm group"
                 >
                     <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
                     Volver
                 </button>
 
-                <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/20 overflow-hidden">
-                    <div className="p-8 border-b border-slate-50 bg-slate-50/30 flex justify-between items-center">
-                        <div>
-                            <Typography variant={TypographyVariant.SUBTITLE}>Modificar Acceso</Typography>
-                            <p className="text-sm text-slate-400">Editando el perfil del ID: <span className="font-mono text-blue-600">#{userUuid}</span></p>
+                {/* Card principal */}
+                <div className="bg-white rounded-[2.5rem] border border-neutral-100 shadow-xl shadow-neutral-200/20 overflow-hidden">
+
+                    {/* Header de la card */}
+                    <div className="px-8 pt-8 pb-6 border-b border-neutral-50 flex items-center gap-5">
+                        <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-white text-2xl font-black flex items-center justify-center shadow-lg shadow-primary/20">
+                            {formData.fullName.charAt(0) || 'U'}
                         </div>
-                        <div className="h-12 w-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black">
-                            {formData.fullName.charAt(0)}
+                        <div className="min-w-0">
+                            <Typography variant={TypographyVariant.SUBTITLE} className="truncate">
+                                {formData.fullName || 'Nuevo Usuario'}
+                            </Typography>
+                            <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400 font-mono">
+                                {userUuid}
+                            </Typography>
                         </div>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Nombre */}
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Nombre Completo</label>
-                                <div className="relative">
-                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                    <form onSubmit={handleSubmit} className="p-8 space-y-8">
+
+                        {/* Sección: Datos personales */}
+                        <div>
+                            <Typography variant={TypographyVariant.OVERLINE} className="text-neutral-400 uppercase tracking-widest mb-4 block">
+                                Datos Personales
+                            </Typography>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <FieldRow label="Nombre Completo" icon={<User size={18} />}>
                                     <input
                                         type="text"
                                         value={formData.fullName}
                                         onChange={(event) => setFormData({ ...formData, fullName: event.target.value })}
-                                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                                        className={inputClass}
+                                        placeholder="Nombre del usuario"
                                     />
-                                </div>
-                            </div>
+                                </FieldRow>
 
-                            {/* Correo (solo lectura — email no es editable por PATCH /users) */}
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Correo Electrónico</label>
-                                <div className="relative">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                                <FieldRow label="Teléfono" icon={<Phone size={18} />}>
+                                    <input
+                                        type="tel"
+                                        value={formData.phoneNumber}
+                                        onChange={(event) => setFormData({ ...formData, phoneNumber: event.target.value })}
+                                        className={inputClass}
+                                        placeholder="+506 8888-0000"
+                                    />
+                                </FieldRow>
+                            </div>
+                        </div>
+
+                        {/* Sección: Acceso (solo lectura) */}
+                        <div>
+                            <Typography variant={TypographyVariant.OVERLINE} className="text-neutral-400 uppercase tracking-widest mb-4 block">
+                                Acceso al Sistema
+                            </Typography>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <FieldRow label="Correo Electrónico" icon={<Mail size={18} />} readOnly>
                                     <input
                                         type="email"
                                         value={formData.email}
                                         readOnly
                                         disabled
-                                        className="w-full pl-12 pr-4 py-3 bg-slate-100 border-none rounded-2xl text-sm text-slate-400 outline-none cursor-not-allowed"
+                                        className={readOnlyClass}
                                     />
-                                </div>
-                            </div>
+                                </FieldRow>
 
-                            {/* Rol (solo lectura) */}
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Rol</label>
-                                <div className="relative">
-                                    <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                                <FieldRow label="Rol" icon={<ShieldCheck size={18} />} readOnly>
                                     <input
                                         type="text"
                                         value={formData.role}
                                         readOnly
                                         disabled
-                                        className="w-full pl-12 pr-4 py-3 bg-slate-100 border-none rounded-2xl text-sm text-slate-400 outline-none cursor-not-allowed"
+                                        className={readOnlyClass}
                                     />
-                                </div>
+                                </FieldRow>
                             </div>
-
-                            {/* Especialidad */}
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Especialidad</label>
-                                <div className="relative">
-                                    <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                                    <input
-                                        type="text"
-                                        value={formData.specialty}
-                                        onChange={(event) => setFormData({ ...formData, specialty: event.target.value })}
-                                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-100 outline-none transition-all"
-                                    />
-                                </div>
-                            </div>
+                            <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400 mt-2 ml-1 block">
+                                El correo y el rol solo pueden modificarse por un administrador de cuenta.
+                            </Typography>
                         </div>
 
-                        <div className="pt-6 flex justify-end gap-3 border-t border-slate-50">
+                        {/* Sección: Profesional */}
+                        <div>
+                            <Typography variant={TypographyVariant.OVERLINE} className="text-neutral-400 uppercase tracking-widest mb-4 block">
+                                Perfil Profesional
+                            </Typography>
+                            <FieldRow label="Especialidad" icon={<Stethoscope size={18} />}>
+                                <select
+                                    value={formData.specialty}
+                                    onChange={(event) => setFormData({ ...formData, specialty: event.target.value as UserSpecialty | '' })}
+                                    className={`${inputClass} appearance-none`}
+                                >
+                                    <option value="">Sin especialidad asignada</option>
+                                    {SPECIALTY_OPTIONS.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </FieldRow>
+                        </div>
+
+                        {/* Acciones */}
+                        <div className="pt-6 flex justify-end gap-3 border-t border-neutral-50">
                             <Button
                                 variant={ButtonVariant.CANCEL}
                                 onClick={() => navigation.common.back()}
@@ -167,7 +235,7 @@ const EditUserPage = () => {
                             <Button
                                 variant={ButtonVariant.PRIMARY}
                                 type="submit"
-                                className="shadow-lg shadow-blue-100"
+                                className="shadow-lg shadow-primary/20"
                                 disabled={isPending}
                             >
                                 {isPending ? (

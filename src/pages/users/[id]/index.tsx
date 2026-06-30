@@ -23,7 +23,7 @@ const UserDetailPage = () => {
 
     if (isLoading) {
         return (
-            <DashboardLayout contentStyle={BoxedLayoutStyle.FULL} title="Expediente de Personal">
+            <DashboardLayout contentStyle={BoxedLayoutStyle.FULL} title="Detalle de Usuario">
                 <div className="h-screen flex items-center justify-center">
                     <Loader2 className="animate-spin text-blue-600" size={40} />
                 </div>
@@ -33,7 +33,7 @@ const UserDetailPage = () => {
 
     if (!userDetail) {
         return (
-            <DashboardLayout contentStyle={BoxedLayoutStyle.FULL} title="Expediente de Personal">
+            <DashboardLayout contentStyle={BoxedLayoutStyle.FULL} title="Detalle de Usuario">
                 <div className="max-w-[1200px] mx-auto px-6 py-20 text-center">
                     <Typography variant={TypographyVariant.HELPER} className="text-slate-400">
                         No se encontró información del usuario.
@@ -44,7 +44,7 @@ const UserDetailPage = () => {
     }
 
     return (
-        <DashboardLayout contentStyle={BoxedLayoutStyle.FULL} title="Expediente de Personal">
+        <DashboardLayout contentStyle={BoxedLayoutStyle.FULL} title="Detalle de Usuario">
             <div className="max-w-[1200px] mx-auto px-6 pb-20">
 
                 {/* Navegación Superior */}

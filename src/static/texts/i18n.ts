@@ -27,6 +27,30 @@ export const TEXT = {
     },
   },
   USERS: {
+    DETAIL: {
+      TITLE: 'users.detail.title',
+      BACK_TO_LIST: 'users.detail.backToList',
+      EDIT_BUTTON: 'users.detail.editButton',
+    },
+    EDIT: {
+      TITLE: 'users.edit.title',
+      BACK_BUTTON: 'users.edit.backButton',
+      SECTION_PERSONAL: 'users.edit.sectionPersonal',
+      SECTION_ACCESS: 'users.edit.sectionAccess',
+      SECTION_PROFESSIONAL: 'users.edit.sectionProfessional',
+      READ_ONLY_NOTE: 'users.edit.readOnlyNote',
+      DISCARD_BUTTON: 'users.edit.discardButton',
+      SAVE_BUTTON: 'users.edit.saveButton',
+      SUCCESS_MESSAGE: 'users.edit.successMessage',
+      ERROR_MESSAGE: 'users.edit.errorMessage',
+      SPECIALTY: {
+        LABEL: 'users.edit.specialty.label',
+        NONE: 'users.edit.specialty.none',
+        AUDIOLOGY: 'users.edit.specialty.AUDIOLOGY',
+        DENTAL: 'users.edit.specialty.DENTAL',
+        GENERAL: 'users.edit.specialty.GENERAL',
+      },
+    },
     LIST: {
       TITLE: 'users.list.title',
       SEARCH_PLACEHOLDER: 'users.list.search_placeholder',

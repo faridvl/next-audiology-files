@@ -75,6 +75,30 @@
     }
   },
   "users": {
+    "detail": {
+      "title": "Detalle de Usuario",
+      "backToList": "Regresar al listado",
+      "editButton": "Editar Información"
+    },
+    "edit": {
+      "title": "Editar Usuario",
+      "backButton": "Volver",
+      "sectionPersonal": "Datos Personales",
+      "sectionAccess": "Acceso al Sistema",
+      "sectionProfessional": "Perfil Profesional",
+      "readOnlyNote": "El correo y el rol solo pueden modificarse por un administrador de cuenta.",
+      "discardButton": "Descartar Cambios",
+      "saveButton": "Guardar Cambios",
+      "successMessage": "Usuario actualizado correctamente",
+      "errorMessage": "Error al actualizar el usuario",
+      "specialty": {
+        "label": "Especialidad",
+        "none": "Sin especialidad asignada",
+        "AUDIOLOGY": "Audiología",
+        "DENTAL": "Odontología",
+        "GENERAL": "Medicina General"
+      }
+    },
     "list": {
       "title": "Gestión de Usuarios",
       "search_placeholder": "Buscar por nombre o correo...",

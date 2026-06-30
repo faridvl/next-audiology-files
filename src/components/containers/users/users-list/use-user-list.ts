@@ -19,7 +19,8 @@ export function useUsersContainer() {
 
   const columns = useMemo(
     () => [
-      { header: 'Usuario', accessor: 'userDisplay', width: '40%' },
+      { header: 'Usuario', accessor: 'userDisplay', width: '35%' },
+      { header: 'Teléfono', accessor: 'phoneDisplay' },
       { header: 'Rol / Especialidad', accessor: 'roleDisplay' },
       { header: 'Estado', accessor: 'statusDisplay' },
     ],
