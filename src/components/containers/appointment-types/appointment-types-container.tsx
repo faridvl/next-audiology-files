@@ -2,16 +2,19 @@ import React, { useState } from 'react';
 import {
   Plus,
   Search,
-  MoreVertical,
+  Trash2,
   Clock,
   LayoutGrid,
   CheckCircle2,
   Stethoscope,
 } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { useNavigation } from '@/hooks/use-navigation';
-import { useAppointmentTypesQuery, AppointmentType } from '@/shared/api/querys/appointment-types-query';
+import { useAppointmentTypesQuery, AppointmentType, FETCH_APPOINTMENT_TYPES_KEY } from '@/shared/api/querys/appointment-types-query';
+import { useDeleteAppointmentTypeMutation } from '@/shared/api/mutations/appointment-types/delete-appointment-type-mutation';
 
 const COLOR_CLASSES: Record<string, string> = {
   blue: 'bg-primary-soft text-primary',
@@ -27,12 +30,26 @@ const DEFAULT_COLOR = 'bg-neutral-50 text-neutral-600';
 
 export const AppointmentTypesContainer: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [confirmDeleteUuid, setConfirmDeleteUuid] = useState<string | null>(null);
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
   const { data: appointmentTypes, isLoading } = useAppointmentTypesQuery();
+  const { executeDeleteAppointmentType, isPending: isDeleting } = useDeleteAppointmentTypeMutation();
 
   const filtered = (appointmentTypes ?? []).filter((type: AppointmentType) =>
     type.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+
+  const handleDelete = (uuid: string) => {
+    executeDeleteAppointmentType(uuid, {
+      onSuccess: () => {
+        toast.success('Tipo de cita eliminado correctamente.');
+        setConfirmDeleteUuid(null);
+        queryClient.invalidateQueries({ queryKey: [FETCH_APPOINTMENT_TYPES_KEY] });
+      },
+      onError: () => toast.error('Error al eliminar el tipo de cita.'),
+    });
+  };
 
   return (
     <div className="flex flex-col h-full gap-5 p-6 bg-[#F8FAFC]">
@@ -92,8 +109,24 @@ export const AppointmentTypesContainer: React.FC = () => {
                     <span className="flex items-center gap-0.5 bg-success/10 text-success-dark px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border border-success/20">
                       <CheckCircle2 size={9} /> Activo
                     </span>
-                    <button className="p-1.5 text-neutral-300 hover:bg-neutral-50 hover:text-neutral-600 rounded-lg transition-all">
-                      <MoreVertical size={18} />
+                    <button
+                      type="button"
+                      disabled={isDeleting && confirmDeleteUuid === type.uuid}
+                      onClick={() => {
+                        if (confirmDeleteUuid === type.uuid) {
+                          handleDelete(type.uuid);
+                        } else {
+                          setConfirmDeleteUuid(type.uuid);
+                        }
+                      }}
+                      className={`p-1.5 rounded-lg transition-all ${
+                        confirmDeleteUuid === type.uuid
+                          ? 'bg-danger/10 text-danger hover:bg-danger/20'
+                          : 'text-neutral-300 hover:bg-neutral-50 hover:text-danger'
+                      }`}
+                      title={confirmDeleteUuid === type.uuid ? 'Confirmar eliminación' : 'Eliminar'}
+                    >
+                      <Trash2 size={18} />
                     </button>
                   </div>
                 </div>
