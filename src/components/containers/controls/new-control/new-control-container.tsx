@@ -289,7 +289,7 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                                         <input type="checkbox" id={`field-${field.id}`} checked={Boolean(currentValue)}
                                                             onChange={(event) => setters.setDynamicFieldValue(field.id, event.target.checked)}
                                                             className="w-4 h-4 rounded border-neutral-300" />
-                                                        <Typography variant={TypographyVariant.BODY} as="label" htmlFor={`field-${field.id}`}>{field.label}</Typography>
+                                                        <label htmlFor={`field-${field.id}`} className="text-sm font-medium text-neutral-700">{field.label}</label>
                                                     </div>
                                                 )}
                                                 {field.fieldType === 'select' && field.options && (
