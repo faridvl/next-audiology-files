@@ -36,6 +36,9 @@ export function useConsultaControl(patientUuid: string) {
 
   const [otoscopyRight, setOtoscopyRight] = useState('');
   const [otoscopyLeft, setOtoscopyLeft] = useState('');
+  const [cleaningPerformed, setCleaningPerformed] = useState(false);
+  const [usesAuxiliaries, setUsesAuxiliaries] = useState(false);
+  const [tinnitus, setTinnitus] = useState(false);
   const [diagnosis, setDiagnosis] = useState('');
   const [fieldValues, setFieldValues] = useState<Record<string, string | boolean | number>>({});
 
@@ -67,6 +70,9 @@ export function useConsultaControl(patientUuid: string) {
     if (apiSpeciality === MedicalSpeciality.AUDIOLOGY) {
       findings.otoscopyRight = otoscopyRight;
       findings.otoscopyLeft = otoscopyLeft;
+      findings.cleaningPerformed = cleaningPerformed;
+      findings.usesAuxiliaries = usesAuxiliaries;
+      findings.tinnitus = tinnitus;
     }
 
     if (activeTemplate) {
@@ -99,7 +105,15 @@ export function useConsultaControl(patientUuid: string) {
     activeTemplate,
     selectedTemplateUuid,
     setSelectedTemplateUuid,
-    fields: { otoscopyRight, setOtoscopyRight, otoscopyLeft, setOtoscopyLeft, diagnosis, setDiagnosis, fieldValues, setFieldValue },
+    fields: {
+      otoscopyRight, setOtoscopyRight,
+      otoscopyLeft, setOtoscopyLeft,
+      cleaningPerformed, setCleaningPerformed,
+      usesAuxiliaries, setUsesAuxiliaries,
+      tinnitus, setTinnitus,
+      diagnosis, setDiagnosis,
+      fieldValues, setFieldValue,
+    },
     isPending,
     handleSave,
   };

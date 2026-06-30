@@ -86,6 +86,33 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
                 />
               </div>
             </div>
+
+            {/* Checkboxes audiología */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+              {(
+                [
+                  { key: 'cleaningPerformed', value: fields.cleaningPerformed, setter: fields.setCleaningPerformed, label: t(TEXT.CONSULTA.CONTROL.CLEANING_PERFORMED) },
+                  { key: 'usesAuxiliaries', value: fields.usesAuxiliaries, setter: fields.setUsesAuxiliaries, label: t(TEXT.CONSULTA.CONTROL.USES_AUXILIARIES) },
+                  { key: 'tinnitus', value: fields.tinnitus, setter: fields.setTinnitus, label: t(TEXT.CONSULTA.CONTROL.TINNITUS) },
+                ] as const
+              ).map(({ key, value, setter, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setter(!value)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-app-sm border text-sm font-semibold transition-all ${
+                    value
+                      ? 'bg-success/10 border-success/40 text-success-dark'
+                      : 'bg-neutral-50 border-neutral-200 text-neutral-400 hover:border-neutral-300'
+                  }`}
+                >
+                  <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${value ? 'bg-success border-success' : 'border-neutral-300'}`}>
+                    {value && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  </div>
+                  {label}
+                </button>
+              ))}
+            </div>
           </section>
         )}
 
