@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,15 @@ import { useSidebar } from './use-sidebar';
 export default function DesktopSidebar() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { userRoleLabel, businessName, initials, avatarUrl, tenantLogoUrl, isLoading, filteredNavigation } = useSidebar();
+  const { userRoleLabel, businessName, tenantLogoUrl, isLoading, filteredNavigation } = useSidebar();
+  const [zynkaLogoError, setZynkaLogoError] = useState(false);
+
+  const tenantInitials = useMemo(() => {
+    if (!businessName || businessName === 'Zynka') return '??';
+    const words = businessName.trim().split(/\s+/);
+    if (words.length >= 2) return `${words[0][0]}${words[1][0]}`.toUpperCase();
+    return words[0].substring(0, 2).toUpperCase();
+  }, [businessName]);
 
   return (
     <div className="flex h-full max-h-screen flex-col bg-white border-r border-neutral-100">
@@ -19,8 +27,8 @@ export default function DesktopSidebar() {
         <Link href={routesPrivate.dashboard} className="flex items-center gap-3 group">
 
           <div className="h-10 w-10 bg-primary rounded-app-md flex items-center justify-center text-white font-extrabold text-sm tracking-tight transition-all duration-300 group-hover:scale-105 overflow-hidden">
-            {tenantLogoUrl ? (
-              <img src={tenantLogoUrl} alt="Logo" className="h-full w-full object-cover" />
+            {!zynkaLogoError ? (
+              <img src="/zynka-logo.png" alt="Zynka" className="h-full w-full object-cover" onError={() => setZynkaLogoError(true)} />
             ) : (
               'Z'
             )}
@@ -95,10 +103,10 @@ export default function DesktopSidebar() {
           className="flex items-center gap-3 px-4 py-3 bg-neutral-50 hover:bg-white rounded-app-md border border-neutral-100 hover:border-primary/30 hover:shadow-md hover:shadow-primary/5 transition-all duration-300 group cursor-pointer"
         >
           <div className="h-9 w-9 rounded-app-sm bg-primary group-hover:bg-primary-dark flex items-center justify-center font-bold text-white text-[11px] flex-shrink-0 transition-colors shadow-sm overflow-hidden">
-            {isLoading ? '?' : avatarUrl ? (
-              <img src={avatarUrl} alt={initials} className="h-full w-full object-cover" />
+            {isLoading ? '?' : tenantLogoUrl ? (
+              <img src={tenantLogoUrl} alt={businessName} className="h-full w-full object-cover" />
             ) : (
-              initials
+              tenantInitials
             )}
           </div>
 
