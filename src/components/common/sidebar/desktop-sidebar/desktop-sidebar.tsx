@@ -26,11 +26,11 @@ export default function DesktopSidebar() {
       <div className="flex h-[80px] items-center px-8 mb-2">
         <Link href={routesPrivate.dashboard} className="flex items-center gap-3 group">
 
-          <div className="h-10 w-10 bg-primary rounded-app-md flex items-center justify-center text-white font-extrabold text-sm tracking-tight transition-all duration-300 group-hover:scale-105 overflow-hidden">
+          <div className="h-10 w-10 rounded-app-md flex items-center justify-center text-white font-extrabold text-sm tracking-tight transition-all duration-300 group-hover:scale-105 overflow-hidden">
             {!zynkaLogoError ? (
-              <img src="/zynka-logo.png" alt="Zynka" className="h-full w-full object-cover" onError={() => setZynkaLogoError(true)} />
+              <img src="/zynka-logo.png" alt="Zynka" className="h-full w-full object-contain" onError={() => setZynkaLogoError(true)} />
             ) : (
-              'Z'
+              <div className="h-full w-full bg-primary flex items-center justify-center">Z</div>
             )}
           </div>
 
