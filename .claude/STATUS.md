@@ -9,8 +9,8 @@
 ## 🎯 Próximo paso
 
 **Branch activo:** `main`  
-**Última etapa completada:** Auditoría completa pre-producción. Limpieza de login/registro, bugs de sesión y WhatsApp corregidos. Sistema listo para pruebas en Railway/Vercel.  
-**Siguiente:** Pruebas en producción (Railway + Vercel). UI de múltiples audífonos en patient-detail (P2-1) si se necesita antes del lanzamiento.
+**Última etapa completada:** UI de audífonos (PatientDevice), antecedentes médicos editables y documentos del paciente conectados. TypeScript limpio. Todo en producción (Railway + Vercel).  
+**Siguiente:** Pruebas reales con usuarios. Siguiente mejora prioritaria: `GET /patients/:uuid/documents` en API para persistir URLs de documentos subidos.
 
 ---
 
@@ -26,7 +26,7 @@ _Ninguno. Sistema listo para pruebas en producción._
 | # | Tarea | Esfuerzo | Repo | Notas |
 |---|-------|----------|------|-------|
 | ~~P1-1~~ | ~~**Soft delete de pacientes**~~ | — | — | ✅ Completado. `isActive`/`deletedAt` en schema, `DELETE /patients/:uuid`, botón con confirmación en patient-detail. |
-| P1-5 | **Patient documents: UI listado** | M | Site | Endpoints de upload a R2 listos: `POST /upload/patients/:uuid/audiometrias|imagenes|informes`. Falta UI de lista de documentos vinculados. |
+| ~~P1-5~~ | ~~**Patient documents: UI listado**~~ | — | — | ✅ `DocumentsContainer` conectado en patient-detail. Falta endpoint `GET /patients/:uuid/documents` en API para persistir URLs. |
 | P1-6 | **Filtro/cambio de estado en citas en lote** | S | Site | UI de `statusFilter` existe. Falta acción de cambio por ítem desde la lista. |
 
 ---
@@ -35,9 +35,9 @@ _Ninguno. Sistema listo para pruebas en producción._
 
 | # | Tarea | Esfuerzo | Repo | Notas |
 |---|-------|----------|------|-------|
-| P2-1 | **UI múltiples audífonos (PatientDevice)** | S | Site | Modelo `PatientDevice` migrado y endpoints `GET/POST/DELETE /patients/:uuid/devices` listos. Falta UI de listado + formulario de alta en patient-detail. |
+| ~~P2-1~~ | ~~**UI múltiples audífonos (PatientDevice)**~~ | — | — | ✅ `DevicesPanel` colapsable en patient-detail. Lista, agrega y elimina audífonos por oído. |
 | P2-4 | **Snapshot de plantilla al guardar control** | M | API | Al crear `MedicalControl`, copiar el contenido de las preguntas en `clinicalData` para que cambios futuros a la plantilla no alteren registros históricos. Sin nuevo modelo — solo guardar el snapshot en el JSON. |
-| P2-5 | **Nota de corrección en controles** | M | API+Site | `MedicalControl` no tiene `correctionNotes`. Cliente dijo que los controles no se editan, se corrigen con una nota. Agregar campo + UI en control-detail. |
+| ~~P2-5~~ | ~~**Nota de corrección en controles**~~ | — | — | ✅ `PATCH /medical-controls/:uuid/correction-note`. UI inline amber en control-detail. |
 | P2-6 | **Vencimiento de garantía y próxima receta** | L | API+Site | Sin diseño. Requiere campos nuevos en `Patient` o modelo separado. |
 | P2-7 | **Indicador de pacientes inactivos** | M | API+Site | Calcular desde último control/cita. Badge/filtro en lista de pacientes. |
 | P2-8 | **Reporte de consulta PDF: contenido completo** | L | Site | `PdfDownloadButton` existe. Revisar que incluya: audiograma, mantenimiento, plantilla clínica, firma del médico. |
@@ -102,11 +102,10 @@ _Ninguno. Sistema listo para pruebas en producción._
 
 ---
 
-## 🔍 Mocks conocidos pendientes de integración
+## 🔍 Pendientes menores conocidos
 
-| Feature | Archivo | Bloqueo |
-|---------|---------|---------|
-| Patient documents | `src/components/containers/documents/use-documents.tsx` | Sin endpoint ni storage definido |
-| Report template | `src/pages/report-template/create.tsx` | Feature sin diseñar |
-| Patient documents (listado) | `src/components/containers/documents/use-documents.tsx` | Endpoints de upload listos. Falta UI de listado de documentos del paciente. |
-| Patient bloodType en summary | `use-patient-summary-header.ts` | Campo existe en DB, falta leerlo del query |
+| Feature | Archivo | Notas |
+|---------|---------|-------|
+| `GET /patients/:uuid/documents` | API (medical-records) | Endpoint no existe aún. El site llama a este endpoint — devolverá 404 hasta que se implemente. La subida de documentos sí funciona. |
+| Report template | `src/pages/report-template/create.tsx` | Feature sin diseñar, P3. |
+| Patient bloodType en summary | `use-patient-summary-header.ts` | Hardcodeado como 'O+'. Campo existe en DB. |
