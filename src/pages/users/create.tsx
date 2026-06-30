@@ -14,7 +14,7 @@ const CreateUserPage = () => {
   return (
     <DashboardLayout
       contentStyle={BoxedLayoutStyle.FULL}
-      title={t('pages.users.create.layoutTitle')}
+      title={t('users.create.layoutTitle')}
     >
       <div className="max-w-3xl mx-auto px-6">
         <BackButton onClick={() => navigation.common.back()} />

@@ -37,6 +37,11 @@ import { useCreatePatientDeviceMutation } from "@/shared/api/mutations/patients/
 import { useDeactivatePatientDeviceMutation } from "@/shared/api/mutations/patients/deactivate-patient-device-mutation";
 import { PatientDevice } from "@/types/patients/patient-device.types";
 import { toast } from "sonner";
+import { useAppointmentTypesQuery, AppointmentType } from "@/shared/api/querys/appointment-types-query";
+import { useCreateAppointmentMutation } from "@/shared/api/mutations/appointments/create-appointment-mutation";
+import { useUpdateAppointmentMutation } from "@/shared/api/mutations/appointments/update-appointment-mutation";
+import { AppointmentStatus } from "@/types/appointments/appointment";
+import { FETCH_APPOINTMENT_BY_PATIENT_KEY } from "@/shared/api/querys/get-appoinment-by-patient-query";
 import { ChevronDown, ChevronUp, Trash2, Headphones, Plus, Save, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { TEXT } from "@/static/texts/i18n";
@@ -319,11 +324,179 @@ const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
   );
 };
 
+interface AppointmentModalData {
+  uuid: string;
+  status: AppointmentStatus;
+  schedule: { date: string; startTime: string; endTime: string };
+  notes?: string;
+  type?: { name: string };
+}
+
+interface AppointmentModalProps {
+  patientUuid: string;
+  existingAppointment: AppointmentModalData | null;
+  onClose: () => void;
+  onSaved: () => void;
+}
+
+function AppointmentModal({ patientUuid, existingAppointment, onClose, onSaved }: AppointmentModalProps) {
+  const { user } = useSession();
+  const { data: appointmentTypes, isLoading: isLoadingTypes } = useAppointmentTypesQuery();
+  const { executeCreateAppointment, isPending: isCreating } = useCreateAppointmentMutation();
+  const { executeUpdateAppointment, isPending: isUpdating } = useUpdateAppointmentMutation();
+  const { t } = useTranslation();
+
+  const isReschedule = !!existingAppointment;
+  const isPending = isCreating || isUpdating;
+
+  const types = (appointmentTypes as AppointmentType[] ?? []);
+
+  const [form, setForm] = useState({
+    typeId: '',
+    date: existingAppointment ? new Date(existingAppointment.schedule.date).toISOString().split('T')[0] : '',
+    startTime: existingAppointment ? new Date(existingAppointment.schedule.startTime).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false }) : '',
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.date || !form.startTime) {
+      toast.error('Completa fecha y hora.');
+      return;
+    }
+    const startDateTime = new Date(`${form.date}T${form.startTime}:00`);
+    const endDateTime = new Date(startDateTime.getTime() + 30 * 60000);
+
+    if (isReschedule) {
+      executeUpdateAppointment(
+        {
+          uuid: existingAppointment.uuid,
+          date: new Date(`${form.date}T00:00:00.000Z`).toISOString(),
+          startTime: startDateTime.toISOString(),
+          endTime: endDateTime.toISOString(),
+          status: existingAppointment.status,
+        },
+        {
+          onSuccess: () => { toast.success('Cita reagendada correctamente.'); onSaved(); },
+          onError: () => toast.error('Error al reagendar la cita.'),
+        }
+      );
+    } else {
+      if (!form.typeId) { toast.error('Selecciona un tipo de cita.'); return; }
+      executeCreateAppointment(
+        {
+          patientUUID: patientUuid,
+          typeUUID: form.typeId,
+          speciality: (user?.specialty ?? 'GENERAL') as string,
+          status: AppointmentStatus.PENDING,
+          date: new Date(`${form.date}T00:00:00.000Z`).toISOString(),
+          startTime: startDateTime.toISOString(),
+          endTime: endDateTime.toISOString(),
+          notes: '',
+        },
+        {
+          onSuccess: () => { toast.success('Cita agendada correctamente.'); onSaved(); },
+          onError: () => toast.error('Error al agendar la cita.'),
+        }
+      );
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="bg-white rounded-app-xl shadow-2xl w-full max-w-md p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between">
+          <Typography variant={TypographyVariant.ACCENT} className="text-neutral-900">
+            {isReschedule ? 'Reagendar Cita' : 'Agendar Nueva Cita'}
+          </Typography>
+          <button onClick={onClose} className="p-1.5 rounded-app-sm hover:bg-neutral-100 text-neutral-400 transition-colors">
+            <X size={16} />
+          </button>
+        </div>
+
+        {isReschedule && existingAppointment.type?.name && (
+          <div className="px-4 py-3 bg-primary-soft rounded-app-md">
+            <Typography variant={TypographyVariant.CAPTION} className="text-primary font-bold">
+              {existingAppointment.type.name}
+            </Typography>
+            <Typography variant={TypographyVariant.CAPTION} className="text-primary/70 text-[10px]">
+              Cita actual: {new Date(existingAppointment.schedule.startTime).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+            </Typography>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {!isReschedule && (
+            <div>
+              <Typography variant={TypographyVariant.OVERLINE} as="label" className="mb-1.5 block text-[11px] font-bold tracking-widest uppercase text-neutral-500">
+                Tipo de Cita
+              </Typography>
+              {isLoadingTypes ? (
+                <div className="h-12 bg-neutral-50 rounded-app-md animate-pulse" />
+              ) : (
+                <select
+                  required
+                  value={form.typeId}
+                  onChange={(e) => setForm((f) => ({ ...f, typeId: e.target.value }))}
+                  className="w-full p-3.5 bg-neutral-50 border-2 border-transparent focus:border-primary rounded-app-md text-sm outline-none transition-all"
+                >
+                  <option value="">¿Qué realizaremos hoy?</option>
+                  {types.map((type) => (
+                    <option key={type.uuid} value={type.uuid}>{type.name}</option>
+                  ))}
+                </select>
+              )}
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Typography variant={TypographyVariant.OVERLINE} as="label" className="mb-1.5 block text-[11px] font-bold tracking-widest uppercase text-neutral-500">
+                Fecha
+              </Typography>
+              <input
+                required
+                type="date"
+                value={form.date}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+                className="w-full p-3.5 bg-neutral-50 border-2 border-transparent focus:border-primary rounded-app-md text-sm outline-none transition-all"
+              />
+            </div>
+            <div>
+              <Typography variant={TypographyVariant.OVERLINE} as="label" className="mb-1.5 block text-[11px] font-bold tracking-widest uppercase text-neutral-500">
+                Hora
+              </Typography>
+              <input
+                required
+                type="time"
+                value={form.startTime}
+                onChange={(e) => setForm((f) => ({ ...f, startTime: e.target.value }))}
+                className="w-full p-3.5 bg-neutral-50 border-2 border-transparent focus:border-primary rounded-app-md text-sm outline-none transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-1">
+            <button type="button" onClick={onClose} disabled={isPending} className="flex-1 py-3 border border-neutral-200 rounded-app-md text-sm font-bold text-neutral-500 hover:bg-neutral-50 transition-all disabled:opacity-50">
+              {t(TEXT.GENERAL.BUTTONS.CANCEL)}
+            </button>
+            <button type="submit" disabled={isPending} className="flex-1 py-3 bg-primary hover:bg-primary-dark text-white rounded-app-md text-sm font-bold transition-all disabled:opacity-50">
+              {isPending ? 'Guardando...' : isReschedule ? 'Reagendar' : 'Agendar'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export const PatientDetailContainer = ({ id }: { id: string }) => {
     const { t } = useTranslation();
     const navigation = useNavigation();
     const [isLinkDeviceOpen, setIsLinkDeviceOpen] = useState(false);
     const [isConfirmDelete, setIsConfirmDelete] = useState(false);
+    const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+    const queryClient = useQueryClient();
     const { user } = useSession();
     const canStartConsulta = user?.role && user.role !== UserRole.STAFF;
     const isAdmin = user?.role === UserRole.OWNER || user?.role === UserRole.ADMIN;
@@ -332,7 +505,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
     const {
         patient, history, summary, isLoading, isFetching,
         hasMore, searchTerm, setSearchTerm, selectedSpec, setSelectedSpec, loadMore,
-        latestAudiogram, recordTypeFilter, setRecordTypeFilter,
+        latestAudiogram, recordTypeFilter, setRecordTypeFilter, nextAppointmentData,
     } = usePatientDetail(id, user?.specialty);
 
     if (isLoading || !patient) return (
@@ -428,13 +601,20 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
             {/* INDICADORES RÁPIDOS */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="flex flex-col gap-2">
-                    <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.NEXT_APPOINTMENT)} value={summary.nextAppointment} icon={<CalendarIcon className="h-5 w-5 text-primary" />} onClick={() => navigation.appointments.list()} />
-                    <button
-                        onClick={() => navigation.appointments.create()}
-                        className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-primary/30 rounded-app-md text-[10px] font-black uppercase tracking-widest text-primary/70 hover:border-primary hover:text-primary transition-all"
-                    >
-                        <PlusIcon className="h-3 w-3" /> {t(TEXT.PATIENTS.DETAIL.STATS.SCHEDULE_APPOINTMENT)}
-                    </button>
+                    <StatCard
+                        title={t(TEXT.PATIENTS.DETAIL.STATS.NEXT_APPOINTMENT)}
+                        value={summary.nextAppointment}
+                        icon={<CalendarIcon className="h-5 w-5 text-primary" />}
+                        onClick={() => setIsAppointmentModalOpen(true)}
+                    />
+                    {!nextAppointmentData && (
+                        <button
+                            onClick={() => setIsAppointmentModalOpen(true)}
+                            className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-primary/30 rounded-app-md text-[10px] font-black uppercase tracking-widest text-primary/70 hover:border-primary hover:text-primary transition-all"
+                        >
+                            <PlusIcon className="h-3 w-3" /> {t(TEXT.PATIENTS.DETAIL.STATS.SCHEDULE_APPOINTMENT)}
+                        </button>
+                    )}
                 </div>
                 <div className="flex flex-col gap-2">
                     <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.NEXT_MAINTENANCE)} value={summary.warrantyExpiration} icon={<ShieldCheckIcon className="h-5 w-5 text-success" />} onClick={() => navigation.maintenance.list()} />
@@ -585,6 +765,18 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                 currentLinkedProductUuid={patient.linkedProductUuid}
                 onClose={() => setIsLinkDeviceOpen(false)}
                 onSuccess={() => setIsLinkDeviceOpen(false)}
+            />
+        )}
+
+        {isAppointmentModalOpen && (
+            <AppointmentModal
+                patientUuid={id}
+                existingAppointment={nextAppointmentData as AppointmentModalData | null}
+                onClose={() => setIsAppointmentModalOpen(false)}
+                onSaved={() => {
+                    setIsAppointmentModalOpen(false);
+                    queryClient.invalidateQueries({ queryKey: [FETCH_APPOINTMENT_BY_PATIENT_KEY, id] });
+                }}
             />
         )}
         </>

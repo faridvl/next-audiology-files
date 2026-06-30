@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // useEffect needed for userDetail sync
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
@@ -55,7 +55,7 @@ const EditUserPage = () => {
 
     const userUuid = typeof id === 'string' ? id : '';
     const { data: userDetail, isLoading } = useGetUserQuery(userUuid);
-    const { executeUpdateUser, isPending, isSuccess, error } = useUpdateUserMutation();
+    const { executeUpdateUser, isPending } = useUpdateUserMutation();
 
     const [formData, setFormData] = useState({
         fullName: '',
@@ -77,27 +77,25 @@ const EditUserPage = () => {
         }
     }, [userDetail]);
 
-    useEffect(() => {
-        if (isSuccess) {
-            toast.success('Usuario actualizado correctamente');
-            navigation.users.detail(userUuid);
-        }
-    }, [isSuccess]);
-
-    useEffect(() => {
-        if (error) {
-            toast.error('Error al actualizar el usuario');
-        }
-    }, [error]);
-
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        executeUpdateUser({
-            uuid: userUuid,
-            fullName: formData.fullName,
-            phoneNumber: formData.phoneNumber,
-            specialty: formData.specialty || undefined,
-        });
+        executeUpdateUser(
+            {
+                uuid: userUuid,
+                fullName: formData.fullName,
+                phoneNumber: formData.phoneNumber,
+                specialty: formData.specialty || undefined,
+            },
+            {
+                onSuccess: () => {
+                    toast.success('Usuario actualizado correctamente');
+                    navigation.users.detail(userUuid);
+                },
+                onError: () => {
+                    toast.error('Error al actualizar el usuario');
+                },
+            }
+        );
     };
 
     if (isLoading) {

@@ -6,10 +6,12 @@ import { useCreateAppointmentMutation } from '@/shared/api/mutations/appointment
 import { AppointmentStatus } from '@/types/appointments/appointment';
 import { usePatientsQuery } from '@/shared/api/querys/patients-query';
 import { useAppointmentTypesQuery, AppointmentType } from '@/shared/api/querys/appointment-types-query';
+import { useSession } from '@/hooks/use-session';
 
 export const useCreateAppointment = () => {
   const navigation = useNavigation();
   const { executeCreateAppointment, isPending, isSuccess, error } = useCreateAppointmentMutation();
+  const { user } = useSession();
 
   const [patientSearchTerm, setPatientSearchTerm] = useState('');
   const [debouncedPatientSearch, setDebouncedPatientSearch] = useState('');
@@ -28,6 +30,8 @@ export const useCreateAppointment = () => {
   const { data: patientsData, isLoading: isLoadingPatients } = usePatientsQuery(1, 100, debouncedPatientSearch);
   const { data: appointmentTypes, isLoading: isLoadingTypes } = useAppointmentTypesQuery();
 
+  const userSpeciality = (user?.specialty as MedicalSpeciality) ?? MedicalSpeciality.GENERAL;
+
   const [formData, setFormData] = useState({
     patientUuid: '',
     speciality: MedicalSpeciality.GENERAL,
@@ -36,6 +40,12 @@ export const useCreateAppointment = () => {
     startTime: '',
     notes: '',
   });
+
+  useEffect(() => {
+    if (user?.specialty) {
+      setFormData((prev) => ({ ...prev, speciality: user.specialty as MedicalSpeciality }));
+    }
+  }, [user?.specialty]);
 
   const availableServices = (appointmentTypes as AppointmentType[] ?? []).map((type: AppointmentType) => ({
     id: type.uuid,
@@ -87,11 +97,14 @@ export const useCreateAppointment = () => {
     formData,
     setFormData,
     isLoading: isPending || isLoadingPatients || isLoadingTypes,
+    isLoadingTypes,
+    hasNoTypes: !isLoadingTypes && (appointmentTypes as AppointmentType[] ?? []).length === 0,
     handleSubmit,
     navigation,
     patients: patientsData?.data || [],
     availableServices,
     patientSearchTerm,
     setPatientSearchTerm,
+    userSpeciality,
   };
 };

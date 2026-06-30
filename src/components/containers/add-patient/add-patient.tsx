@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { UserIcon, PhoneIcon, EnvelopeIcon, CalendarIcon, IdentificationIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { ChevronDown } from 'lucide-react';
@@ -61,7 +61,6 @@ const FieldGroup: React.FC<FieldGroupProps> = ({ label, name, icon, error, touch
 
 export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
   const { initialValues, validationSchema, handleSubmit, isLoading } = usePatientForm(onShowSuccess);
-  const [showDatePicker, setShowDatePicker] = useState(false);
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
@@ -219,15 +218,8 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                         name="birthDate"
                         type="date"
                         max={new Date().toISOString().split('T')[0]}
-                        onFocus={() => setShowDatePicker(true)}
-                        onBlur={() => setShowDatePicker(false)}
-                        className={`${inputBase} ${errors.birthDate && touched.birthDate ? inputError : ''} [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-3 [&::-webkit-calendar-picker-indicator]:cursor-pointer`}
+                        className={`${inputBase} ${errors.birthDate && touched.birthDate ? inputError : ''}`}
                       />
-                      {!values.birthDate && !showDatePicker && (
-                        <span className="absolute left-11 top-3.5 text-sm text-neutral-400 font-normal pointer-events-none">
-                          DD / MM / AAAA
-                        </span>
-                      )}
                     </div>
                     <ErrorMessage
                       name="birthDate"

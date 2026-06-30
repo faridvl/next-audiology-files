@@ -42,7 +42,7 @@
 import { LucideIcon } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Save, User, Mail, ShieldCheck, Briefcase, Lock } from 'lucide-react';
+import { Save, User, Mail, ShieldCheck, Briefcase, Lock, Phone } from 'lucide-react';
 import { useNavigation } from '@/hooks/use-navigation';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
@@ -137,19 +137,30 @@ export function UserFormContainer() {
             </select>
           </FormField>
 
-          <div className="md:col-span-2">
-            <FormField
-              label={t('users.create.form.specialty')}
-              icon={Briefcase}
-              error={errors.specialty?.message}
-            >
-              <input
-                {...register('specialty')}
-                className={inputStyles}
-                placeholder={t('users.create.form.specialtyPlaceholder')}
-              />
-            </FormField>
-          </div>
+          <FormField
+            label={t('users.create.form.specialty')}
+            icon={Briefcase}
+            error={errors.specialty?.message}
+          >
+            <input
+              {...register('specialty')}
+              className={inputStyles}
+              placeholder={t('users.create.form.specialtyPlaceholder')}
+            />
+          </FormField>
+
+          <FormField
+            label={t('users.create.form.phoneNumber')}
+            icon={Phone}
+            error={errors.phoneNumber?.message}
+          >
+            <input
+              {...register('phoneNumber')}
+              type="tel"
+              className={inputStyles}
+              placeholder={t('users.create.form.phoneNumberPlaceholder')}
+            />
+          </FormField>
         </div>
 
         <div className="pt-6 flex justify-end gap-3">

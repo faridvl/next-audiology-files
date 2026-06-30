@@ -24,8 +24,11 @@ interface MedicalControlResponse {
 }
 
 interface AppointmentResponse {
+  uuid: string;
   status: AppointmentStatus;
-  schedule: { startTime: string };
+  schedule: { date: string; startTime: string; endTime: string };
+  notes?: string;
+  type?: { name: string };
 }
 
 export type RecordTypeFilter = 'ALL' | 'CONTROL' | 'AUDIOGRAM' | 'MAINTENANCE';
@@ -131,7 +134,7 @@ export function usePatientDetail(uuid: string, userSpecialty?: string) {
   // --- RESUMEN (SUMMARY) ---
   const appointments = appointmentsData?.appointments ?? [];
 
-  const nextAppointment = useMemo(() => {
+  const nextAppointmentData = useMemo((): AppointmentResponse | null => {
     const upcoming = (appointments as AppointmentResponse[])
       .filter((appointment) =>
         [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED, AppointmentStatus.TENTATIVE].includes(appointment.status)
@@ -139,12 +142,15 @@ export function usePatientDetail(uuid: string, userSpecialty?: string) {
       .sort((a, b) =>
         new Date(a.schedule.startTime).getTime() - new Date(b.schedule.startTime).getTime()
       );
-    if (upcoming.length === 0) return 'Sin programar';
-    const next = upcoming[0];
-    return new Date(next.schedule.startTime).toLocaleDateString('es-ES', {
+    return upcoming.length > 0 ? upcoming[0] : null;
+  }, [appointments]);
+
+  const nextAppointment = useMemo(() => {
+    if (!nextAppointmentData) return 'Sin programar';
+    return new Date(nextAppointmentData.schedule.startTime).toLocaleDateString('es-ES', {
       day: '2-digit', month: 'short', year: 'numeric',
     });
-  }, [appointments]);
+  }, [nextAppointmentData]);
 
   const warrantyExpiration = useMemo(() => {
     const maintenances: MaintenanceEntity[] = maintenancesData ?? [];
@@ -180,6 +186,7 @@ export function usePatientDetail(uuid: string, userSpecialty?: string) {
     history: mappedHistory,
     summary,
     latestAudiogram,
+    nextAppointmentData,
 
     // Estados de carga
     // isLoading es para la carga inicial, isFetching para las páginas subsecuentes

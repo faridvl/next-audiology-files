@@ -8,6 +8,7 @@ export type UserFormValues = {
   email: string;
   role: UserRole;
   specialty: string;
+  phoneNumber?: string;
   password?: string;
 };
 
@@ -26,6 +27,7 @@ export function useUserForm(onSuccess?: () => void): useUserFormReturn {
       email: '',
       role: UserRole.DOCTOR,
       specialty: '',
+      phoneNumber: '',
       password: '',
     },
   });

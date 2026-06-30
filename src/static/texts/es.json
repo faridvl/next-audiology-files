@@ -125,6 +125,8 @@
         "role": "Rol de Sistema",
         "specialty": "Especialidad / Área",
         "specialtyPlaceholder": "Ej. Audiología Clínica",
+        "phoneNumber": "Teléfono",
+        "phoneNumberPlaceholder": "8888-8888",
         "submit": "Guardar Usuario"
       },
       "roles": {

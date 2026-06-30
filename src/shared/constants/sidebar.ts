@@ -2,7 +2,6 @@ import { INavigationPath } from '@/types/system/navigation-path';
 import { routesPrivate } from '../navigation/routes';
 import { UserRole } from '@/types/auth/auth';
 import {
-  LayoutDashboard,
   CalendarDays,
   Users,
   Package,
@@ -20,13 +19,6 @@ const CLINICAL_ROLES = [UserRole.OWNER, UserRole.ADMIN, UserRole.DOCTOR];
 
 // Orden operativo: lo que el clínico necesita primero → al fondo la administración
 export const NAVIGATION_PATHS: INavigationPath[] = [
-  {
-    menuKey: 'dashboard',
-    default: false,
-    icon: LayoutDashboard,
-    labelKey: 'Inicio',
-    route: routesPrivate.dashboard,
-  },
   {
     menuKey: 'appointments',
     default: false,

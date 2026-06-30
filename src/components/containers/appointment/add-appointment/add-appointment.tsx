@@ -1,19 +1,54 @@
 import React from 'react';
 import {
     ChevronLeft, UserPlus, Calendar as CalendarIcon,
-    Clock, Plus, Stethoscope, Save
+    Clock, Plus, Stethoscope, Save, AlertTriangle
 } from 'lucide-react';
 
 import { Typography, TypographyVariant } from "@/components/common/typography/typography";
 import { Button, ButtonVariant } from "@/components/common/button/button";
 import { useCreateAppointment } from './use-add-appointment';
-import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
 
 export const CreateAppointmentContainer: React.FC = () => {
     const {
         formData, setFormData, isLoading, handleSubmit,
-        navigation, patients, availableServices
+        navigation, patients, availableServices, hasNoTypes, userSpeciality,
     } = useCreateAppointment();
+
+    if (hasNoTypes) {
+        return (
+            <div className="max-w-3xl mx-auto py-6">
+                <button
+                    type="button"
+                    onClick={navigation.common.back}
+                    className="flex items-center gap-2 text-neutral-400 hover:text-primary transition-colors mb-8 group"
+                >
+                    <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                    <Typography variant={TypographyVariant.BODY_SEMIBOLD}>Volver a la Agenda</Typography>
+                </button>
+
+                <div className="bg-amber-50 border border-amber-200 rounded-app-xl p-10 flex flex-col items-center gap-6 text-center">
+                    <div className="bg-amber-100 p-4 rounded-full text-amber-600">
+                        <AlertTriangle size={32} />
+                    </div>
+                    <div>
+                        <Typography variant={TypographyVariant.ACCENT} className="text-amber-800 mb-2">
+                            No hay tipos de cita configurados
+                        </Typography>
+                        <Typography variant={TypographyVariant.BODY} className="text-amber-700 max-w-md">
+                            Para agendar una cita debes crear al menos un tipo de cita primero. Ve a la sección de configuración y agrega los servicios que ofrece tu clínica.
+                        </Typography>
+                    </div>
+                    <Button
+                        type="button"
+                        variant={ButtonVariant.PRIMARY}
+                        onClick={() => navigation.appointmentType.create()}
+                    >
+                        Ir a Tipos de Cita
+                    </Button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-3xl mx-auto py-6">
@@ -73,16 +108,9 @@ export const CreateAppointmentContainer: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <Typography variant={TypographyVariant.OVERLINE} className="ml-1 mb-2 block text-neutral-400 font-bold">Área Médica</Typography>
-                                <select
-                                    disabled={isLoading}
-                                    className="w-full p-4 bg-white border-2 border-neutral-100 rounded-app-md text-sm font-bold text-primary outline-none focus:border-primary transition-all cursor-pointer"
-                                    value={formData.speciality}
-                                    onChange={(e) => setFormData({ ...formData, speciality: e.target.value as MedicalSpeciality, typeId: '' })}
-                                >
-                                    <option value={MedicalSpeciality.GENERAL}>General</option>
-                                    <option value={MedicalSpeciality.DENTAL}>Dental</option>
-                                    <option value={MedicalSpeciality.AUDIOLOGY}>Audiología</option>
-                                </select>
+                                <div className="w-full p-4 bg-neutral-50 border-2 border-neutral-100 rounded-app-md text-sm font-bold text-primary">
+                                    {userSpeciality === 'AUDIOLOGY' ? 'Audiología' : userSpeciality === 'DENTAL' ? 'Dental' : 'General'}
+                                </div>
                             </div>
 
                             <div>
