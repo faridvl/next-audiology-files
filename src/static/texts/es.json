@@ -416,6 +416,158 @@
       }
     }
   },
+  "login": {
+    "registered": {
+      "title": "¡Registro Exitoso!",
+      "message": "Ya puedes iniciar sesión con tu nueva cuenta."
+    },
+    "expired": {
+      "title": "Sesión expirada",
+      "message": "Tu sesión expiró después de 1 hora. Ingresa nuevamente."
+    }
+  },
+  "maintenance": {
+    "pageTitle": "Mantenimientos — Zynka",
+    "loading": "Cargando mantenimientos...",
+    "empty": "Sin mantenimientos este mes",
+    "title": "Mantenimientos",
+    "patientSingular": "paciente",
+    "patientPlural": "pacientes"
+  },
+  "ficha": {
+    "loading": "Cargando ficha del paciente...",
+    "notFound": "No se encontró el paciente.",
+    "backToFile": "Volver al expediente",
+    "print": "Imprimir ficha",
+    "title": "Ficha Técnica del Paciente",
+    "subtitle": "Sistema de Gestión de Expedientes Digitales — Zynka",
+    "issuedAt": "Fecha de emisión:",
+    "section1": "1. Datos del Paciente",
+    "section2": "2. Historial de Controles Médicos",
+    "section3": "3. Historial de Citas",
+    "section4": "4. Antecedentes Médicos",
+    "footer": "Documento confidencial — Propiedad privada del paciente — Ley de Protección de Datos",
+    "fields": {
+      "fullName": "Nombre completo",
+      "identifier": "Identificador",
+      "phone": "Teléfono",
+      "email": "Correo electrónico",
+      "address": "Dirección",
+      "birthDate": "Fecha de nacimiento"
+    },
+    "controls": {
+      "empty": "Sin controles registrados.",
+      "colDate": "Fecha",
+      "colSpeciality": "Especialidad",
+      "colDiagnosis": "Diagnóstico"
+    },
+    "appointments": {
+      "empty": "Sin citas registradas.",
+      "colDate": "Fecha",
+      "colNotes": "Notas"
+    },
+    "background": {
+      "empty": "Sin antecedentes registrados.",
+      "noPositive": "Sin antecedentes positivos.",
+      "notes": "Notas"
+    }
+  },
+  "profile": {
+    "pageTitle": "Perfil",
+    "layoutTitle": "Configuración de Perfil",
+    "tabs": {
+      "general": "Información de Cuenta",
+      "medical": "Perfil Médico"
+    },
+    "avatar": {
+      "title": "Fotografía de Perfil",
+      "subtitle": "Esta imagen será visible en el directorio del staff."
+    },
+    "fields": {
+      "passwordPlaceholder": "••••••••",
+      "loadingPlaceholder": "Cargando...",
+      "professionalId": "Cédula Profesional",
+      "professionalIdPlaceholder": "Ej. 1234567",
+      "university": "Universidad",
+      "universityPlaceholder": "Institución de Egreso",
+      "subSpecialty": "Sub-especialidad",
+      "subSpecialtyPlaceholder": "Ej. Audiología Pediátrica"
+    },
+    "signature": {
+      "sectionLabel": "Firma Digitalizada para Recetas",
+      "urlLabel": "URL de firma (imagen pública)",
+      "urlPlaceholder": "https://ejemplo.com/mi-firma.png",
+      "uploadButton": "Subir",
+      "uploadSuccess": "Firma subida correctamente",
+      "uploadError": "Error al subir la firma"
+    },
+    "buttons": {
+      "discard": "Descartar",
+      "save": "Actualizar Perfil"
+    },
+    "toasts": {
+      "updateSuccess": "Perfil actualizado correctamente",
+      "updateError": "Error al actualizar el perfil"
+    }
+  },
+  "settings": {
+    "pageTitle": "Configuración de Clínica | Zynka",
+    "layoutTitle": "Configuración del Negocio",
+    "sections": {
+      "identity": "Identidad Institucional",
+      "location": "Ubicación y Contacto",
+      "legal": "Validación y Firmas",
+      "subscription": "Suscripción SaaS"
+    },
+    "identity": {
+      "logoLabel": "Logo",
+      "businessNameLabel": "Nombre Comercial de la Clínica",
+      "businessNamePlaceholder": "Nombre de la clínica",
+      "logoUrlLabel": "URL del logo (imagen pública)",
+      "logoUrlPlaceholder": "https://ejemplo.com/logo.png",
+      "legalNameLabel": "Razón Social / Nombre Legal",
+      "legalNamePlaceholder": "Zynka Health S.A.",
+      "fiscalIdLabel": "ID Fiscal / RUC",
+      "fiscalIdPlaceholder": "1790000000001",
+      "specialityLabel": "Especialidad Principal",
+      "specialityPlaceholder": "Especialidad de la clínica"
+    },
+    "location": {
+      "cityLabel": "Ciudad",
+      "cityPlaceholder": "Ciudad",
+      "phoneLabel": "Teléfono de Contacto",
+      "phonePlaceholder": "+593 ...",
+      "addressLabel": "Dirección Física",
+      "addressPlaceholder": "Av. Amazonas y Naciones Unidas, Edificio Signature",
+      "websiteLabel": "Sitio Web",
+      "websitePlaceholder": "https://www.tuclinica.com"
+    },
+    "legal": {
+      "licenseLabel": "Registro Sanitario / Licencia",
+      "licensePlaceholder": "SESS-00123",
+      "notificationEmailLabel": "Correo de Notificaciones",
+      "notificationEmailPlaceholder": "admin@clinica.com",
+      "signatureTitle": "Firma del Representante",
+      "signatureSubtitle": "Para documentos institucionales",
+      "signatureUploadButton": "Cargar PNG"
+    },
+    "subscription": {
+      "loading": "Cargando...",
+      "planPrefix": "Plan ",
+      "active": "Activo",
+      "manageButton": "Gestionar"
+    },
+    "buttons": {
+      "discard": "Descartar",
+      "save": "Actualizar Clínica"
+    },
+    "toasts": {
+      "updateSuccess": "Configuración actualizada correctamente",
+      "updateError": "Error al actualizar la configuración",
+      "logoSuccess": "Logo subido correctamente",
+      "logoError": "Error al subir el logo"
+    }
+  },
   "auth": {
     "login": {
       "title": "Iniciar Sesión",

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
+import { useTranslation } from 'react-i18next';
+import { TEXT } from '@/static/texts/i18n';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
@@ -28,7 +30,7 @@ const CompactInput = ({ label, value, placeholder, onChange, disabled }: {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) => (
   <div className="flex flex-col gap-1 w-full">
-    <Typography variant={TypographyVariant.OVERLINE} className="ml-1 !text-slate-400 !text-[9px]">
+    <Typography variant={TypographyVariant.OVERLINE} className="ml-1 !text-neutral-400 !text-[9px]">
       {label}
     </Typography>
     <input
@@ -36,21 +38,22 @@ const CompactInput = ({ label, value, placeholder, onChange, disabled }: {
       placeholder={placeholder}
       onChange={onChange}
       disabled={disabled}
-      className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:border-[#1E3A8A] focus:bg-white transition-all text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+      className="w-full bg-neutral-50 border border-neutral-100 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:border-primary focus:bg-white transition-all text-neutral-700 disabled:cursor-not-allowed disabled:opacity-50"
     />
   </div>
 );
 
 const SectionHeader = ({ icon: Icon, title }: { icon: React.ElementType; title: string }) => (
-  <div className="flex items-center gap-2 mb-6 border-b border-slate-50 pb-3">
-    <Icon size={16} className="text-[#1E3A8A]" strokeWidth={2.5} />
-    <Typography variant={TypographyVariant.OVERLINE} className="!text-slate-900">
+  <div className="flex items-center gap-2 mb-6 border-b border-neutral-50 pb-3">
+    <Icon size={16} className="text-primary" strokeWidth={2.5} />
+    <Typography variant={TypographyVariant.OVERLINE} className="!text-neutral-900">
       {title}
     </Typography>
   </div>
 );
 
 const BusinessSettingsPage: React.FC = () => {
+  const { t } = useTranslation();
   const { tenant, isLoading } = useSession();
   const { executeUpdateTenant, isPending, isSuccess, error } = useUpdateTenantMutation();
   const { uploadLogo, isPending: isUploadingLogo } = useUploadLogoMutation(tenant?.uuid ?? '');
@@ -70,13 +73,13 @@ const BusinessSettingsPage: React.FC = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      toast.success('Configuración actualizada correctamente');
+      toast.success(t(TEXT.SETTINGS.TOASTS.UPDATE_SUCCESS));
     }
   }, [isSuccess]);
 
   useEffect(() => {
     if (error) {
-      toast.error('Error al actualizar la configuración');
+      toast.error(t(TEXT.SETTINGS.TOASTS.UPDATE_ERROR));
     }
   }, [error]);
 
@@ -103,19 +106,19 @@ const BusinessSettingsPage: React.FC = () => {
 
   return (
     <>
-      <Head><title>Configuración de Clínica | Zynka</title></Head>
-      <DashboardLayout isMainPage contentStyle={BoxedLayoutStyle.FULL} title="Configuración del Negocio">
+      <Head><title>{t(TEXT.SETTINGS.PAGE_TITLE)}</title></Head>
+      <DashboardLayout isMainPage contentStyle={BoxedLayoutStyle.FULL} title={t(TEXT.SETTINGS.LAYOUT_TITLE)}>
 
         <div className="max-w-3xl mx-auto space-y-4 pb-16">
 
           {/* SECCIÓN 1: IDENTIDAD */}
-          <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-sm">
-            <SectionHeader icon={Building2} title="Identidad Institucional" />
+          <div className="bg-white border border-neutral-100 rounded-app-xl p-8 shadow-sm">
+            <SectionHeader icon={Building2} title={t(TEXT.SETTINGS.SECTIONS.IDENTITY)} />
 
             <div className="flex items-center gap-6 mb-6">
               <div
                 onClick={() => !isUploadingLogo && logoInputRef.current?.click()}
-                className="relative h-16 w-16 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400 hover:border-[#1E3A8A]/40 hover:text-[#1E3A8A] transition-all cursor-pointer group shrink-0 overflow-hidden"
+                className="relative h-16 w-16 bg-neutral-50 border-2 border-dashed border-neutral-200 rounded-2xl flex flex-col items-center justify-center text-neutral-400 hover:border-primary/40 hover:text-primary transition-all cursor-pointer group shrink-0 overflow-hidden"
               >
                 {logoUrl ? (
                   <>
@@ -123,7 +126,7 @@ const BusinessSettingsPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); setLogoUrl(''); }}
-                      className="absolute top-0.5 right-0.5 p-0.5 bg-red-100 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"
+                      className="absolute top-0.5 right-0.5 p-0.5 bg-danger/20 text-danger rounded-lg hover:bg-danger hover:text-white transition-all"
                     >
                       <X size={10} />
                     </button>
@@ -131,7 +134,7 @@ const BusinessSettingsPage: React.FC = () => {
                 ) : (
                   <>
                     <Upload size={18} />
-                    <Typography variant={TypographyVariant.CAPTION} className="!text-[8px] font-black uppercase mt-1">Logo</Typography>
+                    <Typography variant={TypographyVariant.CAPTION} className="!text-[8px] font-black uppercase mt-1">{t(TEXT.SETTINGS.IDENTITY.LOGO_LABEL)}</Typography>
                   </>
                 )}
                 <input
@@ -145,41 +148,41 @@ const BusinessSettingsPage: React.FC = () => {
                     try {
                       const result = await uploadLogo(file);
                       setLogoUrl(result.url);
-                      toast.success('Logo subido correctamente');
+                      toast.success(t(TEXT.SETTINGS.TOASTS.LOGO_SUCCESS));
                     } catch {
-                      toast.error('Error al subir el logo');
+                      toast.error(t(TEXT.SETTINGS.TOASTS.LOGO_ERROR));
                     }
                   }}
                 />
               </div>
               <div className="w-full space-y-2">
                 <CompactInput
-                  label="Nombre Comercial de la Clínica"
+                  label={t(TEXT.SETTINGS.IDENTITY.BUSINESS_NAME_LABEL)}
                   value={isLoading ? '' : businessName}
-                  placeholder={isLoading ? 'Cargando...' : 'Nombre de la clínica'}
+                  placeholder={isLoading ? t(TEXT.SETTINGS.SUBSCRIPTION.LOADING) : t(TEXT.SETTINGS.IDENTITY.BUSINESS_NAME_PLACEHOLDER)}
                   onChange={(event) => setBusinessName(event.target.value)}
                   disabled={isLoading}
                 />
                 <CompactInput
-                  label="URL del logo (imagen pública)"
+                  label={t(TEXT.SETTINGS.IDENTITY.LOGO_URL_LABEL)}
                   value={logoUrl}
-                  placeholder="https://ejemplo.com/logo.png"
+                  placeholder={t(TEXT.SETTINGS.IDENTITY.LOGO_URL_PLACEHOLDER)}
                   onChange={(event) => setLogoUrl(event.target.value)}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <CompactInput label="Razón Social / Nombre Legal" placeholder="Zynka Health S.A." />
-              <CompactInput label="ID Fiscal / RUC" placeholder="1790000000001" />
+              <CompactInput label={t(TEXT.SETTINGS.IDENTITY.LEGAL_NAME_LABEL)} placeholder={t(TEXT.SETTINGS.IDENTITY.LEGAL_NAME_PLACEHOLDER)} />
+              <CompactInput label={t(TEXT.SETTINGS.IDENTITY.FISCAL_ID_LABEL)} placeholder={t(TEXT.SETTINGS.IDENTITY.FISCAL_ID_PLACEHOLDER)} />
             </div>
 
             {specialityLabel && (
               <div className="mt-4">
                 <CompactInput
-                  label="Especialidad Principal"
+                  label={t(TEXT.SETTINGS.IDENTITY.SPECIALITY_LABEL)}
                   value={specialityLabel}
-                  placeholder="Especialidad de la clínica"
+                  placeholder={t(TEXT.SETTINGS.IDENTITY.SPECIALITY_PLACEHOLDER)}
                   disabled
                 />
               </div>
@@ -187,75 +190,75 @@ const BusinessSettingsPage: React.FC = () => {
           </div>
 
           {/* SECCIÓN 2: UBICACIÓN */}
-          <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-sm">
-            <SectionHeader icon={MapPin} title="Ubicación y Contacto" />
+          <div className="bg-white border border-neutral-100 rounded-app-xl p-8 shadow-sm">
+            <SectionHeader icon={MapPin} title={t(TEXT.SETTINGS.SECTIONS.LOCATION)} />
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <CompactInput label="Ciudad" placeholder="Ciudad" />
-                <CompactInput label="Teléfono de Contacto" placeholder="+593 ..." />
+                <CompactInput label={t(TEXT.SETTINGS.LOCATION.CITY_LABEL)} placeholder={t(TEXT.SETTINGS.LOCATION.CITY_PLACEHOLDER)} />
+                <CompactInput label={t(TEXT.SETTINGS.LOCATION.PHONE_LABEL)} placeholder={t(TEXT.SETTINGS.LOCATION.PHONE_PLACEHOLDER)} />
               </div>
-              <CompactInput label="Dirección Física" placeholder="Av. Amazonas y Naciones Unidas, Edificio Signature" />
-              <CompactInput label="Sitio Web" placeholder="https://www.tuclinica.com" />
+              <CompactInput label={t(TEXT.SETTINGS.LOCATION.ADDRESS_LABEL)} placeholder={t(TEXT.SETTINGS.LOCATION.ADDRESS_PLACEHOLDER)} />
+              <CompactInput label={t(TEXT.SETTINGS.LOCATION.WEBSITE_LABEL)} placeholder={t(TEXT.SETTINGS.LOCATION.WEBSITE_PLACEHOLDER)} />
             </div>
           </div>
 
           {/* SECCIÓN 3: LEGAL */}
-          <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-sm">
-            <SectionHeader icon={FileText} title="Validación y Firmas" />
+          <div className="bg-white border border-neutral-100 rounded-app-xl p-8 shadow-sm">
+            <SectionHeader icon={FileText} title={t(TEXT.SETTINGS.SECTIONS.LEGAL)} />
 
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <CompactInput label="Registro Sanitario / Licencia" placeholder="SESS-00123" />
-              <CompactInput label="Correo de Notificaciones" placeholder="admin@clinica.com" />
+              <CompactInput label={t(TEXT.SETTINGS.LEGAL.LICENSE_LABEL)} placeholder={t(TEXT.SETTINGS.LEGAL.LICENSE_PLACEHOLDER)} />
+              <CompactInput label={t(TEXT.SETTINGS.LEGAL.NOTIFICATION_EMAIL_LABEL)} placeholder={t(TEXT.SETTINGS.LEGAL.NOTIFICATION_EMAIL_PLACEHOLDER)} />
             </div>
 
-            <div className="p-4 border-2 border-dashed border-slate-100 rounded-2xl flex items-center justify-between bg-slate-50/50 group hover:border-[#1E3A8A]/20 transition-all cursor-pointer">
+            <div className="p-4 border-2 border-dashed border-neutral-100 rounded-2xl flex items-center justify-between bg-neutral-50/50 group hover:border-primary/20 transition-all cursor-pointer">
               <div className="flex items-center gap-4">
                 <div className="p-2 bg-white rounded-xl shadow-sm">
-                  <PenTool size={18} className="text-slate-400 group-hover:text-[#1E3A8A]" />
+                  <PenTool size={18} className="text-neutral-400 group-hover:text-primary" />
                 </div>
                 <div>
-                  <Typography variant={TypographyVariant.BODY_BOLD} className="!text-slate-700 !text-xs">
-                    Firma del Representante
+                  <Typography variant={TypographyVariant.BODY_BOLD} className="!text-neutral-700 !text-xs">
+                    {t(TEXT.SETTINGS.LEGAL.SIGNATURE_TITLE)}
                   </Typography>
                   <Typography variant={TypographyVariant.CAPTION} className="!text-[10px] italic">
-                    Para documentos institucionales
+                    {t(TEXT.SETTINGS.LEGAL.SIGNATURE_SUBTITLE)}
                   </Typography>
                 </div>
               </div>
-              <button className="bg-white border border-slate-200 px-4 py-2 rounded-xl transition-all hover:bg-slate-50 shadow-sm">
-                <Typography variant={TypographyVariant.OVERLINE} className="!text-[#1E3A8A] !text-[9px]">
-                  Cargar PNG
+              <button className="bg-white border border-neutral-200 px-4 py-2 rounded-xl transition-all hover:bg-neutral-50 shadow-sm">
+                <Typography variant={TypographyVariant.OVERLINE} className="!text-primary !text-[9px]">
+                  {t(TEXT.SETTINGS.LEGAL.SIGNATURE_UPLOAD_BUTTON)}
                 </Typography>
               </button>
             </div>
           </div>
 
           {/* SECCIÓN 4: SUSCRIPCIÓN */}
-          <div className="bg-white border border-slate-100 rounded-[2.5rem] p-6 shadow-sm flex items-center justify-between">
+          <div className="bg-white border border-neutral-100 rounded-app-xl p-6 shadow-sm flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-slate-200">
+              <div className="h-12 w-12 bg-neutral-900 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-neutral-200">
                 <CreditCard size={20} />
               </div>
               <div>
-                <Typography variant={TypographyVariant.OVERLINE} className="!text-slate-400 !text-[9px] block">
-                  Suscripción SaaS
+                <Typography variant={TypographyVariant.OVERLINE} className="!text-neutral-400 !text-[9px] block">
+                  {t(TEXT.SETTINGS.SECTIONS.SUBSCRIPTION)}
                 </Typography>
                 <div className="flex items-center gap-2">
-                  <Typography variant={TypographyVariant.BODY_BOLD} className="!text-slate-800">
-                    {isLoading ? 'Cargando...' : `Plan ${planLabel}`}
+                  <Typography variant={TypographyVariant.BODY_BOLD} className="!text-neutral-800">
+                    {isLoading ? t(TEXT.SETTINGS.SUBSCRIPTION.LOADING) : `${t(TEXT.SETTINGS.SUBSCRIPTION.PLAN_PREFIX)}${planLabel}`}
                   </Typography>
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <Typography variant={TypographyVariant.CAPTION} className="!text-emerald-500 font-black uppercase">
-                    Activo
+                  <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
+                  <Typography variant={TypographyVariant.CAPTION} className="!text-success font-black uppercase">
+                    {t(TEXT.SETTINGS.SUBSCRIPTION.ACTIVE)}
                   </Typography>
                 </div>
               </div>
             </div>
-            <button className="flex items-center gap-2 bg-slate-100 px-5 py-2.5 rounded-xl hover:bg-slate-200 transition-all">
-              <Typography variant={TypographyVariant.OVERLINE} className="!text-slate-600 !text-[10px]">
-                Gestionar
+            <button className="flex items-center gap-2 bg-neutral-100 px-5 py-2.5 rounded-xl hover:bg-neutral-200 transition-all">
+              <Typography variant={TypographyVariant.OVERLINE} className="!text-neutral-600 !text-[10px]">
+                {t(TEXT.SETTINGS.SUBSCRIPTION.MANAGE_BUTTON)}
               </Typography>
-              <Globe size={12} className="text-slate-400" />
+              <Globe size={12} className="text-neutral-400" />
             </button>
           </div>
 
@@ -264,17 +267,17 @@ const BusinessSettingsPage: React.FC = () => {
             <button
               type="button"
               onClick={handleDiscard}
-              className="px-6 py-2 hover:bg-slate-50 rounded-xl transition-colors"
+              className="px-6 py-2 hover:bg-neutral-50 rounded-xl transition-colors"
             >
-              <Typography variant={TypographyVariant.OVERLINE} className="!text-slate-400">
-                Descartar
+              <Typography variant={TypographyVariant.OVERLINE} className="!text-neutral-400">
+                {t(TEXT.SETTINGS.BUTTONS.DISCARD)}
               </Typography>
             </button>
             <button
               type="button"
               onClick={handleSave}
               disabled={isPending || isLoading}
-              className="bg-[#1E3A8A] text-white px-10 py-3.5 rounded-2xl shadow-xl shadow-blue-200 hover:bg-[#152a63] hover:-translate-y-0.5 transition-all flex items-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="bg-primary text-white px-10 py-3.5 rounded-2xl shadow-xl shadow-primary-soft hover:bg-primary-dark hover:-translate-y-0.5 transition-all flex items-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isPending ? (
                 <Loader2 size={16} strokeWidth={3} className="animate-spin" />
@@ -282,7 +285,7 @@ const BusinessSettingsPage: React.FC = () => {
                 <Check size={16} strokeWidth={3} />
               )}
               <Typography variant={TypographyVariant.OVERLINE} className="!text-white">
-                Actualizar Clínica
+                {t(TEXT.SETTINGS.BUTTONS.SAVE)}
               </Typography>
             </button>
           </div>
