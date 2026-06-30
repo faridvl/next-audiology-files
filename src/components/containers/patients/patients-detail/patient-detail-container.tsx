@@ -1,4 +1,5 @@
 import React from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigation } from "@/hooks/use-navigation";
 import { usePatientDetail } from "./use-patient-detail";
 import { Typography, TypographyVariant } from "@/components/common/typography/typography";
@@ -14,7 +15,6 @@ import {
     PhoneIcon,
     PlusIcon,
     ShieldCheckIcon,
-    FileText,
     ClipboardList,
     Link,
 } from "lucide-react";
@@ -27,7 +27,16 @@ import { LinkDeviceModal } from "./link-device-modal";
 import { AudiogramChart, classifyHearingLoss } from "@/components/common/audiogram-chart/audiogram-chart";
 import { useState } from "react";
 import { useDeletePatientMutation } from "@/shared/api/mutations/patients/use-delete-patient-mutation";
+import { DocumentsContainer } from "@/components/containers/documents/documents-view";
+import { usePatientBackgroundQuery } from "@/shared/api/querys/patient-background-query";
+import { useUpsertPatientBackgroundMutation } from "@/shared/api/mutations/patients/upsert-background-mutation";
+import { UpsertPatientBackgroundPayload, PatientBackgroundEntity } from "@/types/patients/patient-background.types";
+import { usePatientDevicesQuery } from "@/shared/api/querys/patient-devices-query";
+import { useCreatePatientDeviceMutation } from "@/shared/api/mutations/patients/create-patient-device-mutation";
+import { useDeactivatePatientDeviceMutation } from "@/shared/api/mutations/patients/deactivate-patient-device-mutation";
+import { PatientDevice } from "@/types/patients/patient-device.types";
 import { toast } from "sonner";
+import { ChevronDown, ChevronUp, Trash2, Headphones, Plus, Save, X } from "lucide-react";
 
 interface HeaderInfoProps { icon: React.ReactNode; text: string; isWarning?: boolean; }
 const HeaderInfo = ({ icon, text, isWarning }: HeaderInfoProps) => (
@@ -77,6 +86,205 @@ const getTypeStyle = (type: ControlType) => {
         case ControlType.GENERAL: return "bg-emerald-50 text-emerald-600 border-emerald-100";
         default: return "bg-slate-50 text-slate-600 border-slate-100";
     }
+};
+
+const BACKGROUND_LABELS: Record<string, string> = {
+  earInfections: 'Infecciones de oído',
+  nasalSurgery: 'Cirugía nasal',
+  throatSurgery: 'Cirugía de garganta',
+  earSurgery: 'Cirugía de oído',
+  diabetes: 'Diabetes',
+  cholesterol: 'Colesterol alto',
+  highPressure: 'Presión alta',
+  allergies: 'Alergias',
+  rhinitis: 'Rinitis',
+  vertigo: 'Vértigo',
+  tinnitus: 'Tinnitus',
+  headacheNoise: 'Dolor de cabeza / ruido',
+  cloggedEar: 'Oído tapado',
+};
+const BACKGROUND_KEYS = Object.keys(BACKGROUND_LABELS) as Array<keyof Omit<PatientBackgroundEntity, 'uuid' | 'patientUuid' | 'updatedAt' | 'notes'>>;
+
+const BackgroundPanel = ({ patientUuid }: { patientUuid: string }) => {
+  const { data: background, isLoading } = usePatientBackgroundQuery(patientUuid);
+  const { executeUpsertBackground, isPending } = useUpsertPatientBackgroundMutation(patientUuid);
+  const [isOpen, setIsOpen] = useState(false);
+  const [values, setValues] = useState<UpsertPatientBackgroundPayload | null>(null);
+
+  const handleOpen = () => {
+    const defaults = BACKGROUND_KEYS.reduce((acc, key) => ({ ...acc, [key]: background?.[key] ?? false }), {} as Record<string, boolean>);
+    setValues({ ...defaults, notes: background?.notes ?? null } as UpsertPatientBackgroundPayload);
+    setIsOpen(true);
+  };
+
+  const handleSave = () => {
+    if (!values) return;
+    executeUpsertBackground(values, {
+      onSuccess: () => { toast.success('Antecedentes actualizados'); setIsOpen(false); },
+      onError: () => toast.error('Error al guardar antecedentes'),
+    });
+  };
+
+  const positiveCount = background ? BACKGROUND_KEYS.filter((k) => background[k]).length : 0;
+
+  return (
+    <div className="bg-white rounded-[1.8rem] border border-slate-100 shadow-sm overflow-hidden">
+      <button onClick={() => (isOpen ? setIsOpen(false) : handleOpen())} className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors">
+        <div className="flex items-center gap-3">
+          <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-slate-800">Antecedentes médicos</Typography>
+          {positiveCount > 0 && (
+            <span className="px-2 py-0.5 bg-red-50 text-red-600 border border-red-100 rounded-lg text-[10px] font-black">{positiveCount} positivos</span>
+          )}
+          {isLoading && <span className="text-[10px] text-slate-400 font-bold">Cargando...</span>}
+        </div>
+        {isOpen ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+      </button>
+
+      {isOpen && values && (
+        <div className="px-5 pb-5 border-t border-slate-100">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
+            {BACKGROUND_KEYS.map((key) => (
+              <label key={key} className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition-all text-xs font-bold select-none ${(values as Record<string, unknown>)[key] ? 'bg-red-50 border-red-200 text-red-700' : 'bg-slate-50 border-transparent text-slate-500 hover:border-slate-200'}`}>
+                <input
+                  type="checkbox"
+                  checked={!!(values as Record<string, unknown>)[key]}
+                  onChange={(e) => setValues((prev) => prev ? { ...prev, [key]: e.target.checked } : prev)}
+                  className="accent-red-500 w-3.5 h-3.5 shrink-0"
+                />
+                {BACKGROUND_LABELS[key]}
+              </label>
+            ))}
+          </div>
+          <div className="mt-3">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Notas adicionales</label>
+            <textarea
+              value={values.notes ?? ''}
+              onChange={(e) => setValues((prev) => prev ? { ...prev, notes: e.target.value || null } : prev)}
+              rows={2}
+              placeholder="Observaciones adicionales..."
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-400 resize-none transition-all"
+            />
+          </div>
+          <div className="flex justify-end gap-2 mt-3">
+            <button onClick={() => setIsOpen(false)} className="flex items-center gap-1.5 px-4 py-2 text-slate-400 hover:text-slate-600 font-black text-[10px] uppercase tracking-widest transition-colors">
+              <X size={12} /> Cancelar
+            </button>
+            <button onClick={handleSave} disabled={isPending} className="flex items-center gap-1.5 px-5 py-2 bg-slate-900 hover:bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50">
+              <Save size={12} /> {isPending ? 'Guardando...' : 'Guardar'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const SIDE_LABELS: Record<string, string> = { OD: 'Oído Derecho', OI: 'Oído Izquierdo', AMBOS: 'Ambos' };
+
+const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
+  const queryClient = useQueryClient();
+  const { data: devices, isLoading } = usePatientDevicesQuery(patientUuid);
+  const { executeCreateDevice, isPending: isCreating } = useCreatePatientDeviceMutation(patientUuid);
+  const { executeDeactivateDevice } = useDeactivatePatientDeviceMutation(patientUuid);
+  const [isOpen, setIsOpen] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ side: 'OD' as PatientDevice['side'], brand: '', model: '', serialNumber: '', warrantyUntil: '' });
+
+  const handleCreate = () => {
+    executeCreateDevice(
+      { side: form.side, brand: form.brand || undefined, model: form.model || undefined, serialNumber: form.serialNumber || undefined, warrantyUntil: form.warrantyUntil || undefined },
+      {
+        onSuccess: () => {
+          toast.success('Audífono registrado');
+          setShowForm(false);
+          setForm({ side: 'OD', brand: '', model: '', serialNumber: '', warrantyUntil: '' });
+          queryClient.invalidateQueries({ queryKey: ['fetchPatientDevices', patientUuid] });
+        },
+        onError: () => toast.error('Error al registrar el audífono'),
+      },
+    );
+  };
+
+  const handleDeactivate = (deviceUuid: string) => {
+    if (!window.confirm('¿Eliminar este audífono del registro del paciente?')) return;
+    executeDeactivateDevice(deviceUuid, {
+      onSuccess: () => {
+        toast.success('Audífono eliminado');
+        queryClient.invalidateQueries({ queryKey: ['fetchPatientDevices', patientUuid] });
+      },
+      onError: () => toast.error('Error al eliminar el audífono'),
+    });
+  };
+
+  const activeDevices = (devices ?? []) as PatientDevice[];
+
+  return (
+    <div className="bg-white rounded-[1.8rem] border border-slate-100 shadow-sm overflow-hidden">
+      <button onClick={() => setIsOpen((o) => !o)} className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors">
+        <div className="flex items-center gap-3">
+          <Headphones className="h-4 w-4 text-slate-500" />
+          <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-slate-800">Audífonos registrados</Typography>
+          {!isLoading && <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-black">{activeDevices.length}</span>}
+        </div>
+        {isOpen ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+      </button>
+
+      {isOpen && (
+        <div className="px-5 pb-5 border-t border-slate-100 space-y-3 mt-4">
+          {isLoading ? (
+            <p className="text-xs text-slate-400 text-center py-4">Cargando...</p>
+          ) : activeDevices.length === 0 ? (
+            <p className="text-xs text-slate-400 italic text-center py-4">Sin audífonos registrados.</p>
+          ) : (
+            activeDevices.map((device) => (
+              <div key={device.uuid} className="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest bg-blue-100 text-blue-700 px-2 py-0.5 rounded-lg">{SIDE_LABELS[device.side]}</span>
+                    {device.brand && <span className="text-xs font-bold text-slate-700">{device.brand} {device.model}</span>}
+                  </div>
+                  {device.serialNumber && <p className="text-[10px] text-slate-400 font-medium">S/N: {device.serialNumber}</p>}
+                  {device.warrantyUntil && <p className="text-[10px] text-slate-400">Garantía hasta: {new Date(device.warrantyUntil).toLocaleDateString('es-ES')}</p>}
+                </div>
+                <button onClick={() => handleDeactivate(device.uuid)} className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))
+          )}
+
+          {showForm ? (
+            <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 space-y-3">
+              <div className="grid grid-cols-3 gap-2">
+                {(['OD', 'OI', 'AMBOS'] as const).map((s) => (
+                  <button key={s} onClick={() => setForm((f) => ({ ...f, side: s }))} className={`py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${form.side === s ? 'bg-blue-600 text-white' : 'bg-white text-slate-500 border border-slate-200'}`}>
+                    {SIDE_LABELS[s]}
+                  </button>
+                ))}
+              </div>
+              {['brand', 'model', 'serialNumber'].map((field) => (
+                <input key={field} placeholder={{ brand: 'Marca', model: 'Modelo', serialNumber: 'Número de serie' }[field]} value={(form as Record<string, string>)[field]} onChange={(e) => setForm((f) => ({ ...f, [field]: e.target.value }))} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-400 transition-all" />
+              ))}
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Garantía hasta</label>
+                <input type="date" value={form.warrantyUntil} onChange={(e) => setForm((f) => ({ ...f, warrantyUntil: e.target.value }))} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-400 transition-all" />
+              </div>
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setShowForm(false)} className="px-4 py-2 text-slate-400 font-black text-[10px] uppercase tracking-widest hover:text-slate-600 transition-colors">Cancelar</button>
+                <button onClick={handleCreate} disabled={isCreating} className="flex items-center gap-1.5 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50">
+                  <Save size={12} /> {isCreating ? 'Guardando...' : 'Registrar'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button onClick={() => setShowForm(true)} className="w-full flex items-center justify-center gap-1.5 py-2.5 border border-dashed border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-blue-300 hover:text-blue-600 transition-all">
+              <Plus size={12} /> Agregar audífono
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export const PatientDetailContainer = ({ id }: { id: string }) => {
@@ -184,6 +392,12 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                 <StatCard title="Próxima cita" value={summary.nextAppointment} icon={<CalendarIcon className="h-5 w-5 text-blue-600" />} onClick={() => navigation.appointments.list()} />
                 <StatCard title="Próx. mantenimiento" value={summary.warrantyExpiration} icon={<ShieldCheckIcon className="h-5 w-5 text-emerald-600" />} onClick={() => navigation.maintenance.list()} />
                 <StatCard title="Mantenimientos" value={`${summary.pendingMaintenance.length} registrados`} icon={<WrenchScrewdriverIcon className="h-5 w-5 text-amber-600" />} onClick={() => navigation.maintenance.list()} />
+            </div>
+
+            {/* ANTECEDENTES Y AUDÍFONOS */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <BackgroundPanel patientUuid={id} />
+                <DevicesPanel patientUuid={id} />
             </div>
 
             {/* HISTORIAL CLÍNICO */}
@@ -300,19 +514,12 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                     )}
                 </div>
 
-                {/* DOCUMENTOS — pendiente de backend */}
-                <div className="bg-white rounded-[1.8rem] border border-dashed border-slate-200 p-8 flex flex-col items-center justify-center gap-3 text-center">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center">
-                        <FileText className="h-5 w-5 text-slate-300" />
-                    </div>
-                    <div>
-                        <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-slate-500">
-                            Documentos del paciente
-                        </Typography>
-                        <Typography variant={TypographyVariant.CAPTION} className="text-xs text-slate-400 mt-0.5">
-                            Próximamente — almacenamiento de archivos en configuración
-                        </Typography>
-                    </div>
+                {/* DOCUMENTOS */}
+                <div className="bg-white rounded-[1.8rem] border border-slate-100 shadow-sm p-5">
+                    <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-slate-800 mb-4">
+                        Documentos del paciente
+                    </Typography>
+                    <DocumentsContainer patientId={id} />
                 </div>
             </div>
         </div>
