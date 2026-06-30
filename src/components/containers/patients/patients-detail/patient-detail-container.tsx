@@ -182,8 +182,8 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
             {/* INDICADORES RÁPIDOS */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <StatCard title="Próxima cita" value={summary.nextAppointment} icon={<CalendarIcon className="h-5 w-5 text-blue-600" />} onClick={() => navigation.appointments.list()} />
-                <StatCard title="Garantía equipo" value={summary.warrantyExpiration} icon={<ShieldCheckIcon className="h-5 w-5 text-emerald-600" />} onClick={() => {}} />
-                <StatCard title="Mantenimientos" value={`${summary.pendingMaintenance.length} pendientes`} icon={<WrenchScrewdriverIcon className="h-5 w-5 text-amber-600" />} onClick={() => {}} />
+                <StatCard title="Próx. mantenimiento" value={summary.warrantyExpiration} icon={<ShieldCheckIcon className="h-5 w-5 text-emerald-600" />} onClick={() => navigation.maintenance.list()} />
+                <StatCard title="Mantenimientos" value={`${summary.pendingMaintenance.length} registrados`} icon={<WrenchScrewdriverIcon className="h-5 w-5 text-amber-600" />} onClick={() => navigation.maintenance.list()} />
             </div>
 
             {/* HISTORIAL CLÍNICO */}

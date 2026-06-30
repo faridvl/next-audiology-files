@@ -30,7 +30,6 @@ interface AppointmentResponse {
 
 export type RecordTypeFilter = 'ALL' | 'CONTROL' | 'AUDIOGRAM' | 'MAINTENANCE';
 
-// TODO(!): P3-2-API — El API debe validar esto con un guard de especialidad en el backend
 export function usePatientDetail(uuid: string, userSpecialty?: string) {
   // --- ESTADOS ---
   const [page, setPage] = useState(1);
@@ -171,7 +170,7 @@ export function usePatientDetail(uuid: string, userSpecialty?: string) {
   const summary = {
     nextAppointment,
     lastAppointment: mappedHistory.length > 0 ? mappedHistory[0].date : 'Sin registros',
-    pendingMaintenance: [],
+    pendingMaintenance: (maintenancesData ?? []) as MaintenanceEntity[],
     warrantyExpiration,
   };
 

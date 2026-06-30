@@ -1,7 +1,3 @@
-// src/components/containers/clinical-templates/clinical-templates-list-container.tsx
-// TODO(!): P3-3 — Actualmente usa localStorage.
-// Implementar GET /clinical-templates en API para persistencia real.
-
 import React from 'react';
 import { Plus, Edit2, Trash2, FileText } from 'lucide-react';
 import { useClinicalTemplatesList } from './use-clinical-templates-list';
