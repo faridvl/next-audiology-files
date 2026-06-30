@@ -37,6 +37,8 @@ import { useDeactivatePatientDeviceMutation } from "@/shared/api/mutations/patie
 import { PatientDevice } from "@/types/patients/patient-device.types";
 import { toast } from "sonner";
 import { ChevronDown, ChevronUp, Trash2, Headphones, Plus, Save, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { TEXT } from "@/static/texts/i18n";
 
 interface HeaderInfoProps { icon: React.ReactNode; text: string; isWarning?: boolean; }
 const HeaderInfo = ({ icon, text, isWarning }: HeaderInfoProps) => (
@@ -88,24 +90,31 @@ const getTypeStyle = (type: ControlType) => {
     }
 };
 
-const BACKGROUND_LABELS: Record<string, string> = {
-  earInfections: 'Infecciones de oído',
-  nasalSurgery: 'Cirugía nasal',
-  throatSurgery: 'Cirugía de garganta',
-  earSurgery: 'Cirugía de oído',
-  diabetes: 'Diabetes',
-  cholesterol: 'Colesterol alto',
-  highPressure: 'Presión alta',
-  allergies: 'Alergias',
-  rhinitis: 'Rinitis',
-  vertigo: 'Vértigo',
-  tinnitus: 'Tinnitus',
-  headacheNoise: 'Dolor de cabeza / ruido',
-  cloggedEar: 'Oído tapado',
+type BackgroundKey = keyof Omit<PatientBackgroundEntity, 'uuid' | 'patientUuid' | 'updatedAt' | 'notes'>;
+const BACKGROUND_KEYS: BackgroundKey[] = [
+  'earInfections', 'nasalSurgery', 'throatSurgery', 'earSurgery',
+  'diabetes', 'cholesterol', 'highPressure', 'allergies',
+  'rhinitis', 'vertigo', 'tinnitus', 'headacheNoise', 'cloggedEar',
+];
+
+const BACKGROUND_LABEL_KEYS: Record<BackgroundKey, string> = {
+  earInfections: TEXT.PATIENTS.DETAIL.BACKGROUND.LABELS.EAR_INFECTIONS,
+  nasalSurgery: TEXT.PATIENTS.DETAIL.BACKGROUND.LABELS.NASAL_SURGERY,
+  throatSurgery: TEXT.PATIENTS.DETAIL.BACKGROUND.LABELS.THROAT_SURGERY,
+  earSurgery: TEXT.PATIENTS.DETAIL.BACKGROUND.LABELS.EAR_SURGERY,
+  diabetes: TEXT.PATIENTS.DETAIL.BACKGROUND.LABELS.DIABETES,
+  cholesterol: TEXT.PATIENTS.DETAIL.BACKGROUND.LABELS.CHOLESTEROL,
+  highPressure: TEXT.PATIENTS.DETAIL.BACKGROUND.LABELS.HIGH_PRESSURE,
+  allergies: TEXT.PATIENTS.DETAIL.BACKGROUND.LABELS.ALLERGIES,
+  rhinitis: TEXT.PATIENTS.DETAIL.BACKGROUND.LABELS.RHINITIS,
+  vertigo: TEXT.PATIENTS.DETAIL.BACKGROUND.LABELS.VERTIGO,
+  tinnitus: TEXT.PATIENTS.DETAIL.BACKGROUND.LABELS.TINNITUS,
+  headacheNoise: TEXT.PATIENTS.DETAIL.BACKGROUND.LABELS.HEADACHE_NOISE,
+  cloggedEar: TEXT.PATIENTS.DETAIL.BACKGROUND.LABELS.CLOGGED_EAR,
 };
-const BACKGROUND_KEYS = Object.keys(BACKGROUND_LABELS) as Array<keyof Omit<PatientBackgroundEntity, 'uuid' | 'patientUuid' | 'updatedAt' | 'notes'>>;
 
 const BackgroundPanel = ({ patientUuid }: { patientUuid: string }) => {
+  const { t } = useTranslation();
   const { data: background, isLoading } = usePatientBackgroundQuery(patientUuid);
   const { executeUpsertBackground, isPending } = useUpsertPatientBackgroundMutation(patientUuid);
   const [isOpen, setIsOpen] = useState(false);
@@ -120,8 +129,8 @@ const BackgroundPanel = ({ patientUuid }: { patientUuid: string }) => {
   const handleSave = () => {
     if (!values) return;
     executeUpsertBackground(values, {
-      onSuccess: () => { toast.success('Antecedentes actualizados'); setIsOpen(false); },
-      onError: () => toast.error('Error al guardar antecedentes'),
+      onSuccess: () => { toast.success(t(TEXT.PATIENTS.DETAIL.BACKGROUND.SAVE_SUCCESS)); setIsOpen(false); },
+      onError: () => toast.error(t(TEXT.PATIENTS.DETAIL.BACKGROUND.SAVE_ERROR)),
     });
   };
 
@@ -131,11 +140,13 @@ const BackgroundPanel = ({ patientUuid }: { patientUuid: string }) => {
     <div className="bg-white rounded-app-md border border-neutral-100 shadow-sm overflow-hidden">
       <button onClick={() => (isOpen ? setIsOpen(false) : handleOpen())} className="w-full flex items-center justify-between p-5 hover:bg-neutral-50 transition-colors">
         <div className="flex items-center gap-3">
-          <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">Antecedentes médicos</Typography>
+          <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">{t(TEXT.PATIENTS.DETAIL.BACKGROUND.TITLE)}</Typography>
           {positiveCount > 0 && (
-            <Typography variant={TypographyVariant.CAPTION} inline className="px-2 py-0.5 bg-danger/10 text-danger border border-danger/20 rounded-lg font-black">{positiveCount} positivos</Typography>
+            <Typography variant={TypographyVariant.CAPTION} inline className="px-2 py-0.5 bg-danger/10 text-danger border border-danger/20 rounded-lg font-black">
+              {t(TEXT.PATIENTS.DETAIL.BACKGROUND.POSITIVE_COUNT, { count: positiveCount })}
+            </Typography>
           )}
-          {isLoading && <Typography variant={TypographyVariant.CAPTION} inline className="text-neutral-400 font-bold">Cargando...</Typography>}
+          {isLoading && <Typography variant={TypographyVariant.CAPTION} inline className="text-neutral-400 font-bold">{t(TEXT.PATIENTS.DETAIL.BACKGROUND.LOADING)}</Typography>}
         </div>
         {isOpen ? <ChevronUp className="h-4 w-4 text-neutral-400" /> : <ChevronDown className="h-4 w-4 text-neutral-400" />}
       </button>
@@ -151,26 +162,26 @@ const BackgroundPanel = ({ patientUuid }: { patientUuid: string }) => {
                   onChange={(e) => setValues((prev) => prev ? { ...prev, [key]: e.target.checked } : prev)}
                   className="accent-danger w-3.5 h-3.5 shrink-0"
                 />
-                {BACKGROUND_LABELS[key]}
+                {t(BACKGROUND_LABEL_KEYS[key])}
               </label>
             ))}
           </div>
           <div className="mt-3">
-            <Typography variant={TypographyVariant.OVERLINE} as="label" className="mb-1 block">Notas adicionales</Typography>
+            <Typography variant={TypographyVariant.OVERLINE} as="label" className="mb-1 block">{t(TEXT.PATIENTS.DETAIL.BACKGROUND.NOTES)}</Typography>
             <textarea
               value={values.notes ?? ''}
               onChange={(e) => setValues((prev) => prev ? { ...prev, notes: e.target.value || null } : prev)}
               rows={2}
-              placeholder="Observaciones adicionales..."
+              placeholder={t(TEXT.PATIENTS.DETAIL.BACKGROUND.NOTES_PLACEHOLDER)}
               className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-app-sm text-xs outline-none focus:border-primary/50 resize-none transition-all"
             />
           </div>
           <div className="flex justify-end gap-2 mt-3">
             <button onClick={() => setIsOpen(false)} className="flex items-center gap-1.5 px-4 py-2 text-neutral-400 hover:text-neutral-600 font-black text-[10px] uppercase tracking-widest transition-colors">
-              <X size={12} /> Cancelar
+              <X size={12} /> {t(TEXT.GENERAL.BUTTONS.CANCEL)}
             </button>
             <button onClick={handleSave} disabled={isPending} className="flex items-center gap-1.5 px-5 py-2 bg-neutral-900 hover:bg-primary text-white rounded-app-sm font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50">
-              <Save size={12} /> {isPending ? 'Guardando...' : 'Guardar'}
+              <Save size={12} /> {isPending ? t(TEXT.PATIENTS.DETAIL.DEVICES.SAVING) : t(TEXT.GENERAL.BUTTONS.SAVE)}
             </button>
           </div>
         </div>
@@ -179,9 +190,8 @@ const BackgroundPanel = ({ patientUuid }: { patientUuid: string }) => {
   );
 };
 
-const SIDE_LABELS: Record<string, string> = { OD: 'Oído Derecho', OI: 'Oído Izquierdo', AMBOS: 'Ambos' };
-
 const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { data: devices, isLoading } = usePatientDevicesQuery(patientUuid);
   const { executeCreateDevice, isPending: isCreating } = useCreatePatientDeviceMutation(patientUuid);
@@ -190,40 +200,52 @@ const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ side: 'OD' as PatientDevice['side'], brand: '', model: '', serialNumber: '', warrantyUntil: '' });
 
+  const SIDE_LABELS: Record<string, string> = {
+    OD: t(TEXT.PATIENTS.DETAIL.DEVICES.SIDE_OD),
+    OI: t(TEXT.PATIENTS.DETAIL.DEVICES.SIDE_OI),
+    AMBOS: t(TEXT.PATIENTS.DETAIL.DEVICES.SIDE_AMBOS),
+  };
+
   const handleCreate = () => {
     executeCreateDevice(
       { side: form.side, brand: form.brand || undefined, model: form.model || undefined, serialNumber: form.serialNumber || undefined, warrantyUntil: form.warrantyUntil || undefined },
       {
         onSuccess: () => {
-          toast.success('Audífono registrado');
+          toast.success(t(TEXT.PATIENTS.DETAIL.DEVICES.REGISTER_SUCCESS));
           setShowForm(false);
           setForm({ side: 'OD', brand: '', model: '', serialNumber: '', warrantyUntil: '' });
           queryClient.invalidateQueries({ queryKey: ['fetchPatientDevices', patientUuid] });
         },
-        onError: () => toast.error('Error al registrar el audífono'),
+        onError: () => toast.error(t(TEXT.PATIENTS.DETAIL.DEVICES.REGISTER_ERROR)),
       },
     );
   };
 
   const handleDeactivate = (deviceUuid: string) => {
-    if (!window.confirm('¿Eliminar este audífono del registro del paciente?')) return;
+    if (!window.confirm(t(TEXT.PATIENTS.DETAIL.DEVICES.DELETE_CONFIRM))) return;
     executeDeactivateDevice(deviceUuid, {
       onSuccess: () => {
-        toast.success('Audífono eliminado');
+        toast.success(t(TEXT.PATIENTS.DETAIL.DEVICES.DELETE_SUCCESS));
         queryClient.invalidateQueries({ queryKey: ['fetchPatientDevices', patientUuid] });
       },
-      onError: () => toast.error('Error al eliminar el audífono'),
+      onError: () => toast.error(t(TEXT.PATIENTS.DETAIL.DEVICES.DELETE_ERROR)),
     });
   };
 
   const activeDevices = (devices ?? []) as PatientDevice[];
+
+  const fieldPlaceholders: Record<string, string> = {
+    brand: t(TEXT.PATIENTS.DETAIL.DEVICES.BRAND_PLACEHOLDER),
+    model: t(TEXT.PATIENTS.DETAIL.DEVICES.MODEL_PLACEHOLDER),
+    serialNumber: t(TEXT.PATIENTS.DETAIL.DEVICES.SERIAL_NUMBER_PLACEHOLDER),
+  };
 
   return (
     <div className="bg-white rounded-app-md border border-neutral-100 shadow-sm overflow-hidden">
       <button onClick={() => setIsOpen((o) => !o)} className="w-full flex items-center justify-between p-5 hover:bg-neutral-50 transition-colors">
         <div className="flex items-center gap-3">
           <Headphones className="h-4 w-4 text-neutral-500" />
-          <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">Audífonos registrados</Typography>
+          <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">{t(TEXT.PATIENTS.DETAIL.DEVICES.TITLE)}</Typography>
           {!isLoading && <Typography variant={TypographyVariant.CAPTION} inline className="px-2 py-0.5 bg-neutral-100 text-neutral-500 rounded-lg font-black">{activeDevices.length}</Typography>}
         </div>
         {isOpen ? <ChevronUp className="h-4 w-4 text-neutral-400" /> : <ChevronDown className="h-4 w-4 text-neutral-400" />}
@@ -232,9 +254,9 @@ const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
       {isOpen && (
         <div className="px-5 pb-5 border-t border-neutral-100 space-y-3 mt-4">
           {isLoading ? (
-            <Typography variant={TypographyVariant.HELPER} className="text-center py-4">Cargando...</Typography>
+            <Typography variant={TypographyVariant.HELPER} className="text-center py-4">{t(TEXT.PATIENTS.DETAIL.DEVICES.LOADING)}</Typography>
           ) : activeDevices.length === 0 ? (
-            <Typography variant={TypographyVariant.HELPER} className="italic text-center py-4">Sin audífonos registrados.</Typography>
+            <Typography variant={TypographyVariant.HELPER} className="italic text-center py-4">{t(TEXT.PATIENTS.DETAIL.DEVICES.EMPTY)}</Typography>
           ) : (
             activeDevices.map((device) => (
               <div key={device.uuid} className="flex items-center justify-between p-3.5 bg-neutral-50 rounded-app-md border border-neutral-100">
@@ -243,8 +265,8 @@ const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
                     <Typography variant={TypographyVariant.OVERLINE} inline className="bg-primary-soft text-primary-dark px-2 py-0.5 rounded-lg">{SIDE_LABELS[device.side]}</Typography>
                     {device.brand && <Typography variant={TypographyVariant.CAPTION} inline className="font-bold text-neutral-700">{device.brand} {device.model}</Typography>}
                   </div>
-                  {device.serialNumber && <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400 font-medium">S/N: {device.serialNumber}</Typography>}
-                  {device.warrantyUntil && <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400">Garantía hasta: {new Date(device.warrantyUntil).toLocaleDateString('es-ES')}</Typography>}
+                  {device.serialNumber && <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400 font-medium">{t(TEXT.PATIENTS.DETAIL.DEVICES.SERIAL_NUMBER)} {device.serialNumber}</Typography>}
+                  {device.warrantyUntil && <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400">{t(TEXT.PATIENTS.DETAIL.DEVICES.WARRANTY_UNTIL)} {new Date(device.warrantyUntil).toLocaleDateString('es-ES')}</Typography>}
                 </div>
                 <button onClick={() => handleDeactivate(device.uuid)} className="p-2 text-neutral-300 hover:text-danger hover:bg-danger/10 rounded-app-sm transition-all">
                   <Trash2 size={14} />
@@ -263,22 +285,22 @@ const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
                 ))}
               </div>
               {['brand', 'model', 'serialNumber'].map((field) => (
-                <input key={field} placeholder={{ brand: 'Marca', model: 'Modelo', serialNumber: 'Número de serie' }[field]} value={(form as Record<string, string>)[field]} onChange={(e) => setForm((f) => ({ ...f, [field]: e.target.value }))} className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-app-sm text-xs outline-none focus:border-primary/50 transition-all" />
+                <input key={field} placeholder={fieldPlaceholders[field]} value={(form as Record<string, string>)[field]} onChange={(e) => setForm((f) => ({ ...f, [field]: e.target.value }))} className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-app-sm text-xs outline-none focus:border-primary/50 transition-all" />
               ))}
               <div>
-                <Typography variant={TypographyVariant.OVERLINE} as="label" className="mb-1 block">Garantía hasta</Typography>
+                <Typography variant={TypographyVariant.OVERLINE} as="label" className="mb-1 block">{t(TEXT.PATIENTS.DETAIL.DEVICES.WARRANTY_LABEL)}</Typography>
                 <input type="date" value={form.warrantyUntil} onChange={(e) => setForm((f) => ({ ...f, warrantyUntil: e.target.value }))} className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-app-sm text-xs outline-none focus:border-primary/50 transition-all" />
               </div>
               <div className="flex justify-end gap-2">
-                <button onClick={() => setShowForm(false)} className="px-4 py-2 text-neutral-400 font-black text-[10px] uppercase tracking-widest hover:text-neutral-600 transition-colors">Cancelar</button>
+                <button onClick={() => setShowForm(false)} className="px-4 py-2 text-neutral-400 font-black text-[10px] uppercase tracking-widest hover:text-neutral-600 transition-colors">{t(TEXT.GENERAL.BUTTONS.CANCEL)}</button>
                 <button onClick={handleCreate} disabled={isCreating} className="flex items-center gap-1.5 px-5 py-2 bg-primary hover:bg-primary-dark text-white rounded-app-sm font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50">
-                  <Save size={12} /> {isCreating ? 'Guardando...' : 'Registrar'}
+                  <Save size={12} /> {isCreating ? t(TEXT.PATIENTS.DETAIL.DEVICES.SAVING) : t(TEXT.PATIENTS.DETAIL.DEVICES.REGISTER_BUTTON)}
                 </button>
               </div>
             </div>
           ) : (
             <button onClick={() => setShowForm(true)} className="w-full flex items-center justify-center gap-1.5 py-2.5 border border-dashed border-neutral-200 rounded-app-md text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:border-primary/40 hover:text-primary transition-all">
-              <Plus size={12} /> Agregar audífono
+              <Plus size={12} /> {t(TEXT.PATIENTS.DETAIL.DEVICES.ADD)}
             </button>
           )}
         </div>
@@ -288,6 +310,7 @@ const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
 };
 
 export const PatientDetailContainer = ({ id }: { id: string }) => {
+    const { t } = useTranslation();
     const navigation = useNavigation();
     const [isLinkDeviceOpen, setIsLinkDeviceOpen] = useState(false);
     const [isConfirmDelete, setIsConfirmDelete] = useState(false);
@@ -304,7 +327,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
 
     if (isLoading || !patient) return (
         <div className="p-20 text-center animate-pulse text-neutral-400 font-bold uppercase tracking-widest">
-            Cargando expediente...
+            {t(TEXT.PATIENTS.DETAIL.LOADING)}
         </div>
     );
 
@@ -329,7 +352,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                         <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
                             <HeaderInfo icon={<IdentificationIcon className="h-3.5 w-3.5" />} text={patient.uuid.split('-')[0].toUpperCase()} />
                             <HeaderInfo icon={<PhoneIcon className="h-3.5 w-3.5" />} text={patient.phone} />
-                            <HeaderInfo icon={<EnvelopeIcon className="h-3.5 w-3.5" />} text={patient.email ?? 'Sin correo'} isWarning={!patient.email} />
+                            <HeaderInfo icon={<EnvelopeIcon className="h-3.5 w-3.5" />} text={patient.email ?? t(TEXT.PATIENTS.DETAIL.NO_EMAIL)} isWarning={!patient.email} />
                         </div>
                     </div>
                 </div>
@@ -339,29 +362,29 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                             onClick={() => setIsConfirmDelete(true)}
                             className="flex items-center justify-center gap-1.5 border border-danger/30 text-danger px-4 h-10 rounded-app-sm font-black text-[10px] uppercase tracking-widest hover:bg-danger/10 transition-all flex-1 sm:flex-none"
                         >
-                            Desactivar paciente
+                            {t(TEXT.PATIENTS.DETAIL.DEACTIVATE)}
                         </button>
                     )}
                     {isAdmin && isConfirmDelete && (
                         <div className="flex items-center gap-2 border border-danger/30 bg-danger/10 px-4 h-10 rounded-app-sm flex-1 sm:flex-none">
-                            <Typography variant={TypographyVariant.OVERLINE} inline className="text-danger">¿Confirmar?</Typography>
+                            <Typography variant={TypographyVariant.OVERLINE} inline className="text-danger">{t(TEXT.PATIENTS.DETAIL.DEACTIVATE_CONFIRM)}</Typography>
                             <button
                                 disabled={isDeletingPatient}
                                 onClick={async () => {
                                     try {
                                         await deletePatient(id);
-                                        toast.success('Paciente desactivado');
+                                        toast.success(t(TEXT.PATIENTS.DETAIL.DEACTIVATE_SUCCESS));
                                         navigation.patients.list();
                                     } catch {
-                                        toast.error('Error al desactivar');
+                                        toast.error(t(TEXT.PATIENTS.DETAIL.DEACTIVATE_ERROR));
                                         setIsConfirmDelete(false);
                                     }
                                 }}
                                 className="text-[10px] font-black text-white bg-danger hover:bg-danger/80 px-3 py-1 rounded-lg uppercase tracking-widest transition-all disabled:opacity-50"
                             >
-                                {isDeletingPatient ? '...' : 'Sí'}
+                                {isDeletingPatient ? '...' : t(TEXT.PATIENTS.DETAIL.CONFIRM_YES)}
                             </button>
-                            <button onClick={() => setIsConfirmDelete(false)} className="text-[10px] font-black text-neutral-500 hover:text-neutral-700 uppercase tracking-widest">No</button>
+                            <button onClick={() => setIsConfirmDelete(false)} className="text-[10px] font-black text-neutral-500 hover:text-neutral-700 uppercase tracking-widest">{t(TEXT.PATIENTS.DETAIL.CONFIRM_NO)}</button>
                         </div>
                     )}
                     <button
@@ -369,19 +392,21 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                         className="flex items-center justify-center gap-1.5 border border-neutral-200 text-neutral-600 px-4 h-10 rounded-app-sm font-black text-[10px] uppercase tracking-widest hover:bg-neutral-50 hover:border-neutral-300 transition-all flex-1 sm:flex-none"
                     >
                         <Link className="h-4 w-4 shrink-0" />
-                        <Typography variant={TypographyVariant.CAPTION} inline className="truncate font-black">{patient.linkedProductUuid ? 'Cambiar audífono' : 'Vincular audífono'}</Typography>
+                        <Typography variant={TypographyVariant.CAPTION} inline className="truncate font-black">
+                            {patient.linkedProductUuid ? t(TEXT.PATIENTS.DETAIL.CHANGE_DEVICE) : t(TEXT.PATIENTS.DETAIL.LINK_DEVICE)}
+                        </Typography>
                     </button>
                     <button
                         onClick={() => navigation.patients.ficha(id)}
                         className="flex items-center justify-center gap-1.5 border border-neutral-200 text-neutral-600 px-4 h-10 rounded-app-sm font-black text-[10px] uppercase tracking-widest hover:bg-neutral-50 hover:border-neutral-300 transition-all flex-1 sm:flex-none"
                     >
                         <ClipboardList className="h-4 w-4 shrink-0" />
-                        <Typography variant={TypographyVariant.CAPTION} inline className="truncate font-black">Ver ficha completa</Typography>
+                        <Typography variant={TypographyVariant.CAPTION} inline className="truncate font-black">{t(TEXT.PATIENTS.DETAIL.VIEW_FULL_FILE)}</Typography>
                     </button>
                     {canStartConsulta && (
                         <Button variant={ButtonVariant.PRIMARY} className="rounded-app-sm px-5 h-10 shadow-lg shadow-primary-soft flex-1 sm:flex-none" onClick={() => navigation.patients.consulta(id)}>
                             <PlusIcon className="h-4 w-4 mr-2 shrink-0" />
-                            <Typography variant={TypographyVariant.CAPTION} inline className="font-bold uppercase tracking-tight">Iniciar consulta</Typography>
+                            <Typography variant={TypographyVariant.CAPTION} inline className="font-bold uppercase tracking-tight">{t(TEXT.PATIENTS.DETAIL.START_CONSULTA)}</Typography>
                         </Button>
                     )}
                 </div>
@@ -389,9 +414,9 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
 
             {/* INDICADORES RÁPIDOS */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <StatCard title="Próxima cita" value={summary.nextAppointment} icon={<CalendarIcon className="h-5 w-5 text-primary" />} onClick={() => navigation.appointments.list()} />
-                <StatCard title="Próx. mantenimiento" value={summary.warrantyExpiration} icon={<ShieldCheckIcon className="h-5 w-5 text-success" />} onClick={() => navigation.maintenance.list()} />
-                <StatCard title="Mantenimientos" value={`${summary.pendingMaintenance.length} registrados`} icon={<WrenchScrewdriverIcon className="h-5 w-5 text-warning" />} onClick={() => navigation.maintenance.list()} />
+                <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.NEXT_APPOINTMENT)} value={summary.nextAppointment} icon={<CalendarIcon className="h-5 w-5 text-primary" />} onClick={() => navigation.appointments.list()} />
+                <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.NEXT_MAINTENANCE)} value={summary.warrantyExpiration} icon={<ShieldCheckIcon className="h-5 w-5 text-success" />} onClick={() => navigation.maintenance.list()} />
+                <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.MAINTENANCE_COUNT)} value={t(TEXT.PATIENTS.DETAIL.STATS.MAINTENANCE_COUNT_VALUE, { count: summary.pendingMaintenance.length })} icon={<WrenchScrewdriverIcon className="h-5 w-5 text-warning" />} onClick={() => navigation.maintenance.list()} />
             </div>
 
             {/* ANTECEDENTES Y AUDÍFONOS */}
@@ -402,17 +427,16 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
 
             {/* HISTORIAL CLÍNICO */}
             <div className="space-y-4">
-                {/* Filtros */}
                 <div className="flex flex-col gap-3 bg-white p-4 rounded-app-md border border-neutral-100 shadow-sm">
                     <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                        <SpecFilterButton label="Todos" isActive={recordTypeFilter === 'ALL'} onClick={() => setRecordTypeFilter('ALL')} />
-                        <SpecFilterButton label="Controles" isActive={recordTypeFilter === 'CONTROL'} onClick={() => setRecordTypeFilter('CONTROL')} />
-                        <SpecFilterButton label="Audiogramas" isActive={recordTypeFilter === 'AUDIOGRAM'} onClick={() => setRecordTypeFilter('AUDIOGRAM')} />
-                        <SpecFilterButton label="Mantenimientos" isActive={recordTypeFilter === 'MAINTENANCE'} onClick={() => setRecordTypeFilter('MAINTENANCE')} />
+                        <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_ALL)} isActive={recordTypeFilter === 'ALL'} onClick={() => setRecordTypeFilter('ALL')} />
+                        <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_CONTROLS)} isActive={recordTypeFilter === 'CONTROL'} onClick={() => setRecordTypeFilter('CONTROL')} />
+                        <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_AUDIOGRAMS)} isActive={recordTypeFilter === 'AUDIOGRAM'} onClick={() => setRecordTypeFilter('AUDIOGRAM')} />
+                        <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_MAINTENANCE)} isActive={recordTypeFilter === 'MAINTENANCE'} onClick={() => setRecordTypeFilter('MAINTENANCE')} />
                     </div>
                     {specialityOptions.length > 1 && (
                         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                            <SpecFilterButton label="Toda especialidad" isActive={selectedSpec === 'ALL'} onClick={() => setSelectedSpec('ALL')} />
+                            <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_ALL_SPECIALTY)} isActive={selectedSpec === 'ALL'} onClick={() => setSelectedSpec('ALL')} />
                             {specialityOptions.map((spec) => (
                                 <SpecFilterButton key={spec} label={spec} isActive={selectedSpec === spec} onClick={() => setSelectedSpec(spec)} />
                             ))}
@@ -422,7 +446,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                         <MagnifyingGlassIcon className="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" />
                         <input
                             type="text"
-                            placeholder="Buscar en registros..."
+                            placeholder={t(TEXT.PATIENTS.DETAIL.HISTORY.SEARCH_PLACEHOLDER)}
                             className="w-full pl-10 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-app-sm text-xs outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                             value={searchTerm}
                             onChange={(event) => setSearchTerm(event.target.value)}
@@ -436,7 +460,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                         <div className="flex items-center justify-between">
                             <div>
                                 <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">
-                                    Audiograma más reciente
+                                    {t(TEXT.PATIENTS.DETAIL.HISTORY.LATEST_AUDIOGRAM)}
                                 </Typography>
                                 <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 font-medium">
                                     {history.find(record => record.type === 'AUDIOLOGY')?.date ?? ''}
@@ -471,7 +495,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                 <div className="space-y-3">
                     {history.length === 0 ? (
                         <div className="py-16 text-center bg-white rounded-app-xl border border-dashed border-neutral-200 text-neutral-400 text-xs font-bold uppercase tracking-widest">
-                            No hay registros
+                            {t(TEXT.PATIENTS.DETAIL.HISTORY.EMPTY)}
                         </div>
                     ) : (
                         <>
@@ -507,7 +531,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                                     disabled={isFetching}
                                     className="w-full py-3 text-center text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:text-primary border border-dashed border-neutral-200 rounded-app-lg hover:border-primary/40 transition-all disabled:opacity-50"
                                 >
-                                    {isFetching ? 'Cargando...' : 'Cargar más registros'}
+                                    {isFetching ? t(TEXT.PATIENTS.DETAIL.HISTORY.LOADING) : t(TEXT.PATIENTS.DETAIL.HISTORY.LOAD_MORE)}
                                 </button>
                             )}
                         </>
@@ -517,7 +541,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                 {/* DOCUMENTOS */}
                 <div className="bg-white rounded-app-md border border-neutral-100 shadow-sm p-5">
                     <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800 mb-4">
-                        Documentos del paciente
+                        {t(TEXT.PATIENTS.DETAIL.DOCUMENTS.TITLE)}
                     </Typography>
                     <DocumentsContainer patientId={id} />
                 </div>

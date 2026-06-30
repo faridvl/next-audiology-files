@@ -6,6 +6,8 @@ import { useNavigation } from '@/hooks/use-navigation';
 import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
 import { useConsultaControl } from './use-consulta-control';
+import { useTranslation } from 'react-i18next';
+import { TEXT } from '@/static/texts/i18n';
 
 interface Props {
   patientUuid: string;
@@ -15,6 +17,7 @@ const inputClass = 'w-full px-4 py-3 rounded-app-sm border border-neutral-200 bg
 const textareaClass = `${inputClass} min-h-[100px]`;
 
 export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const { data: patient } = usePatientDetailQuery(patientUuid);
   const {
@@ -43,7 +46,7 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
         </button>
         <div>
           <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-primary">
-            Control clínico
+            {t(TEXT.CONSULTA.CONTROL.BREADCRUMB)}
           </Typography>
           <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
             {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
@@ -57,27 +60,27 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
         {isAudiology && (
           <section className="space-y-4">
             <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1">
-              Otoscopía
+              {t(TEXT.CONSULTA.CONTROL.OTOSCOPY)}
             </Typography>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Typography variant={TypographyVariant.OVERLINE} as="label" className="block text-primary ml-1">
-                  Oído derecho (OD)
+                  {t(TEXT.CONSULTA.CONTROL.OTOSCOPY_RIGHT)}
                 </Typography>
                 <textarea
                   className={`${textareaClass} border-primary-soft bg-primary-soft/20 focus:border-primary/30`}
-                  placeholder="Hallazgos oído derecho..."
+                  placeholder={t(TEXT.CONSULTA.CONTROL.OTOSCOPY_RIGHT_PLACEHOLDER)}
                   value={fields.otoscopyRight}
                   onChange={(e) => fields.setOtoscopyRight(e.target.value)}
                 />
               </div>
               <div className="space-y-1.5">
                 <Typography variant={TypographyVariant.OVERLINE} as="label" className="block text-danger ml-1">
-                  Oído izquierdo (OI)
+                  {t(TEXT.CONSULTA.CONTROL.OTOSCOPY_LEFT)}
                 </Typography>
                 <textarea
                   className={`${textareaClass} border-danger/20 bg-danger/5 focus:border-danger/30`}
-                  placeholder="Hallazgos oído izquierdo..."
+                  placeholder={t(TEXT.CONSULTA.CONTROL.OTOSCOPY_LEFT_PLACEHOLDER)}
                   value={fields.otoscopyLeft}
                   onChange={(e) => fields.setOtoscopyLeft(e.target.value)}
                 />
@@ -90,7 +93,7 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
         {templates.length > 1 && (
           <section className="space-y-2 pt-2 border-t border-neutral-50">
             <Typography variant={TypographyVariant.OVERLINE} as="label" className="block ml-1">
-              Plantilla clínica
+              {t(TEXT.CONSULTA.CONTROL.TEMPLATE_LABEL)}
             </Typography>
             <select
               className={`${inputClass} bg-white`}
@@ -144,7 +147,7 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
                     {field.fieldType === 'textarea' && (
                       <textarea
                         className={`${inputClass} min-h-[80px]`}
-                        placeholder="Apuntes adicionales..."
+                        placeholder={t(TEXT.CONSULTA.CONTROL.ADDITIONAL_NOTES)}
                         value={String(currentValue)}
                         onChange={(e) => fields.setFieldValue(field.id, e.target.value)}
                       />
@@ -176,7 +179,7 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
                         value={String(currentValue)}
                         onChange={(e) => fields.setFieldValue(field.id, e.target.value)}
                       >
-                        <option value="">— Seleccionar —</option>
+                        <option value="">{t(TEXT.CONSULTA.CONTROL.SELECT_OPTION)}</option>
                         {field.options.map((opt) => (
                           <option key={opt} value={opt}>{opt}</option>
                         ))}
@@ -192,11 +195,11 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
         {/* DIAGNÓSTICO */}
         <section className="space-y-2 pt-2 border-t border-neutral-50">
           <Typography variant={TypographyVariant.OVERLINE} as="label" className="block ml-1">
-            Diagnóstico <Typography variant={TypographyVariant.OVERLINE} inline className="text-danger">*</Typography>
+            {t(TEXT.CONSULTA.CONTROL.DIAGNOSIS)} <Typography variant={TypographyVariant.OVERLINE} inline className="text-danger">*</Typography>
           </Typography>
           <textarea
             className={`${textareaClass} min-h-[120px]`}
-            placeholder="Escribe el diagnóstico de esta consulta..."
+            placeholder={t(TEXT.CONSULTA.CONTROL.DIAGNOSIS_PLACEHOLDER)}
             value={fields.diagnosis}
             onChange={(e) => fields.setDiagnosis(e.target.value)}
           />
@@ -205,7 +208,7 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
 
       {/* BOTONES */}
       <div className="flex justify-end gap-3">
-        <Button variant={ButtonVariant.CANCEL} onClick={() => navigation.patients.consulta(patientUuid)} text="Cancelar" />
+        <Button variant={ButtonVariant.CANCEL} onClick={() => navigation.patients.consulta(patientUuid)} text={t(TEXT.GENERAL.BUTTONS.CANCEL)} />
         <Button
           variant={ButtonVariant.PRIMARY}
           className="!h-12 !px-10 !rounded-app-sm shadow-lg shadow-primary-soft"
@@ -213,7 +216,7 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
           disabled={isPending}
         >
           <Save size={16} className="mr-2" />
-          {isPending ? 'Guardando...' : 'Guardar control'}
+          {isPending ? t(TEXT.CONSULTA.CONTROL.SAVING) : t(TEXT.CONSULTA.CONTROL.SAVE)}
         </Button>
       </div>
     </div>

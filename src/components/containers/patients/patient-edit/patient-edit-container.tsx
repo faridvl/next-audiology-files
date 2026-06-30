@@ -5,12 +5,15 @@ import { UserIcon as HeroUserIcon, PhoneIcon, EnvelopeIcon, MapPinIcon } from '@
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { usePatientEdit } from './use-patient-edit';
+import { useTranslation } from 'react-i18next';
+import { TEXT } from '@/static/texts/i18n';
 
 interface Props {
   patientUuid: string;
 }
 
 export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
+  const { t } = useTranslation();
   const {
     initialValues,
     isLoadingPatient,
@@ -46,7 +49,7 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
         onClick={handleCancel}
         className="flex items-center gap-2 text-neutral-400 hover:text-neutral-900 font-medium text-xs uppercase tracking-widest transition-all mb-6"
       >
-        <ArrowLeft size={14} /> Volver al expediente
+        <ArrowLeft size={14} /> {t(TEXT.PATIENTS.EDIT.BACK_TO_FILE)}
       </button>
 
       <div className="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-app-2xl overflow-hidden border border-neutral-100">
@@ -56,10 +59,10 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
           </div>
           <div>
             <Typography variant={TypographyVariant.SUBTITLE} textColor="text-neutral-800">
-              Editar Paciente
+              {t(TEXT.PATIENTS.EDIT.TITLE)}
             </Typography>
             <Typography variant={TypographyVariant.HELPER}>
-              Actualice los datos del expediente clínico.
+              {t(TEXT.PATIENTS.EDIT.SUBTITLE)}
             </Typography>
           </div>
         </div>
@@ -76,11 +79,10 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
             <Form className="p-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 
-                {/* Nombre */}
                 <div>
-                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>Nombre</Typography>
+                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.FIRST_NAME)}</Typography>
                   <div className="relative group">
-                    <Field name="firstName" maxLength={60} className={inputClasses} placeholder="Nombre" />
+                    <Field name="firstName" maxLength={60} className={inputClasses} placeholder={t(TEXT.PATIENTS.EDIT.FORM.FIRST_NAME)} />
                     <HeroUserIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary transition-colors" />
                   </div>
                   <ErrorMessage name="firstName" render={(msg) => (
@@ -88,11 +90,10 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                   )} />
                 </div>
 
-                {/* Apellido */}
                 <div>
-                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>Apellido</Typography>
+                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.LAST_NAME)}</Typography>
                   <div className="relative group">
-                    <Field name="lastName" maxLength={60} className={inputClasses} placeholder="Apellido" />
+                    <Field name="lastName" maxLength={60} className={inputClasses} placeholder={t(TEXT.PATIENTS.EDIT.FORM.LAST_NAME)} />
                     <HeroUserIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary transition-colors" />
                   </div>
                   <ErrorMessage name="lastName" render={(msg) => (
@@ -100,9 +101,8 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                   )} />
                 </div>
 
-                {/* Teléfono */}
                 <div>
-                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>Teléfono Móvil</Typography>
+                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.PHONE)}</Typography>
                   <div className="relative group">
                     <Field
                       name="phone"
@@ -118,25 +118,23 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                   )} />
                 </div>
 
-                {/* Género */}
                 <div>
-                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>Género</Typography>
+                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.GENDER)}</Typography>
                   <Field
                     as="select"
                     name="gender"
                     className={`${inputClasses} pl-4`}
                   >
-                    <option value="">Sin especificar</option>
-                    <option value="male">Masculino</option>
-                    <option value="female">Femenino</option>
+                    <option value="">{t(TEXT.PATIENTS.EDIT.FORM.GENDER_UNSPECIFIED)}</option>
+                    <option value="male">{t(TEXT.PATIENTS.EDIT.FORM.GENDER_MALE)}</option>
+                    <option value="female">{t(TEXT.PATIENTS.EDIT.FORM.GENDER_FEMALE)}</option>
                   </Field>
                 </div>
 
-                {/* Correo */}
                 <div className="md:col-span-2">
-                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>Correo Electrónico</Typography>
+                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.EMAIL)}</Typography>
                   <div className="relative group">
-                    <Field name="email" type="email" className={inputClasses} placeholder="paciente@ejemplo.com" />
+                    <Field name="email" type="email" className={inputClasses} placeholder={t(TEXT.PATIENTS.EDIT.FORM.EMAIL_PLACEHOLDER)} />
                     <EnvelopeIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary" />
                   </div>
                   <ErrorMessage name="email" render={(msg) => (
@@ -144,11 +142,10 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                   )} />
                 </div>
 
-                {/* Dirección */}
                 <div className="md:col-span-2">
-                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>Dirección</Typography>
+                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.ADDRESS)}</Typography>
                   <div className="relative group">
-                    <Field name="address" maxLength={120} className={inputClasses} placeholder="Ej. San José, Barrio Escalante..." />
+                    <Field name="address" maxLength={120} className={inputClasses} placeholder={t(TEXT.PATIENTS.EDIT.FORM.ADDRESS_PLACEHOLDER)} />
                     <MapPinIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary" />
                   </div>
                   <ErrorMessage name="address" render={(msg) => (
@@ -164,7 +161,7 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                   onClick={handleCancel}
                   disabled={isSaving}
                 >
-                  Cancelar
+                  {t(TEXT.GENERAL.BUTTONS.CANCEL)}
                 </Button>
                 <Button
                   variant={ButtonVariant.PRIMARY}
@@ -172,7 +169,7 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                   className="flex-1 py-4 rounded-app-md text-base shadow-xl shadow-primary-dark/10"
                   disabled={isSaving}
                 >
-                  {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+                  {isSaving ? t(TEXT.PATIENTS.EDIT.FORM.SAVING) : t(TEXT.PATIENTS.EDIT.FORM.SAVE_CHANGES)}
                 </Button>
               </div>
             </Form>

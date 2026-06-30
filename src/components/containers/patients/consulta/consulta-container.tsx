@@ -7,6 +7,8 @@ import { ConsultaSession, ConsultaSessionStorage } from '@/shared/utils/consulta
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
 import { useSession } from '@/hooks/use-session';
 import { UserSpecialty } from '@/types/auth/auth';
+import { useTranslation } from 'react-i18next';
+import { TEXT } from '@/static/texts/i18n';
 
 interface Props {
   patientUuid: string;
@@ -25,9 +27,10 @@ interface SectionButtonProps {
   done: boolean;
   onClick: () => void;
   color: string;
+  doneLabel: string;
 }
 
-function SectionButton({ icon, label, description, done, onClick, color }: SectionButtonProps) {
+function SectionButton({ icon, label, description, done, onClick, color, doneLabel }: SectionButtonProps) {
   return (
     <button
       onClick={onClick}
@@ -53,7 +56,7 @@ function SectionButton({ icon, label, description, done, onClick, color }: Secti
           {label}
         </Typography>
         <Typography variant={TypographyVariant.CAPTION} className={`text-[11px] mt-0.5 ${done ? 'text-success' : 'text-neutral-400'}`}>
-          {done ? 'Guardado ✓' : description}
+          {done ? doneLabel : description}
         </Typography>
       </div>
       <ChevronRight size={16} className={`shrink-0 ${done ? 'text-success/60' : 'text-neutral-300 group-hover:text-neutral-500'}`} />
@@ -62,6 +65,7 @@ function SectionButton({ icon, label, description, done, onClick, color }: Secti
 }
 
 export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const { user } = useSession();
   const { data: patient } = usePatientDetailQuery(patientUuid);
@@ -105,6 +109,7 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
   ].filter(Boolean).length;
 
   const totalCount = isAudiology ? 3 : 2;
+  const doneLabel = t(TEXT.CONSULTA.SAVED_CHECK);
 
   return (
     <div className="w-full max-w-[1400px] mx-auto pb-24 animate-in fade-in duration-500">
@@ -119,7 +124,7 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
         </button>
         <div className="flex-1 min-w-0">
           <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
-            Consulta del día
+            {t(TEXT.CONSULTA.HEADER.DAY_LABEL)}
           </Typography>
           <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
             {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
@@ -131,7 +136,7 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
         {/* Progreso */}
         <div className="hidden md:flex flex-col items-end gap-1 shrink-0">
           <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
-            Progreso
+            {t(TEXT.CONSULTA.HEADER.PROGRESS_LABEL)}
           </Typography>
           <div className="flex items-center gap-2">
             <div className="flex gap-1">
@@ -153,36 +158,39 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
         {/* COLUMNA IZQUIERDA — secciones */}
         <div className="space-y-4">
           <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1">
-            ¿Qué se va a realizar hoy?
+            {t(TEXT.CONSULTA.HEADER.WHAT_TODAY)}
           </Typography>
 
           <SectionButton
             icon={<Stethoscope size={22} />}
-            label="Control clínico"
-            description="Plantilla de preguntas + diagnóstico"
+            label={t(TEXT.CONSULTA.SECTIONS.CLINICAL_CONTROL)}
+            description={t(TEXT.CONSULTA.SECTIONS.CLINICAL_CONTROL_DESC)}
             done={!!session?.savedControlUuid}
             onClick={() => navigation.patients.consultaControl(patientUuid)}
             color="blue"
+            doneLabel={doneLabel}
           />
 
           {isAudiology && (
             <SectionButton
               icon={<Activity size={22} />}
-              label="Audiograma"
-              description="Ingreso numérico por frecuencia OD / OI"
+              label={t(TEXT.CONSULTA.SECTIONS.AUDIOGRAM)}
+              description={t(TEXT.CONSULTA.SECTIONS.AUDIOGRAM_DESC)}
               done={!!session?.savedAudiogram}
               onClick={() => navigation.patients.consultaAudiograma(patientUuid)}
               color="purple"
+              doneLabel={doneLabel}
             />
           )}
 
           <SectionButton
             icon={<Wrench size={22} />}
-            label="Mantenimiento"
-            description="Descripción del servicio + próxima fecha"
+            label={t(TEXT.CONSULTA.SECTIONS.MAINTENANCE)}
+            description={t(TEXT.CONSULTA.SECTIONS.MAINTENANCE_DESC)}
             done={!!session?.savedMaintenanceUuid}
             onClick={() => navigation.patients.consultaMantenimiento(patientUuid)}
             color="amber"
+            doneLabel={doneLabel}
           />
 
           {/* FINALIZAR — mobile */}
@@ -193,7 +201,7 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
                 className="w-full flex items-center justify-center gap-3 bg-neutral-900 hover:bg-primary text-white font-black py-4 rounded-app-md shadow-lg transition-all text-sm"
               >
                 <Flag size={16} />
-                Finalizar consulta
+                {t(TEXT.CONSULTA.FINISH)}
               </button>
             </div>
           )}
@@ -205,7 +213,7 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
           {/* Card paciente */}
           <div className="bg-white border border-neutral-100 rounded-app-xl p-6 shadow-sm space-y-4">
             <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
-              Paciente
+              {t(TEXT.CONSULTA.PATIENT)}
             </Typography>
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-app-md bg-neutral-100 flex items-center justify-center text-neutral-500 font-black text-lg shrink-0">
@@ -225,12 +233,12 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
           {/* Resumen de progreso */}
           <div className="bg-white border border-neutral-100 rounded-app-xl p-6 shadow-sm space-y-3">
             <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
-              Estado de la consulta
+              {t(TEXT.CONSULTA.STATUS.TITLE)}
             </Typography>
             {[
-              { label: 'Control clínico', done: !!session?.savedControlUuid },
-              ...(isAudiology ? [{ label: 'Audiograma', done: !!session?.savedAudiogram }] : []),
-              { label: 'Mantenimiento', done: !!session?.savedMaintenanceUuid },
+              { label: t(TEXT.CONSULTA.SECTIONS.CLINICAL_CONTROL), done: !!session?.savedControlUuid },
+              ...(isAudiology ? [{ label: t(TEXT.CONSULTA.SECTIONS.AUDIOGRAM), done: !!session?.savedAudiogram }] : []),
+              { label: t(TEXT.CONSULTA.SECTIONS.MAINTENANCE), done: !!session?.savedMaintenanceUuid },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-3">
                 <div className={`h-2 w-2 rounded-full shrink-0 ${item.done ? 'bg-success' : 'bg-neutral-200'}`} />
@@ -242,7 +250,7 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
                 </Typography>
                 {item.done && (
                   <span className="ml-auto text-[9px] font-black text-success uppercase tracking-wider">
-                    ✓ Listo
+                    {t(TEXT.CONSULTA.STATUS.DONE)}
                   </span>
                 )}
               </div>
@@ -256,12 +264,12 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
               className="w-full flex items-center justify-center gap-3 bg-neutral-900 hover:bg-primary text-white font-black py-4 rounded-app-md shadow-lg transition-all text-sm"
             >
               <Flag size={16} />
-              Finalizar consulta
+              {t(TEXT.CONSULTA.FINISH)}
             </button>
           ) : (
             <div className="p-4 bg-neutral-50 border border-dashed border-neutral-200 rounded-app-md text-center">
               <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400">
-                Completa al menos una sección para finalizar
+                {t(TEXT.CONSULTA.STATUS.COMPLETE_AT_LEAST_ONE)}
               </Typography>
             </div>
           )}

@@ -11,6 +11,8 @@ import { ConsultaSessionStorage } from '@/shared/utils/consulta-session';
 import { useSession } from '@/hooks/use-session';
 import { UserSpecialty } from '@/types/auth/auth';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import { TEXT } from '@/static/texts/i18n';
 
 interface Props {
   patientUuid: string;
@@ -23,6 +25,7 @@ const userSpecialtyToApiSpeciality: Record<UserSpecialty, MedicalSpeciality> = {
 };
 
 export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid }) => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const { user } = useSession();
   const { data: patient } = usePatientDetailQuery(patientUuid);
@@ -37,7 +40,7 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid }) =>
   function handleSave() {
     const hasData = Object.values(audiogramData.OD).some((v) => v !== '') || Object.values(audiogramData.OI).some((v) => v !== '');
     if (!hasData) {
-      toast.error('Ingresa al menos un valor en el audiograma');
+      toast.error(t(TEXT.CONSULTA.AUDIOGRAM.EMPTY_ERROR));
       return;
     }
 
@@ -46,7 +49,7 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid }) =>
         header: { patientUUID: patientUuid, speciality: apiSpeciality, schemaVersion: 1 },
         clinicalData: {
           findings: { audiogram: audiogramData, type: 'audiogram-only' },
-          diagnosis: 'Audiograma',
+          diagnosis: t(TEXT.CONSULTA.AUDIOGRAM.BREADCRUMB),
         },
         followUp: { hasFollowUp: false, tentativeDate: null },
       },
@@ -54,10 +57,10 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid }) =>
         onSuccess: (data) => {
           const saved = data as { uuid: string };
           ConsultaSessionStorage.update(patientUuid, { savedAudiogram: true, savedControlUuid: saved.uuid });
-          toast.success('Audiograma guardado');
+          toast.success(t(TEXT.CONSULTA.AUDIOGRAM.SAVE_SUCCESS));
           navigation.patients.consulta(patientUuid);
         },
-        onError: () => toast.error('Error al guardar el audiograma. Intenta nuevamente.'),
+        onError: () => toast.error(t(TEXT.CONSULTA.AUDIOGRAM.SAVE_ERROR)),
       },
     );
   }
@@ -75,7 +78,7 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid }) =>
         </button>
         <div>
           <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-accent">
-            Audiograma
+            {t(TEXT.CONSULTA.AUDIOGRAM.BREADCRUMB)}
           </Typography>
           <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
             {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
@@ -88,7 +91,7 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid }) =>
       </div>
 
       <div className="flex justify-end gap-3">
-        <Button variant={ButtonVariant.CANCEL} onClick={() => navigation.patients.consulta(patientUuid)} text="Cancelar" />
+        <Button variant={ButtonVariant.CANCEL} onClick={() => navigation.patients.consulta(patientUuid)} text={t(TEXT.GENERAL.BUTTONS.CANCEL)} />
         <Button
           variant={ButtonVariant.PRIMARY}
           className="!h-12 !px-10 !rounded-app-sm shadow-lg shadow-accent/20"
@@ -96,7 +99,7 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid }) =>
           disabled={isPending}
         >
           <Save size={16} className="mr-2" />
-          {isPending ? 'Guardando...' : 'Guardar audiograma'}
+          {isPending ? t(TEXT.CONSULTA.AUDIOGRAM.SAVING) : t(TEXT.CONSULTA.AUDIOGRAM.SAVE)}
         </Button>
       </div>
     </div>

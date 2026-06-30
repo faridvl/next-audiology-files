@@ -7,6 +7,8 @@ import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
 import { useCreateMaintenanceMutation } from '@/shared/api/mutations/maintenance/create-maintenance-mutation';
 import { ConsultaSessionStorage } from '@/shared/utils/consulta-session';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import { TEXT } from '@/static/texts/i18n';
 
 interface Props {
   patientUuid: string;
@@ -15,6 +17,7 @@ interface Props {
 const inputClass = 'w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm outline-none focus:bg-white focus:border-warning/40 transition-colors';
 
 export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid }) => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const { data: patient } = usePatientDetailQuery(patientUuid);
   const [description, setDescription] = useState('');
@@ -30,7 +33,7 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
 
   function handleSave() {
     if (!description.trim()) {
-      toast.error('La descripción del mantenimiento es requerida');
+      toast.error(t(TEXT.CONSULTA.MAINTENANCE.DESCRIPTION_REQUIRED));
       return;
     }
 
@@ -44,13 +47,19 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
         onSuccess: (data) => {
           const saved = data as { uuid: string };
           ConsultaSessionStorage.update(patientUuid, { savedMaintenanceUuid: saved.uuid });
-          toast.success('Mantenimiento guardado');
+          toast.success(t(TEXT.CONSULTA.MAINTENANCE.SAVE_SUCCESS));
           navigation.patients.consulta(patientUuid);
         },
-        onError: () => toast.error('Error al guardar el mantenimiento. Intenta nuevamente.'),
+        onError: () => toast.error(t(TEXT.CONSULTA.MAINTENANCE.SAVE_ERROR)),
       },
     );
   }
+
+  const quickDates = [
+    { label: t(TEXT.CONSULTA.MAINTENANCE.PLUS_1_MONTH), days: 30 },
+    { label: t(TEXT.CONSULTA.MAINTENANCE.PLUS_3_MONTHS), days: 90 },
+    { label: t(TEXT.CONSULTA.MAINTENANCE.PLUS_6_MONTHS), days: 180 },
+  ];
 
   return (
     <div className="max-w-xl mx-auto p-4 md:p-6 pb-24 space-y-6 animate-in fade-in duration-500">
@@ -65,7 +74,7 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
         </button>
         <div>
           <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-warning">
-            Mantenimiento
+            {t(TEXT.CONSULTA.MAINTENANCE.BREADCRUMB)}
           </Typography>
           <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
             {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
@@ -77,11 +86,11 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
 
         <div className="space-y-2">
           <Typography variant={TypographyVariant.OVERLINE} as="label" className="block ml-1">
-            ¿Qué se realizó? <Typography variant={TypographyVariant.OVERLINE} inline className="text-danger">*</Typography>
+            {t(TEXT.CONSULTA.MAINTENANCE.DESCRIPTION_LABEL)} <Typography variant={TypographyVariant.OVERLINE} inline className="text-danger">*</Typography>
           </Typography>
           <textarea
             className={`${inputClass} min-h-[140px]`}
-            placeholder="Describe el mantenimiento realizado: limpieza, cambio de filtros, ajuste de volumen, etc."
+            placeholder={t(TEXT.CONSULTA.MAINTENANCE.DESCRIPTION_PLACEHOLDER)}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
@@ -89,10 +98,10 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
 
         <div className="space-y-3">
           <Typography variant={TypographyVariant.OVERLINE} as="label" className="block ml-1">
-            Próximo mantenimiento
+            {t(TEXT.CONSULTA.MAINTENANCE.NEXT_MAINTENANCE)}
           </Typography>
           <div className="flex flex-wrap gap-2">
-            {[{ label: '+1 Mes', days: 30 }, { label: '+3 Meses', days: 90 }, { label: '+6 Meses', days: 180 }].map(({ label, days }) => (
+            {quickDates.map(({ label, days }) => (
               <button
                 key={days}
                 type="button"
@@ -111,7 +120,7 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
           />
           {nextMaintenanceAt && (
             <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 ml-1">
-              Próximo:{' '}
+              {t(TEXT.CONSULTA.MAINTENANCE.NEXT_LABEL)}{' '}
               {new Date(nextMaintenanceAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
             </Typography>
           )}
@@ -119,7 +128,7 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
       </div>
 
       <div className="flex justify-end gap-3">
-        <Button variant={ButtonVariant.CANCEL} onClick={() => navigation.patients.consulta(patientUuid)} text="Cancelar" />
+        <Button variant={ButtonVariant.CANCEL} onClick={() => navigation.patients.consulta(patientUuid)} text={t(TEXT.GENERAL.BUTTONS.CANCEL)} />
         <Button
           variant={ButtonVariant.PRIMARY}
           className="!h-12 !px-10 !rounded-xl shadow-lg shadow-warning/20"
@@ -127,7 +136,7 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
           disabled={isPending}
         >
           <Save size={16} className="mr-2" />
-          {isPending ? 'Guardando...' : 'Guardar mantenimiento'}
+          {isPending ? t(TEXT.CONSULTA.MAINTENANCE.SAVING) : t(TEXT.CONSULTA.MAINTENANCE.SAVE)}
         </Button>
       </div>
     </div>

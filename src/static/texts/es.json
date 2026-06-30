@@ -192,6 +192,194 @@
         "viewFile": "Ver Ficha",
         "edit": "Editar"
       }
+    },
+    "edit": {
+      "backToFile": "Volver al expediente",
+      "title": "Editar Paciente",
+      "subtitle": "Actualice los datos del expediente clínico.",
+      "form": {
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "phone": "Teléfono Móvil",
+        "gender": "Género",
+        "genderUnspecified": "Sin especificar",
+        "genderMale": "Masculino",
+        "genderFemale": "Femenino",
+        "email": "Correo Electrónico",
+        "emailPlaceholder": "paciente@ejemplo.com",
+        "address": "Dirección",
+        "addressPlaceholder": "Ej. San José, Barrio Escalante...",
+        "saveChanges": "Guardar Cambios",
+        "saving": "Guardando..."
+      }
+    },
+    "detail": {
+      "loading": "Cargando expediente...",
+      "noEmail": "Sin correo",
+      "deactivate": "Desactivar paciente",
+      "deactivateConfirm": "¿Confirmar?",
+      "deactivateSuccess": "Paciente desactivado",
+      "deactivateError": "Error al desactivar",
+      "confirmYes": "Sí",
+      "confirmNo": "No",
+      "linkDevice": "Vincular audífono",
+      "changeDevice": "Cambiar audífono",
+      "viewFullFile": "Ver ficha completa",
+      "startConsulta": "Iniciar consulta",
+      "stats": {
+        "nextAppointment": "Próxima cita",
+        "nextMaintenance": "Próx. mantenimiento",
+        "maintenanceCount": "Mantenimientos",
+        "maintenanceCountValue": "{{count}} registrados"
+      },
+      "background": {
+        "title": "Antecedentes médicos",
+        "positiveCount": "{{count}} positivos",
+        "loading": "Cargando...",
+        "notes": "Notas adicionales",
+        "notesPlaceholder": "Observaciones adicionales...",
+        "saveSuccess": "Antecedentes actualizados",
+        "saveError": "Error al guardar antecedentes",
+        "labels": {
+          "earInfections": "Infecciones de oído",
+          "nasalSurgery": "Cirugía nasal",
+          "throatSurgery": "Cirugía de garganta",
+          "earSurgery": "Cirugía de oído",
+          "diabetes": "Diabetes",
+          "cholesterol": "Colesterol alto",
+          "highPressure": "Presión alta",
+          "allergies": "Alergias",
+          "rhinitis": "Rinitis",
+          "vertigo": "Vértigo",
+          "tinnitus": "Tinnitus",
+          "headacheNoise": "Dolor de cabeza / ruido",
+          "cloggedEar": "Oído tapado"
+        }
+      },
+      "devices": {
+        "title": "Audífonos registrados",
+        "loading": "Cargando...",
+        "empty": "Sin audífonos registrados.",
+        "warrantyUntil": "Garantía hasta:",
+        "serialNumber": "S/N:",
+        "sideOD": "Oído Derecho",
+        "sideOI": "Oído Izquierdo",
+        "sideAMBOS": "Ambos",
+        "add": "Agregar audífono",
+        "brandPlaceholder": "Marca",
+        "modelPlaceholder": "Modelo",
+        "serialNumberPlaceholder": "Número de serie",
+        "warrantyLabel": "Garantía hasta",
+        "registerButton": "Registrar",
+        "registerSuccess": "Audífono registrado",
+        "registerError": "Error al registrar el audífono",
+        "deleteConfirm": "¿Eliminar este audífono del registro del paciente?",
+        "deleteSuccess": "Audífono eliminado",
+        "deleteError": "Error al eliminar el audífono",
+        "saving": "Guardando..."
+      },
+      "history": {
+        "filterAll": "Todos",
+        "filterControls": "Controles",
+        "filterAudiograms": "Audiogramas",
+        "filterMaintenance": "Mantenimientos",
+        "filterAllSpecialty": "Toda especialidad",
+        "searchPlaceholder": "Buscar en registros...",
+        "latestAudiogram": "Audiograma más reciente",
+        "empty": "No hay registros",
+        "loadMore": "Cargar más registros",
+        "loading": "Cargando..."
+      },
+      "documents": {
+        "title": "Documentos del paciente"
+      }
+    }
+  },
+  "linkDevice": {
+    "title": "Vincular audífono",
+    "searchPlaceholder": "Buscar por nombre, SKU o modelo...",
+    "loadingInventory": "Cargando inventario...",
+    "noResults": "Sin resultados",
+    "removeLink": "Quitar vínculo actual",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "saving": "Guardando...",
+    "successLinked": "Audífono vinculado correctamente",
+    "successUnlinked": "Vínculo eliminado",
+    "error": "No se pudo vincular el audífono"
+  },
+  "consulta": {
+    "header": {
+      "dayLabel": "Consulta del día",
+      "progressLabel": "Progreso",
+      "whatToday": "¿Qué se va a realizar hoy?"
+    },
+    "sections": {
+      "clinicalControl": "Control clínico",
+      "clinicalControlDesc": "Plantilla de preguntas + diagnóstico",
+      "audiogram": "Audiograma",
+      "audiogramDesc": "Ingreso numérico por frecuencia OD / OI",
+      "maintenance": "Mantenimiento",
+      "maintenanceDesc": "Descripción del servicio + próxima fecha"
+    },
+    "status": {
+      "title": "Estado de la consulta",
+      "done": "✓ Listo",
+      "completeAtLeastOne": "Completa al menos una sección para finalizar"
+    },
+    "finish": "Finalizar consulta",
+    "patient": "Paciente",
+    "savedCheck": "Guardado ✓",
+    "control": {
+      "breadcrumb": "Control clínico",
+      "otoscopy": "Otoscopía",
+      "otoscopyRight": "Oído derecho (OD)",
+      "otoscopyRightPlaceholder": "Hallazgos oído derecho...",
+      "otoscopyLeft": "Oído izquierdo (OI)",
+      "otoscopyLeftPlaceholder": "Hallazgos oído izquierdo...",
+      "templateLabel": "Plantilla clínica",
+      "selectOption": "— Seleccionar —",
+      "additionalNotes": "Apuntes adicionales...",
+      "diagnosis": "Diagnóstico",
+      "diagnosisPlaceholder": "Escribe el diagnóstico de esta consulta...",
+      "save": "Guardar control",
+      "saving": "Guardando..."
+    },
+    "audiogram": {
+      "breadcrumb": "Audiograma",
+      "save": "Guardar audiograma",
+      "saving": "Guardando...",
+      "saveSuccess": "Audiograma guardado",
+      "saveError": "Error al guardar el audiograma. Intenta nuevamente.",
+      "emptyError": "Ingresa al menos un valor en el audiograma"
+    },
+    "maintenance": {
+      "breadcrumb": "Mantenimiento",
+      "descriptionLabel": "¿Qué se realizó?",
+      "descriptionPlaceholder": "Describe el mantenimiento realizado: limpieza, cambio de filtros, ajuste de volumen, etc.",
+      "nextMaintenance": "Próximo mantenimiento",
+      "nextLabel": "Próximo:",
+      "plus1Month": "+1 Mes",
+      "plus3Months": "+3 Meses",
+      "plus6Months": "+6 Meses",
+      "save": "Guardar mantenimiento",
+      "saving": "Guardando...",
+      "saveSuccess": "Mantenimiento guardado",
+      "saveError": "Error al guardar el mantenimiento. Intenta nuevamente.",
+      "descriptionRequired": "La descripción del mantenimiento es requerida"
+    },
+    "resumen": {
+      "breadcrumb": "Resumen de consulta",
+      "successTitle": "Consulta completada",
+      "successSubtitle": "Todo quedó guardado correctamente",
+      "whatWasDone": "Lo que se realizó",
+      "clinicalControlSaved": "Control clínico guardado",
+      "audiogramSaved": "Audiograma registrado",
+      "maintenanceSaved": "Mantenimiento registrado",
+      "documentTitle": "Documento",
+      "reportTitle": "Reporte de consulta",
+      "reportSubtitle": "Incluye control clínico y hallazgos",
+      "backToFile": "Volver al expediente"
     }
   },
   "controls": {

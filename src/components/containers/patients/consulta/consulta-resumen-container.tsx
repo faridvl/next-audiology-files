@@ -5,6 +5,8 @@ import { useNavigation } from '@/hooks/use-navigation';
 import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
 import { ConsultaSession, ConsultaSessionStorage } from '@/shared/utils/consulta-session';
 import dynamic from 'next/dynamic';
+import { useTranslation } from 'react-i18next';
+import { TEXT } from '@/static/texts/i18n';
 
 const PdfDownloadButton = dynamic(
   () => import('@/components/pdf/pdf-download-button').then((m) => m.PdfDownloadButton),
@@ -33,6 +35,7 @@ function ResumenItem({ icon, label, done }: { icon: React.ReactNode; label: stri
 }
 
 export const ConsultaResumenContainer: React.FC<Props> = ({ patientUuid }) => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const { data: patient } = usePatientDetailQuery(patientUuid);
   const [session, setSession] = useState<ConsultaSession | null>(null);
@@ -66,7 +69,7 @@ export const ConsultaResumenContainer: React.FC<Props> = ({ patientUuid }) => {
         </button>
         <div>
           <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
-            Resumen de consulta
+            {t(TEXT.CONSULTA.RESUMEN.BREADCRUMB)}
           </Typography>
           <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
             {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
@@ -83,31 +86,31 @@ export const ConsultaResumenContainer: React.FC<Props> = ({ patientUuid }) => {
           <CheckCircle size={32} className="text-success" />
         </div>
         <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 text-center">
-          Consulta completada
+          {t(TEXT.CONSULTA.RESUMEN.SUCCESS_TITLE)}
         </Typography>
         <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400 text-xs text-center">
-          Todo quedó guardado correctamente
+          {t(TEXT.CONSULTA.RESUMEN.SUCCESS_SUBTITLE)}
         </Typography>
       </div>
 
       {/* SECCIONES GUARDADAS */}
       <div className="space-y-3">
         <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1">
-          Lo que se realizó
+          {t(TEXT.CONSULTA.RESUMEN.WHAT_WAS_DONE)}
         </Typography>
         <ResumenItem
           icon={<Stethoscope size={18} />}
-          label="Control clínico guardado"
+          label={t(TEXT.CONSULTA.RESUMEN.CLINICAL_CONTROL_SAVED)}
           done={!!session?.savedControlUuid}
         />
         <ResumenItem
           icon={<Activity size={18} />}
-          label="Audiograma registrado"
+          label={t(TEXT.CONSULTA.RESUMEN.AUDIOGRAM_SAVED)}
           done={!!session?.savedAudiogram}
         />
         <ResumenItem
           icon={<Wrench size={18} />}
-          label="Mantenimiento registrado"
+          label={t(TEXT.CONSULTA.RESUMEN.MAINTENANCE_SAVED)}
           done={!!session?.savedMaintenanceUuid}
         />
       </div>
@@ -116,16 +119,16 @@ export const ConsultaResumenContainer: React.FC<Props> = ({ patientUuid }) => {
       {session?.savedControlUuid && (
         <div className="pt-2">
           <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1 mb-3">
-            Documento
+            {t(TEXT.CONSULTA.RESUMEN.DOCUMENT_TITLE)}
           </Typography>
           <div className="bg-neutral-50 border border-neutral-100 rounded-app-md p-4 flex items-center gap-3">
             <FileText size={18} className="text-neutral-400 shrink-0" />
             <div className="flex-1">
               <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-700">
-                Reporte de consulta
+                {t(TEXT.CONSULTA.RESUMEN.REPORT_TITLE)}
               </Typography>
               <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400">
-                Incluye control clínico y hallazgos
+                {t(TEXT.CONSULTA.RESUMEN.REPORT_SUBTITLE)}
               </Typography>
             </div>
             <PdfDownloadButton controlUuid={session.savedControlUuid} patientUuid={patientUuid} />
@@ -139,7 +142,7 @@ export const ConsultaResumenContainer: React.FC<Props> = ({ patientUuid }) => {
           onClick={handleFinish}
           className="w-full bg-neutral-900 hover:bg-primary text-white font-black py-4 rounded-app-md shadow-lg transition-all text-sm"
         >
-          Volver al expediente
+          {t(TEXT.CONSULTA.RESUMEN.BACK_TO_FILE)}
         </button>
       </div>
     </div>
