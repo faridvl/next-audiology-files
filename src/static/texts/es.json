@@ -210,6 +210,8 @@
         "emailPlaceholder": "paciente@ejemplo.com",
         "address": "Dirección",
         "addressPlaceholder": "Ej. San José, Barrio Escalante...",
+        "documentId": "Número de cédula",
+        "documentIdLocked": "La cédula no puede modificarse",
         "saveChanges": "Guardar Cambios",
         "saving": "Guardando..."
       }
@@ -231,7 +233,9 @@
         "nextAppointment": "Próxima cita",
         "nextMaintenance": "Próx. mantenimiento",
         "maintenanceCount": "Mantenimientos",
-        "maintenanceCountValue": "{{count}} registrados"
+        "maintenanceCountValue": "{{count}} registrados",
+        "scheduleAppointment": "Agendar cita",
+        "scheduleMaintenance": "Programar mantenimiento"
       },
       "background": {
         "title": "Antecedentes médicos",
@@ -433,7 +437,8 @@
     "empty": "Sin mantenimientos este mes",
     "title": "Mantenimientos",
     "patientSingular": "paciente",
-    "patientPlural": "pacientes"
+    "patientPlural": "pacientes",
+    "backToPatient": "Volver al paciente"
   },
   "ficha": {
     "loading": "Cargando ficha del paciente...",

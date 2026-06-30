@@ -1,7 +1,7 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { ArrowLeft, UserIcon } from 'lucide-react';
-import { UserIcon as HeroUserIcon, PhoneIcon, EnvelopeIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { UserIcon as HeroUserIcon, PhoneIcon, EnvelopeIcon, MapPinIcon, IdentificationIcon } from '@heroicons/react/24/outline';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { usePatientEdit } from './use-patient-edit';
@@ -21,6 +21,7 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
     handleSubmit,
     handleCancel,
     validationSchema,
+    documentId,
   } = usePatientEdit(patientUuid);
 
   const inputClasses =
@@ -78,6 +79,24 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
           {() => (
             <Form className="p-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+
+                {documentId && (
+                  <div className="md:col-span-2">
+                    <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.DOCUMENT_ID)}</Typography>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={documentId}
+                        disabled
+                        className="w-full pl-11 pr-4 py-3 bg-neutral-100 border border-neutral-200 rounded-app-md text-sm font-semibold text-neutral-400 cursor-not-allowed"
+                      />
+                      <IdentificationIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-300" />
+                    </div>
+                    <Typography variant={TypographyVariant.CAPTION} className="ml-2 mt-1 text-neutral-400 italic">
+                      {t(TEXT.PATIENTS.EDIT.FORM.DOCUMENT_ID_LOCKED)}
+                    </Typography>
+                  </div>
+                )}
 
                 <div>
                   <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.FIRST_NAME)}</Typography>

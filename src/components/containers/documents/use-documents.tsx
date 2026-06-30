@@ -35,7 +35,7 @@ function mapApiDocumentToItem(patientUuid: string, document: PatientDocument): D
   const displayCategory =
     DOCUMENT_CATEGORY_API_TO_DISPLAY[document.category] ?? DocumentCategory.OTHER;
   return {
-    id: document.id,
+    id: document.uuid,
     patientId: patientUuid,
     name: document.originalName,
     url: document.url,

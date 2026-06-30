@@ -44,6 +44,8 @@ export const useNavigation = () => {
 
     maintenance: {
       list: () => router.push(routesPrivate.maintenance.index),
+      listFromPatient: (patientUuid: string) =>
+        router.push(`${routesPrivate.maintenance.index}?fromPatient=${patientUuid}`),
     },
 
     // Módulo de Citas

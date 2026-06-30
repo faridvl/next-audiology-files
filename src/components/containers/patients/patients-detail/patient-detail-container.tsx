@@ -350,7 +350,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                             {patient.firstName} {patient.lastName}
                         </Typography>
                         <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
-                            <HeaderInfo icon={<IdentificationIcon className="h-3.5 w-3.5" />} text={patient.uuid.split('-')[0].toUpperCase()} />
+                            <HeaderInfo icon={<IdentificationIcon className="h-3.5 w-3.5" />} text={patient.documentId ?? patient.uuid.split('-')[0].toUpperCase()} />
                             <HeaderInfo icon={<PhoneIcon className="h-3.5 w-3.5" />} text={patient.phone} />
                             <HeaderInfo icon={<EnvelopeIcon className="h-3.5 w-3.5" />} text={patient.email ?? t(TEXT.PATIENTS.DETAIL.NO_EMAIL)} isWarning={!patient.email} />
                         </div>
@@ -414,9 +414,27 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
 
             {/* INDICADORES RÁPIDOS */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.NEXT_APPOINTMENT)} value={summary.nextAppointment} icon={<CalendarIcon className="h-5 w-5 text-primary" />} onClick={() => navigation.appointments.list()} />
-                <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.NEXT_MAINTENANCE)} value={summary.warrantyExpiration} icon={<ShieldCheckIcon className="h-5 w-5 text-success" />} onClick={() => navigation.maintenance.list()} />
-                <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.MAINTENANCE_COUNT)} value={t(TEXT.PATIENTS.DETAIL.STATS.MAINTENANCE_COUNT_VALUE, { count: summary.pendingMaintenance.length })} icon={<WrenchScrewdriverIcon className="h-5 w-5 text-warning" />} onClick={() => navigation.maintenance.list()} />
+                <div className="flex flex-col gap-2">
+                    <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.NEXT_APPOINTMENT)} value={summary.nextAppointment} icon={<CalendarIcon className="h-5 w-5 text-primary" />} onClick={() => navigation.appointments.list()} />
+                    <button
+                        onClick={() => navigation.appointments.create()}
+                        className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-primary/30 rounded-app-md text-[10px] font-black uppercase tracking-widest text-primary/70 hover:border-primary hover:text-primary transition-all"
+                    >
+                        <PlusIcon className="h-3 w-3" /> {t(TEXT.PATIENTS.DETAIL.STATS.SCHEDULE_APPOINTMENT)}
+                    </button>
+                </div>
+                <div className="flex flex-col gap-2">
+                    <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.NEXT_MAINTENANCE)} value={summary.warrantyExpiration} icon={<ShieldCheckIcon className="h-5 w-5 text-success" />} onClick={() => navigation.maintenance.list()} />
+                    {summary.pendingMaintenance.length === 0 && (
+                        <button
+                            onClick={() => navigation.patients.consultaMantenimiento(id)}
+                            className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-success/30 rounded-app-md text-[10px] font-black uppercase tracking-widest text-success/70 hover:border-success hover:text-success transition-all"
+                        >
+                            <PlusIcon className="h-3 w-3" /> {t(TEXT.PATIENTS.DETAIL.STATS.SCHEDULE_MAINTENANCE)}
+                        </button>
+                    )}
+                </div>
+                <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.MAINTENANCE_COUNT)} value={t(TEXT.PATIENTS.DETAIL.STATS.MAINTENANCE_COUNT_VALUE, { count: summary.pendingMaintenance.length })} icon={<WrenchScrewdriverIcon className="h-5 w-5 text-warning" />} onClick={() => navigation.maintenance.listFromPatient(id)} />
             </div>
 
             {/* ANTECEDENTES Y AUDÍFONOS */}

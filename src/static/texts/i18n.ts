@@ -161,6 +161,8 @@ export const TEXT = {
         EMAIL_PLACEHOLDER: 'patients.edit.form.emailPlaceholder',
         ADDRESS: 'patients.edit.form.address',
         ADDRESS_PLACEHOLDER: 'patients.edit.form.addressPlaceholder',
+        DOCUMENT_ID: 'patients.edit.form.documentId',
+        DOCUMENT_ID_LOCKED: 'patients.edit.form.documentIdLocked',
         SAVE_CHANGES: 'patients.edit.form.saveChanges',
         SAVING: 'patients.edit.form.saving',
       },
@@ -183,6 +185,8 @@ export const TEXT = {
         NEXT_MAINTENANCE: 'patients.detail.stats.nextMaintenance',
         MAINTENANCE_COUNT: 'patients.detail.stats.maintenanceCount',
         MAINTENANCE_COUNT_VALUE: 'patients.detail.stats.maintenanceCountValue',
+        SCHEDULE_APPOINTMENT: 'patients.detail.stats.scheduleAppointment',
+        SCHEDULE_MAINTENANCE: 'patients.detail.stats.scheduleMaintenance',
       },
       BACKGROUND: {
         TITLE: 'patients.detail.background.title',
@@ -385,6 +389,7 @@ export const TEXT = {
     EMPTY: 'maintenance.empty',
     PATIENT_SINGULAR: 'maintenance.patientSingular',
     PATIENT_PLURAL: 'maintenance.patientPlural',
+    BACK_TO_PATIENT: 'maintenance.backToPatient',
   },
   FICHA: {
     LOADING: 'ficha.loading',

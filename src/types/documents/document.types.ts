@@ -41,7 +41,8 @@ export interface DocumentItem {
 
 /** Respuesta del API para un documento de paciente */
 export interface PatientDocument {
-  id: string;
+  id: number;
+  uuid: string;
   originalName: string;
   category: DocumentCategoryApiValue;
   uploadedAt: string;

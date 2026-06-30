@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { X, Link, Search, CheckCircle } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useProductsQuery } from '@/shared/api/querys/inventory/inventory-query';
 import { useUpdatePatientMutation } from '@/shared/api/mutations/patients/update-patient-mutation';
+import { FETCH_PATIENT_DETAIL_KEY } from '@/shared/api/querys/get-patient-query';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { TEXT } from '@/static/texts/i18n';
@@ -15,16 +17,18 @@ interface Props {
 
 export const LinkDeviceModal: React.FC<Props> = ({ patientUuid, currentLinkedProductUuid, onClose, onSuccess }) => {
     const { t } = useTranslation();
+    const queryClient = useQueryClient();
     const { data: products = [], isLoading } = useProductsQuery(false);
     const { executeUpdatePatient, isPending } = useUpdatePatientMutation();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedUuid, setSelectedUuid] = useState<string | null>(currentLinkedProductUuid ?? null);
 
+    const lowerSearch = searchTerm.toLowerCase();
     const filtered = products.filter(
         (product) =>
-            product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (product.model ?? '').toLowerCase().includes(searchTerm.toLowerCase()),
+            product.name.toLowerCase().includes(lowerSearch) ||
+            (product.sku ?? '').toLowerCase().includes(lowerSearch) ||
+            (product.model ?? '').toLowerCase().includes(lowerSearch),
     );
 
     const handleConfirm = () => {
@@ -33,6 +37,7 @@ export const LinkDeviceModal: React.FC<Props> = ({ patientUuid, currentLinkedPro
             {
                 onSuccess: () => {
                     toast.success(selectedUuid ? t(TEXT.LINK_DEVICE.SUCCESS_LINKED) : t(TEXT.LINK_DEVICE.SUCCESS_UNLINKED));
+                    queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_DETAIL_KEY, patientUuid] });
                     onSuccess();
                     onClose();
                 },

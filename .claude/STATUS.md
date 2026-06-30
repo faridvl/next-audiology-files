@@ -9,15 +9,17 @@
 ## 🎯 Próximo paso
 
 **Branch activo:** `main`  
-**Última etapa completada:** UI de audífonos (PatientDevice), antecedentes médicos editables y documentos del paciente conectados. TypeScript limpio. Todo en producción (Railway + Vercel).  
-**Siguiente:** Pruebas reales con usuarios. Siguiente mejora prioritaria: `GET /patients/:uuid/documents` en API para persistir URLs de documentos subidos.
+**Última etapa completada:** Mejoras a ficha del paciente, formulario de edición, mantenimientos clicables, fix LinkDevice y mapeo correcto de UUID de documentos.  
+**Siguiente:** Investigar error 500 en upload de documentos (problema en StorageService/R2 en API). Probar flujo completo con usuarios.
 
 ---
 
 ## 📋 Pendientes
 
 ### 🔴 P0 — Roto ahora
-_Ninguno. Sistema listo para pruebas en producción._
+| # | Tarea | Esfuerzo | Repo | Notas |
+|---|-------|----------|------|-------|
+| P0-1 | **Upload de documentos error 500** | XS | API | `POST /patients/:uuid/documents` devuelve 500. Probablemente StorageService R2 no configurado en producción o credenciales faltantes. El código del site es correcto. |
 
 ---
 
@@ -61,6 +63,12 @@ _Ninguno. Sistema listo para pruebas en producción._
 ---
 
 ## ✅ Completado (últimas etapas)
+
+- **Ficha del paciente — mejoras UX:** Header muestra `documentId` (cédula) en lugar de UUID corto. Cards de stats tienen botones de acción rápida: "Agendar cita" y "Programar mantenimiento" (este último solo si no hay mantenimientos).
+- **Fix LinkDevice:** Protegido `product.sku ?? ''` en el filtro (prevenía TypeError si sku era null). El modal ahora invalida `getPatientDetail` al confirmar para que el botón se actualice de "Vincular" → "Cambiar".
+- **Editar Paciente:** Bug de género corregido (`gender: patient?.gender ?? ''`). Campo de cédula visible pero bloqueado/disabled en el formulario.
+- **Mantenimientos:** Filas ahora son `<button>` clicables que navegan al detalle del paciente. Botón "Volver al paciente" aparece cuando se llega desde la ficha (`?fromPatient=:uuid`). StatCard de mantenimientos usa `navigation.maintenance.listFromPatient(id)`.
+- **Documentos:** Fix en `mapApiDocumentToItem` — usa `document.uuid` (no `document.id` que es int) para que el delete funcione contra el endpoint `/documents/:documentUuid`. El tipo `PatientDocument` ahora incluye `uuid: string`.
 
 - **StorageModule en @project/core:** `StorageService` con Cloudflare R2 (S3-compatible). Acepta imágenes y PDFs, incluye timestamp en filename. `@Global()` — importado por identity y medical-records.
 - **Upload endpoints — identity:** `POST /upload/tenants/:uuid/logo`, `/upload/users/:uuid/signature`, `/upload/users/:uuid/avatar`. Sube a R2 y actualiza el campo en DB.

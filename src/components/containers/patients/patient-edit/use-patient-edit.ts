@@ -65,7 +65,7 @@ export function usePatientEdit(patientUuid: string) {
     phone: patient?.phone ?? '',
     address: patient?.address ?? '',
     email: patient?.email ?? '',
-    gender: '',
+    gender: patient?.gender ?? '',
   };
 
   const handleSubmit = (values: PatientEditFormValues) => {
@@ -92,5 +92,6 @@ export function usePatientEdit(patientUuid: string) {
     handleSubmit,
     handleCancel,
     validationSchema: patientEditValidationSchema,
+    documentId: patient?.documentId ?? null,
   };
 }

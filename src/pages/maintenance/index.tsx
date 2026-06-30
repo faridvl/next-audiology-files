@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 import { TEXT } from '@/static/texts/i18n';
-import { ChevronLeft, ChevronRight, Wrench, Phone, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Wrench, Phone, Calendar, ArrowLeft } from 'lucide-react';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { useUpcomingMaintenanceQuery } from '@/shared/api/querys/maintenance-query';
 import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
+import { useNavigation } from '@/hooks/use-navigation';
 import { MaintenanceEntity } from '@/types/maintenance/maintenance.types';
 
 function formatMonth(isoMonth: string) {
@@ -27,15 +29,19 @@ function navigateMonth(current: string, delta: number): string {
 
 function MaintenanceRow({ record }: { record: MaintenanceEntity }) {
   const { data: patient } = usePatientDetailQuery(record.patientUuid);
+  const navigation = useNavigation();
 
   return (
-    <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-neutral-100 shadow-sm hover:border-warning/30 transition-all">
+    <button
+      onClick={() => navigation.patients.detail(record.patientUuid)}
+      className="w-full flex items-center justify-between p-4 bg-white rounded-2xl border border-neutral-100 shadow-sm hover:border-warning/30 hover:shadow-md transition-all text-left group"
+    >
       <div className="flex items-center gap-4">
         <div className="h-10 w-10 bg-warning/10 rounded-xl flex items-center justify-center shrink-0">
           <Wrench size={18} className="text-warning" />
         </div>
         <div>
-          <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">
+          <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800 group-hover:text-warning transition-colors">
             {patient ? `${patient.firstName} ${patient.lastName}` : record.patientUuid}
           </Typography>
           {patient?.phone && (
@@ -48,31 +54,38 @@ function MaintenanceRow({ record }: { record: MaintenanceEntity }) {
           )}
         </div>
       </div>
-      <div className="text-right">
-        {record.nextMaintenanceAt && (
-          <div className="flex items-center gap-1.5 justify-end">
-            <Calendar size={12} className="text-warning" />
-            <Typography variant={TypographyVariant.CAPTION} className="text-[11px] font-bold text-warning">
-              {new Date(record.nextMaintenanceAt).toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-              })}
-            </Typography>
-          </div>
-        )}
-        <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 mt-0.5 line-clamp-1 max-w-[180px]">
-          {record.description}
-        </Typography>
+      <div className="flex items-center gap-3">
+        <div className="text-right">
+          {record.nextMaintenanceAt && (
+            <div className="flex items-center gap-1.5 justify-end">
+              <Calendar size={12} className="text-warning" />
+              <Typography variant={TypographyVariant.CAPTION} className="text-[11px] font-bold text-warning">
+                {new Date(record.nextMaintenanceAt).toLocaleDateString('es-ES', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                })}
+              </Typography>
+            </div>
+          )}
+          <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 mt-0.5 line-clamp-1 max-w-[180px]">
+            {record.description}
+          </Typography>
+        </div>
+        <ChevronRight size={14} className="text-neutral-300 group-hover:text-warning transition-colors shrink-0" />
       </div>
-    </div>
+    </button>
   );
 }
 
 const MaintenancePage: React.FC = () => {
   const { t } = useTranslation();
+  const router = useRouter();
+  const navigation = useNavigation();
   const todayMonth = new Date().toISOString().slice(0, 7);
   const [month, setMonth] = useState(todayMonth);
+
+  const fromPatientUuid = typeof router.query.fromPatient === 'string' ? router.query.fromPatient : null;
 
   const { data: records, isLoading } = useUpcomingMaintenanceQuery(month);
 
@@ -83,6 +96,16 @@ const MaintenancePage: React.FC = () => {
       </Head>
       <DashboardLayout isMainPage={false} contentStyle={BoxedLayoutStyle.FULL} title={t(TEXT.MAINTENANCE.TITLE)}>
         <div className="max-w-3xl mx-auto p-4 md:p-6 space-y-6 animate-in fade-in duration-500">
+
+          {/* BOTÓN VOLVER AL PACIENTE */}
+          {fromPatientUuid && (
+            <button
+              onClick={() => navigation.patients.detail(fromPatientUuid)}
+              className="flex items-center gap-2 text-neutral-400 hover:text-neutral-900 font-black text-[10px] uppercase tracking-widest transition-all"
+            >
+              <ArrowLeft size={14} /> {t(TEXT.MAINTENANCE.BACK_TO_PATIENT)}
+            </button>
+          )}
 
           {/* SELECTOR DE MES */}
           <div className="bg-white border border-neutral-100 rounded-app-md p-4 flex items-center justify-between">
