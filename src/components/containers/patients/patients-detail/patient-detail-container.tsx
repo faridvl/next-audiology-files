@@ -7,7 +7,8 @@ import {
     EnvelopeIcon,
     IdentificationIcon,
     MagnifyingGlassIcon,
-    WrenchScrewdriverIcon
+    WrenchScrewdriverIcon,
+    CakeIcon,
 } from "@heroicons/react/24/outline";
 import {
     CalendarIcon,
@@ -39,6 +40,15 @@ import { toast } from "sonner";
 import { ChevronDown, ChevronUp, Trash2, Headphones, Plus, Save, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { TEXT } from "@/static/texts/i18n";
+
+function calculateAge(birthDate: string): number {
+    const birth = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
+    return age;
+}
 
 interface HeaderInfoProps { icon: React.ReactNode; text: string; isWarning?: boolean; }
 const HeaderInfo = ({ icon, text, isWarning }: HeaderInfoProps) => (
@@ -351,6 +361,9 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                         </Typography>
                         <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
                             <HeaderInfo icon={<IdentificationIcon className="h-3.5 w-3.5" />} text={patient.documentId ?? patient.uuid.split('-')[0].toUpperCase()} />
+                            {patient.birthDate && (
+                                <HeaderInfo icon={<CakeIcon className="h-3.5 w-3.5" />} text={t(TEXT.PATIENTS.DETAIL.AGE_YEARS, { age: calculateAge(patient.birthDate) })} />
+                            )}
                             <HeaderInfo icon={<PhoneIcon className="h-3.5 w-3.5" />} text={patient.phone} />
                             <HeaderInfo icon={<EnvelopeIcon className="h-3.5 w-3.5" />} text={patient.email ?? t(TEXT.PATIENTS.DETAIL.NO_EMAIL)} isWarning={!patient.email} />
                         </div>

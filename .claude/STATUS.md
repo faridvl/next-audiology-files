@@ -9,7 +9,7 @@
 ## 🎯 Próximo paso
 
 **Branch activo:** `main`  
-**Última etapa completada:** Mejoras a ficha del paciente, formulario de edición, mantenimientos clicables, fix LinkDevice y mapeo correcto de UUID de documentos.  
+**Última etapa completada:** Edad del paciente en header de ficha. Detalle expandible de mantenimientos en /maintenance (sin endpoint nuevo — expande inline).  
 **Siguiente:** Investigar error 500 en upload de documentos (problema en StorageService/R2 en API). Probar flujo completo con usuarios.
 
 ---
@@ -63,6 +63,9 @@
 ---
 
 ## ✅ Completado (últimas etapas)
+
+- **Edad del paciente en header:** Calculada desde `birthDate` con `calculateAge()`. Se muestra junto a cédula/teléfono/correo en el header de la ficha. Clave i18n `patients.detail.ageYears`.
+- **Detalle expandible de mantenimientos:** Filas en `/maintenance` ahora son expandibles (click expande inline) mostrando fecha realizada, fecha próximo mantenimiento, descripción completa, realizado por, y botón "Ver ficha del paciente".
 
 - **Ficha del paciente — mejoras UX:** Header muestra `documentId` (cédula) en lugar de UUID corto. Cards de stats tienen botones de acción rápida: "Agendar cita" y "Programar mantenimiento" (este último solo si no hay mantenimientos).
 - **Fix LinkDevice:** Protegido `product.sku ?? ''` en el filtro (prevenía TypeError si sku era null). El modal ahora invalida `getPatientDetail` al confirmar para que el botón se actualice de "Vincular" → "Cambiar".

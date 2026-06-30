@@ -7,7 +7,7 @@ import { Typography, TypographyVariant } from '../typography/typography';
 import { routesPrivate } from '@/shared/navigation/routes';
 
 export function Header({ title }: { title?: string }) {
-  const { userName, userRole, initials, isLoading, handleLogout } = useHeader();
+  const { userName, userRole, initials, isLoading, handleLogout, user } = useHeader();
 
   return (
     <header className="h-16 border-b border-neutral-100 bg-white/90 backdrop-blur-sm sticky top-0 z-40">

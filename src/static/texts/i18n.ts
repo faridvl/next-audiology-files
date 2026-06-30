@@ -170,6 +170,7 @@ export const TEXT = {
     DETAIL: {
       LOADING: 'patients.detail.loading',
       NO_EMAIL: 'patients.detail.noEmail',
+      AGE_YEARS: 'patients.detail.ageYears',
       DEACTIVATE: 'patients.detail.deactivate',
       DEACTIVATE_CONFIRM: 'patients.detail.deactivateConfirm',
       DEACTIVATE_SUCCESS: 'patients.detail.deactivateSuccess',

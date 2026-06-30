@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 import { TEXT } from '@/static/texts/i18n';
-import { ChevronLeft, ChevronRight, Wrench, Phone, Calendar, ArrowLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Wrench, Phone, Calendar, ArrowLeft, ChevronDown, ChevronUp, User, ClipboardList } from 'lucide-react';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { DashboardLayout } from '@/components/common/layout/dashboard-layout';
 import { BoxedLayoutStyle } from '@/components/common/layout/boxed-container/boxed-container';
@@ -27,54 +27,113 @@ function navigateMonth(current: string, delta: number): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 }
 
+function formatDate(isoDate: string) {
+  return new Date(isoDate).toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+}
+
 function MaintenanceRow({ record }: { record: MaintenanceEntity }) {
   const { data: patient } = usePatientDetailQuery(record.patientUuid);
   const navigation = useNavigation();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <button
-      onClick={() => navigation.patients.detail(record.patientUuid)}
-      className="w-full flex items-center justify-between p-4 bg-white rounded-2xl border border-neutral-100 shadow-sm hover:border-warning/30 hover:shadow-md transition-all text-left group"
-    >
-      <div className="flex items-center gap-4">
-        <div className="h-10 w-10 bg-warning/10 rounded-xl flex items-center justify-center shrink-0">
-          <Wrench size={18} className="text-warning" />
+    <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden">
+      <button
+        onClick={() => setIsExpanded((prev) => !prev)}
+        className="w-full flex items-center justify-between p-4 hover:border-warning/30 hover:bg-neutral-50/50 transition-all text-left group"
+      >
+        <div className="flex items-center gap-4">
+          <div className="h-10 w-10 bg-warning/10 rounded-xl flex items-center justify-center shrink-0">
+            <Wrench size={18} className="text-warning" />
+          </div>
+          <div>
+            <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800 group-hover:text-warning transition-colors">
+              {patient ? `${patient.firstName} ${patient.lastName}` : record.patientUuid}
+            </Typography>
+            {patient?.phone && (
+              <div className="flex items-center gap-1 mt-0.5">
+                <Phone size={10} className="text-neutral-400" />
+                <Typography variant={TypographyVariant.CAPTION} className="text-[11px] text-neutral-400">
+                  {patient.phone}
+                </Typography>
+              </div>
+            )}
+          </div>
         </div>
-        <div>
-          <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800 group-hover:text-warning transition-colors">
-            {patient ? `${patient.firstName} ${patient.lastName}` : record.patientUuid}
-          </Typography>
-          {patient?.phone && (
-            <div className="flex items-center gap-1 mt-0.5">
-              <Phone size={10} className="text-neutral-400" />
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            {record.nextMaintenanceAt && (
+              <div className="flex items-center gap-1.5 justify-end">
+                <Calendar size={12} className="text-warning" />
+                <Typography variant={TypographyVariant.CAPTION} className="text-[11px] font-bold text-warning">
+                  {formatDate(record.nextMaintenanceAt)}
+                </Typography>
+              </div>
+            )}
+            <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 mt-0.5 line-clamp-1 max-w-[180px]">
+              {record.description}
+            </Typography>
+          </div>
+          {isExpanded
+            ? <ChevronUp size={14} className="text-neutral-400 shrink-0" />
+            : <ChevronDown size={14} className="text-neutral-300 group-hover:text-warning transition-colors shrink-0" />
+          }
+        </div>
+      </button>
+
+      {isExpanded && (
+        <div className="border-t border-neutral-100 px-5 py-4 space-y-3 bg-neutral-50/50">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Typography variant={TypographyVariant.OVERLINE} className="text-[10px] text-neutral-400 uppercase tracking-widest mb-1">
+                Fecha realizada
+              </Typography>
+              <Typography variant={TypographyVariant.BODY} className="text-sm text-neutral-700 font-semibold">
+                {formatDate(record.performedAt)}
+              </Typography>
+            </div>
+            {record.nextMaintenanceAt && (
+              <div>
+                <Typography variant={TypographyVariant.OVERLINE} className="text-[10px] text-neutral-400 uppercase tracking-widest mb-1">
+                  Próximo mantenimiento
+                </Typography>
+                <Typography variant={TypographyVariant.BODY} className="text-sm text-warning font-semibold">
+                  {formatDate(record.nextMaintenanceAt)}
+                </Typography>
+              </div>
+            )}
+          </div>
+          <div>
+            <Typography variant={TypographyVariant.OVERLINE} className="text-[10px] text-neutral-400 uppercase tracking-widest mb-1">
+              Descripción
+            </Typography>
+            <Typography variant={TypographyVariant.BODY} className="text-sm text-neutral-700">
+              {record.description}
+            </Typography>
+          </div>
+          {record.performedBy && (
+            <div className="flex items-center gap-2">
+              <User size={12} className="text-neutral-400" />
               <Typography variant={TypographyVariant.CAPTION} className="text-[11px] text-neutral-400">
-                {patient.phone}
+                Realizado por: {record.performedBy}
               </Typography>
             </div>
           )}
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={() => navigation.patients.detail(record.patientUuid)}
+              className="flex items-center gap-1.5 px-4 py-2 bg-neutral-900 hover:bg-primary text-white rounded-lg font-black text-[10px] uppercase tracking-widest transition-all"
+            >
+              <ClipboardList size={12} /> Ver ficha del paciente
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="flex items-center gap-3">
-        <div className="text-right">
-          {record.nextMaintenanceAt && (
-            <div className="flex items-center gap-1.5 justify-end">
-              <Calendar size={12} className="text-warning" />
-              <Typography variant={TypographyVariant.CAPTION} className="text-[11px] font-bold text-warning">
-                {new Date(record.nextMaintenanceAt).toLocaleDateString('es-ES', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                })}
-              </Typography>
-            </div>
-          )}
-          <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 mt-0.5 line-clamp-1 max-w-[180px]">
-            {record.description}
-          </Typography>
-        </div>
-        <ChevronRight size={14} className="text-neutral-300 group-hover:text-warning transition-colors shrink-0" />
-      </div>
-    </button>
+      )}
+    </div>
   );
 }
 

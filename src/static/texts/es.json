@@ -219,6 +219,7 @@
     "detail": {
       "loading": "Cargando expediente...",
       "noEmail": "Sin correo",
+      "ageYears": "{{age}} años",
       "deactivate": "Desactivar paciente",
       "deactivateConfirm": "¿Confirmar?",
       "deactivateSuccess": "Paciente desactivado",
