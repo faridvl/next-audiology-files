@@ -1,12 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Table } from '@/components/common/table/table';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { usePatientList } from './use-patient-list';
-import { Edit2, Eye, Search, UserPlus } from 'lucide-react';
+import { Edit2, Eye, FileSpreadsheet, Search, UserPlus } from 'lucide-react';
 import { TEXT } from '@/static/texts/i18n';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { PatientStatusFilter } from '@/shared/api/querys/patients-query';
+import { PatientImportModal } from '@/components/containers/patients/patient-import/patient-import-modal';
 
 const STATUS_FILTER_OPTIONS: { value: PatientStatusFilter; label: string }[] = [
     { value: 'active', label: 'Activos' },
@@ -16,6 +17,7 @@ const STATUS_FILTER_OPTIONS: { value: PatientStatusFilter; label: string }[] = [
 
 export const PatientListContainer: React.FC = () => {
     const { t } = useTranslation();
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const {
         patients,
         meta,
@@ -67,12 +69,21 @@ export const PatientListContainer: React.FC = () => {
                 <Typography variant={TypographyVariant.HEADER} className="text-xl md:text-2xl font-bold text-neutral-800">
                     {t(TEXT.PATIENTS.LIST.TITLE)}
                 </Typography>
-                <Button variant={ButtonVariant.PRIMARY} onClick={navigateToCreate}>
-                    <UserPlus size={18} className="mr-0 md:mr-2" />
-                    <Typography variant={TypographyVariant.BUTTON_TEXT} className="hidden md:inline">
-                        {t(TEXT.PATIENTS.LIST.NEW_BUTTON)}
-                    </Typography>
-                </Button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setIsImportModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 border border-neutral-200 text-neutral-600 hover:border-primary/40 hover:text-primary bg-white rounded-app-sm text-sm font-bold transition-colors"
+                    >
+                        <FileSpreadsheet size={16} />
+                        <span className="hidden md:inline">Importar pacientes</span>
+                    </button>
+                    <Button variant={ButtonVariant.PRIMARY} onClick={navigateToCreate}>
+                        <UserPlus size={18} className="mr-0 md:mr-2" />
+                        <Typography variant={TypographyVariant.BUTTON_TEXT} className="hidden md:inline">
+                            {t(TEXT.PATIENTS.LIST.NEW_BUTTON)}
+                        </Typography>
+                    </Button>
+                </div>
             </div>
 
             <div className="bg-white rounded-app-md shadow-sm border border-neutral-100 p-4 flex flex-col sm:flex-row gap-3">
@@ -116,6 +127,11 @@ export const PatientListContainer: React.FC = () => {
                 actions={actions}
                 isLoading={isLoading}
                 onRowClick={(row) => navigateToDetail(row.uuid)}
+            />
+
+            <PatientImportModal
+                isOpen={isImportModalOpen}
+                onClose={() => setIsImportModalOpen(false)}
             />
         </div>
     );
