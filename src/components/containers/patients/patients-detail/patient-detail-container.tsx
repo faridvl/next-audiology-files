@@ -133,9 +133,9 @@ const BackgroundPanel = ({ patientUuid }: { patientUuid: string }) => {
         <div className="flex items-center gap-3">
           <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">Antecedentes médicos</Typography>
           {positiveCount > 0 && (
-            <span className="px-2 py-0.5 bg-danger/10 text-danger border border-danger/20 rounded-lg text-[10px] font-black">{positiveCount} positivos</span>
+            <Typography variant={TypographyVariant.CAPTION} inline className="px-2 py-0.5 bg-danger/10 text-danger border border-danger/20 rounded-lg font-black">{positiveCount} positivos</Typography>
           )}
-          {isLoading && <span className="text-[10px] text-neutral-400 font-bold">Cargando...</span>}
+          {isLoading && <Typography variant={TypographyVariant.CAPTION} inline className="text-neutral-400 font-bold">Cargando...</Typography>}
         </div>
         {isOpen ? <ChevronUp className="h-4 w-4 text-neutral-400" /> : <ChevronDown className="h-4 w-4 text-neutral-400" />}
       </button>
@@ -156,7 +156,7 @@ const BackgroundPanel = ({ patientUuid }: { patientUuid: string }) => {
             ))}
           </div>
           <div className="mt-3">
-            <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-1 block">Notas adicionales</label>
+            <Typography variant={TypographyVariant.OVERLINE} as="label" className="mb-1 block">Notas adicionales</Typography>
             <textarea
               value={values.notes ?? ''}
               onChange={(e) => setValues((prev) => prev ? { ...prev, notes: e.target.value || null } : prev)}
@@ -224,7 +224,7 @@ const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
         <div className="flex items-center gap-3">
           <Headphones className="h-4 w-4 text-neutral-500" />
           <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">Audífonos registrados</Typography>
-          {!isLoading && <span className="px-2 py-0.5 bg-neutral-100 text-neutral-500 rounded-lg text-[10px] font-black">{activeDevices.length}</span>}
+          {!isLoading && <Typography variant={TypographyVariant.CAPTION} inline className="px-2 py-0.5 bg-neutral-100 text-neutral-500 rounded-lg font-black">{activeDevices.length}</Typography>}
         </div>
         {isOpen ? <ChevronUp className="h-4 w-4 text-neutral-400" /> : <ChevronDown className="h-4 w-4 text-neutral-400" />}
       </button>
@@ -232,19 +232,19 @@ const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
       {isOpen && (
         <div className="px-5 pb-5 border-t border-neutral-100 space-y-3 mt-4">
           {isLoading ? (
-            <p className="text-xs text-neutral-400 text-center py-4">Cargando...</p>
+            <Typography variant={TypographyVariant.HELPER} className="text-center py-4">Cargando...</Typography>
           ) : activeDevices.length === 0 ? (
-            <p className="text-xs text-neutral-400 italic text-center py-4">Sin audífonos registrados.</p>
+            <Typography variant={TypographyVariant.HELPER} className="italic text-center py-4">Sin audífonos registrados.</Typography>
           ) : (
             activeDevices.map((device) => (
               <div key={device.uuid} className="flex items-center justify-between p-3.5 bg-neutral-50 rounded-app-md border border-neutral-100">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest bg-primary-soft text-primary-dark px-2 py-0.5 rounded-lg">{SIDE_LABELS[device.side]}</span>
-                    {device.brand && <span className="text-xs font-bold text-neutral-700">{device.brand} {device.model}</span>}
+                    <Typography variant={TypographyVariant.OVERLINE} inline className="bg-primary-soft text-primary-dark px-2 py-0.5 rounded-lg">{SIDE_LABELS[device.side]}</Typography>
+                    {device.brand && <Typography variant={TypographyVariant.CAPTION} inline className="font-bold text-neutral-700">{device.brand} {device.model}</Typography>}
                   </div>
-                  {device.serialNumber && <p className="text-[10px] text-neutral-400 font-medium">S/N: {device.serialNumber}</p>}
-                  {device.warrantyUntil && <p className="text-[10px] text-neutral-400">Garantía hasta: {new Date(device.warrantyUntil).toLocaleDateString('es-ES')}</p>}
+                  {device.serialNumber && <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400 font-medium">S/N: {device.serialNumber}</Typography>}
+                  {device.warrantyUntil && <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400">Garantía hasta: {new Date(device.warrantyUntil).toLocaleDateString('es-ES')}</Typography>}
                 </div>
                 <button onClick={() => handleDeactivate(device.uuid)} className="p-2 text-neutral-300 hover:text-danger hover:bg-danger/10 rounded-app-sm transition-all">
                   <Trash2 size={14} />
@@ -266,7 +266,7 @@ const DevicesPanel = ({ patientUuid }: { patientUuid: string }) => {
                 <input key={field} placeholder={{ brand: 'Marca', model: 'Modelo', serialNumber: 'Número de serie' }[field]} value={(form as Record<string, string>)[field]} onChange={(e) => setForm((f) => ({ ...f, [field]: e.target.value }))} className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-app-sm text-xs outline-none focus:border-primary/50 transition-all" />
               ))}
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-1 block">Garantía hasta</label>
+                <Typography variant={TypographyVariant.OVERLINE} as="label" className="mb-1 block">Garantía hasta</Typography>
                 <input type="date" value={form.warrantyUntil} onChange={(e) => setForm((f) => ({ ...f, warrantyUntil: e.target.value }))} className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-app-sm text-xs outline-none focus:border-primary/50 transition-all" />
               </div>
               <div className="flex justify-end gap-2">
@@ -344,7 +344,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                     )}
                     {isAdmin && isConfirmDelete && (
                         <div className="flex items-center gap-2 border border-danger/30 bg-danger/10 px-4 h-10 rounded-app-sm flex-1 sm:flex-none">
-                            <span className="text-[10px] font-black text-danger uppercase tracking-widest">¿Confirmar?</span>
+                            <Typography variant={TypographyVariant.OVERLINE} inline className="text-danger">¿Confirmar?</Typography>
                             <button
                                 disabled={isDeletingPatient}
                                 onClick={async () => {
@@ -369,19 +369,19 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                         className="flex items-center justify-center gap-1.5 border border-neutral-200 text-neutral-600 px-4 h-10 rounded-app-sm font-black text-[10px] uppercase tracking-widest hover:bg-neutral-50 hover:border-neutral-300 transition-all flex-1 sm:flex-none"
                     >
                         <Link className="h-4 w-4 shrink-0" />
-                        <span className="truncate">{patient.linkedProductUuid ? 'Cambiar audífono' : 'Vincular audífono'}</span>
+                        <Typography variant={TypographyVariant.CAPTION} inline className="truncate font-black">{patient.linkedProductUuid ? 'Cambiar audífono' : 'Vincular audífono'}</Typography>
                     </button>
                     <button
                         onClick={() => navigation.patients.ficha(id)}
                         className="flex items-center justify-center gap-1.5 border border-neutral-200 text-neutral-600 px-4 h-10 rounded-app-sm font-black text-[10px] uppercase tracking-widest hover:bg-neutral-50 hover:border-neutral-300 transition-all flex-1 sm:flex-none"
                     >
                         <ClipboardList className="h-4 w-4 shrink-0" />
-                        <span className="truncate">Ver ficha completa</span>
+                        <Typography variant={TypographyVariant.CAPTION} inline className="truncate font-black">Ver ficha completa</Typography>
                     </button>
                     {canStartConsulta && (
                         <Button variant={ButtonVariant.PRIMARY} className="rounded-app-sm px-5 h-10 shadow-lg shadow-primary-soft flex-1 sm:flex-none" onClick={() => navigation.patients.consulta(id)}>
                             <PlusIcon className="h-4 w-4 mr-2 shrink-0" />
-                            <span className="text-xs font-bold uppercase tracking-tight">Iniciar consulta</span>
+                            <Typography variant={TypographyVariant.CAPTION} inline className="font-bold uppercase tracking-tight">Iniciar consulta</Typography>
                         </Button>
                     )}
                 </div>
@@ -486,9 +486,9 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                                     className={`bg-white p-4 md:p-5 rounded-app-lg md:rounded-app-md border border-neutral-100 transition-all flex items-center gap-3 md:gap-6 group ${record.type === 'MAINTENANCE' ? '' : 'hover:border-primary/40 cursor-pointer'}`}
                                 >
                                     <div className="shrink-0">
-                                        <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-lg border ${getTypeStyle(record.type as ControlType)}`}>
+                                        <Typography variant={TypographyVariant.OVERLINE} inline className={`px-2 py-1 rounded-lg border ${getTypeStyle(record.type as ControlType)}`}>
                                             {record.type}
-                                        </span>
+                                        </Typography>
                                         <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 font-bold mt-2 uppercase tracking-tight whitespace-nowrap">
                                             {record.date}
                                         </Typography>

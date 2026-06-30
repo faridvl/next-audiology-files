@@ -5,6 +5,7 @@ import { Button, ButtonVariant } from '@/components/common/button/button';
 import { usePatientList } from './use-patient-list';
 import { Edit2, Eye, Search, UserPlus } from 'lucide-react';
 import { TEXT } from '@/static/texts/i18n';
+import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
 export const PatientListContainer: React.FC = () => {
     const { t } = useTranslation();
@@ -52,13 +53,13 @@ export const PatientListContainer: React.FC = () => {
     return (
         <div className="max-w-[1400px] mx-auto px-4 md:px-6 space-y-6">
             <div className="flex justify-between items-center mt-6 md:mt-8">
-                <h1 className="text-xl md:text-2xl font-bold text-neutral-800">{t(TEXT.PATIENTS.LIST.TITLE)}</h1>
+                <Typography variant={TypographyVariant.HEADER} className="text-xl md:text-2xl font-bold text-neutral-800">{t(TEXT.PATIENTS.LIST.TITLE)}</Typography>
                 <Button
                     variant={ButtonVariant.PRIMARY}
                     onClick={navigateToCreate}
                 >
                     <UserPlus size={18} className="mr-0 md:mr-2" />
-                    <span className="hidden md:inline">{t(TEXT.PATIENTS.LIST.NEW_BUTTON)}</span>
+                    <Typography variant={TypographyVariant.BUTTON_TEXT} className="hidden md:inline">{t(TEXT.PATIENTS.LIST.NEW_BUTTON)}</Typography>
                 </Button>
             </div>
 

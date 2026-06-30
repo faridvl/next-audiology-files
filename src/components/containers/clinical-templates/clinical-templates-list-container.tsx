@@ -2,6 +2,7 @@ import React from 'react';
 import { Plus, Edit2, Trash2, FileText } from 'lucide-react';
 import { useClinicalTemplatesList } from './use-clinical-templates-list';
 import { ClinicalTemplate } from '@/types/clinical-template/clinical-template.types';
+import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
 const SPECIALITY_LABELS: Record<string, string> = {
   AUDIOLOGY: 'Audiología',
@@ -30,12 +31,12 @@ export const ClinicalTemplatesListContainer: React.FC = () => {
       {/* ENCABEZADO */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-black text-neutral-900 tracking-tight">
+          <Typography variant={TypographyVariant.HEADER} className="text-xl font-black text-neutral-900 tracking-tight">
             Plantillas de Historia Clínica
-          </h1>
-          <p className="text-sm text-neutral-400 mt-1">
+          </Typography>
+          <Typography variant={TypographyVariant.HELPER} className="mt-1">
             Define campos personalizados para cada especialidad del tenant.
-          </p>
+          </Typography>
         </div>
         <button
           onClick={handleCreate}
@@ -50,10 +51,10 @@ export const ClinicalTemplatesListContainer: React.FC = () => {
       {templates.length === 0 ? (
         <div className="text-center py-20 text-neutral-300">
           <FileText size={48} className="mx-auto mb-4 opacity-40" />
-          <p className="font-bold text-neutral-400">No hay plantillas creadas aún.</p>
-          <p className="text-sm text-neutral-300 mt-1">
+          <Typography variant={TypographyVariant.BODY_BOLD} className="text-neutral-400">No hay plantillas creadas aún.</Typography>
+          <Typography variant={TypographyVariant.HELPER} className="mt-1">
             Crea una plantilla para personalizar los campos del control médico.
-          </p>
+          </Typography>
         </div>
       ) : (
         <div className="space-y-4">
@@ -63,12 +64,12 @@ export const ClinicalTemplatesListContainer: React.FC = () => {
               className="flex items-center justify-between p-6 bg-white border border-neutral-100 rounded-app-md shadow-sm hover:border-primary/30 transition-all"
             >
               <div className="space-y-1">
-                <p className="font-bold text-neutral-900">{template.name}</p>
-                <p className="text-xs text-neutral-400 uppercase tracking-wide">
+                <Typography variant={TypographyVariant.BODY_BOLD} className="text-neutral-900">{template.name}</Typography>
+                <Typography variant={TypographyVariant.OVERLINE} className="text-neutral-400">
                   {SPECIALITY_LABELS[template.speciality] ?? template.speciality} —{' '}
                   {template.fields.length}{' '}
                   {template.fields.length === 1 ? 'campo' : 'campos'}
-                </p>
+                </Typography>
               </div>
               <div className="flex gap-2">
                 <button

@@ -1,6 +1,6 @@
-// src/components/ui/alerts/success-alert.tsx
 import React from 'react';
 import { CheckCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
 export const SuccessAlert = ({
     onClose,
@@ -19,8 +19,8 @@ export const SuccessAlert = ({
                 </div>
 
                 <div className="flex-1">
-                    <h3 className="text-neutral-900 font-black text-sm uppercase tracking-wider">{title}</h3>
-                    <p className="text-neutral-500 text-sm font-medium">{message}</p>
+                    <Typography variant={TypographyVariant.OVERLINE} className="text-neutral-900">{title}</Typography>
+                    <Typography variant={TypographyVariant.BODY} className="text-neutral-500">{message}</Typography>
                 </div>
                 <button
                     onClick={onClose}

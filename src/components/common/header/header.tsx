@@ -18,7 +18,7 @@ export function Header({ title }: { title?: string }) {
           <div className="h-8 w-8 bg-primary rounded-app-sm flex items-center justify-center text-white font-extrabold text-xs">
             Z
           </div>
-          <span className="text-sm font-black text-neutral-800 tracking-tight">Zynka</span>
+          <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-black text-neutral-800 tracking-tight">Zynka</Typography>
         </Link>
 
         {/* Title Section */}

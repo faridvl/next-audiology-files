@@ -122,9 +122,9 @@ export function Table({
                                     .filter((column) => column.header && item[column.accessor] != null)
                                     .map((column) => (
                                         <div key={column.accessor} className="flex items-start gap-3">
-                                            <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400 shrink-0 w-24 pt-0.5">
+                                            <Typography variant={TypographyVariant.OVERLINE} className="shrink-0 w-24 pt-0.5">
                                                 {column.header}
-                                            </span>
+                                            </Typography>
                                             <Typography
                                                 variant={TypographyVariant.BODY}
                                                 className="text-neutral-700 break-words text-sm"

@@ -38,12 +38,12 @@ export function InfoTooltip({ title, description }: InfoTooltipProps) {
             </button>
             {show && (
                 <div className="absolute left-8 top-0 w-64 p-3 bg-neutral-900 text-white text-[10px] rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in duration-200 border border-neutral-700">
-                    <p className="font-bold mb-1 border-b border-neutral-700 pb-1 text-primary-light uppercase tracking-tight">
+                    <Typography variant={TypographyVariant.OVERLINE} className="font-bold mb-1 border-b border-neutral-700 pb-1 text-primary-light block">
                         {title}
-                    </p>
-                    <p className="text-neutral-300 leading-relaxed">
+                    </Typography>
+                    <Typography variant={TypographyVariant.CAPTION} className="text-neutral-300 leading-relaxed">
                         {description}
-                    </p>
+                    </Typography>
                 </div>
             )}
         </div>
@@ -82,8 +82,9 @@ export function UsersContainer() {
                         <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm leading-tight text-neutral-700">
                             {user.fullName}
                         </Typography>
-                        <div className="flex items-center gap-1 text-neutral-400 text-[10px] mt-0.5">
-                            <Mail size={10} /> {user.email}
+                        <div className="flex items-center gap-1 mt-0.5">
+                            <Mail size={10} className="text-neutral-400" />
+                            <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400">{user.email}</Typography>
                         </div>
                     </div>
                 </div>

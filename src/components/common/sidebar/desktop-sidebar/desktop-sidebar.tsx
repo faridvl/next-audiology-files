@@ -29,9 +29,9 @@ export default function DesktopSidebar() {
               Zynka
             </Typography>
 
-            <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-[0.18em] mt-0.5">
+            <Typography variant={TypographyVariant.OVERLINE} className="mt-0.5">
               Gestión para Clínicas
-            </span>
+            </Typography>
           </div>
         </Link>
       </div>
@@ -95,12 +95,12 @@ export default function DesktopSidebar() {
           </div>
 
           <div className="flex flex-col min-w-0 flex-1">
-            <span className="text-[12px] font-bold text-neutral-800 truncate group-hover:text-primary-dark transition-colors">
+            <Typography variant={TypographyVariant.CAPTION} className="font-bold text-neutral-800 truncate group-hover:text-primary-dark transition-colors">
               {isLoading ? 'Cargando...' : businessName}
-            </span>
-            <span className="text-[10px] text-neutral-400 font-black truncate uppercase tracking-widest">
+            </Typography>
+            <Typography variant={TypographyVariant.OVERLINE} className="truncate text-neutral-400">
               {isLoading ? '...' : userRole}
-            </span>
+            </Typography>
           </div>
 
           <div className="text-neutral-300 group-hover:text-primary-light transition-colors">

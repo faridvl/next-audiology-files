@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useDocuments } from './use-documents';
 import { DocumentCategory, DocumentCategoryApiValue } from '@/types/documents/document.types';
+import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
 interface DocumentsContainerProps {
   patientId: string;
@@ -132,7 +133,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <aside className="lg:col-span-3">
           <nav className="flex lg:flex-col gap-1 overflow-x-auto no-scrollbar pb-2 lg:pb-0">
-            <span className="hidden lg:block text-neutral-400 text-[9px] font-black uppercase tracking-[0.2em] ml-3 mb-2">Filtros</span>
+            <Typography variant={TypographyVariant.OVERLINE} className="hidden lg:block ml-3 mb-2">Filtros</Typography>
             <button
               onClick={() => setFilter('ALL')}
               className={`flex-none px-4 py-2 rounded-app-sm font-bold text-[11px] uppercase tracking-tight transition-all text-left ${filter === 'ALL' ? 'bg-primary-soft text-primary' : 'text-neutral-500 hover:bg-neutral-50'}`}
@@ -155,7 +156,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
           {isLoading ? (
             <div className="py-20 text-center">
               <Loader2 className="mx-auto text-primary-light animate-spin mb-2" size={28} />
-              <p className="text-[10px] text-neutral-400 font-black uppercase tracking-widest">Cargando documentos...</p>
+              <Typography variant={TypographyVariant.OVERLINE}>Cargando documentos...</Typography>
             </div>
           ) : (
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
@@ -166,13 +167,13 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
                       {getIcon(document.category)}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[11px] font-black text-neutral-800 leading-tight group-hover:text-primary transition-colors truncate">
+                      <Typography variant={TypographyVariant.CAPTION} className="font-black text-neutral-800 leading-tight group-hover:text-primary transition-colors truncate">
                         {document.name}
-                      </p>
+                      </Typography>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-tight">
+                        <Typography variant={TypographyVariant.OVERLINE} className="text-neutral-400 font-bold">
                           {document.date} • {document.size}
-                        </span>
+                        </Typography>
                         {document.controlId && (
                           <div className="flex items-center gap-1 bg-neutral-50 text-neutral-500 px-1.5 py-0.5 rounded text-[8px] font-black uppercase border border-neutral-100">
                             <LinkIcon size={8} /> Ref: {document.controlId}
@@ -205,7 +206,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
               {filteredDocuments.length === 0 && (
                 <div className="col-span-full py-20 text-center bg-white rounded-app-lg border border-dashed border-neutral-200">
                   <FileText className="mx-auto text-neutral-200 mb-2" size={32} />
-                  <p className="text-[10px] text-neutral-400 font-black uppercase tracking-widest">No se encontraron archivos</p>
+                  <Typography variant={TypographyVariant.OVERLINE}>No se encontraron archivos</Typography>
                 </div>
               )}
             </div>

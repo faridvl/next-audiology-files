@@ -76,9 +76,9 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
       <div className="bg-white border border-neutral-100 rounded-app-md p-5 md:p-8 space-y-6 shadow-sm">
 
         <div className="space-y-2">
-          <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">
-            ¿Qué se realizó? <span className="text-danger">*</span>
-          </label>
+          <Typography variant={TypographyVariant.OVERLINE} as="label" className="block ml-1">
+            ¿Qué se realizó? <Typography variant={TypographyVariant.OVERLINE} inline className="text-danger">*</Typography>
+          </Typography>
           <textarea
             className={`${inputClass} min-h-[140px]`}
             placeholder="Describe el mantenimiento realizado: limpieza, cambio de filtros, ajuste de volumen, etc."
@@ -88,9 +88,9 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
         </div>
 
         <div className="space-y-3">
-          <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">
+          <Typography variant={TypographyVariant.OVERLINE} as="label" className="block ml-1">
             Próximo mantenimiento
-          </label>
+          </Typography>
           <div className="flex flex-wrap gap-2">
             {[{ label: '+1 Mes', days: 30 }, { label: '+3 Meses', days: 90 }, { label: '+6 Meses', days: 180 }].map(({ label, days }) => (
               <button

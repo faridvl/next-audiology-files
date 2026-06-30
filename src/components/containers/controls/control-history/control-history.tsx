@@ -24,7 +24,7 @@ export const MedicalHistorySidebar: React.FC<{ patientId: string }> = ({ patient
                         className="p-2 hover:bg-neutral-100 rounded-app-sm transition-all relative flex items-center gap-2 text-neutral-400 hover:text-primary"
                     >
                         <Settings size={18} />
-                        <span className="text-[10px] font-bold uppercase">{sortOrder}</span>
+                        <Typography variant={TypographyVariant.OVERLINE} inline>{sortOrder}</Typography>
                     </button>
                 </div>
 
@@ -72,14 +72,14 @@ export const MedicalHistorySidebar: React.FC<{ patientId: string }> = ({ patient
                                 className="group p-4 bg-white border border-neutral-100 rounded-app-md shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer"
                             >
                                 <div className="flex justify-between items-start mb-2">
-                                    <span className="text-[9px] font-black px-2 py-0.5 rounded bg-neutral-100 text-neutral-500 uppercase">
+                                    <Typography variant={TypographyVariant.OVERLINE} className="px-2 py-0.5 rounded bg-neutral-100 text-neutral-500">
                                         {control.header.speciality}
-                                    </span>
-                                    <span className="text-[10px] text-neutral-400">{new Date(control.createdAt).toLocaleDateString()}</span>
+                                    </Typography>
+                                    <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400">{new Date(control.createdAt).toLocaleDateString()}</Typography>
                                 </div>
-                                <p className="text-xs text-neutral-600 line-clamp-2 italic leading-relaxed leading-relaxed">
+                                <Typography variant={TypographyVariant.CAPTION} className="text-neutral-600 line-clamp-2 italic leading-relaxed">
                                     {control.clinicalData.diagnosis}
-                                </p>
+                                </Typography>
                             </div>
                         ))}
 

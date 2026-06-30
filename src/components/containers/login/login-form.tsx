@@ -27,9 +27,9 @@ const LoginInput = ({ name, label, type = 'text', placeholder, error, touched }:
     return (
         <div className="w-full">
             {label && (
-                <label className="block text-[11px] font-black uppercase tracking-widest text-neutral-400 mb-2 ml-1">
+                <Typography variant={TypographyVariant.OVERLINE} as="label" className="block mb-2 ml-1">
                     {label}
-                </label>
+                </Typography>
             )}
             <div className="relative group">
                 <Field
@@ -87,24 +87,24 @@ export const LoginForm: React.FC<{ onSubmit: (values: { email: string; password:
                 <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-24">
                         <Image src="/zynka-logo.png" alt="Zynka Logo" width={36} height={36} className="object-contain" />
-                        <span className="text-xl font-bold tracking-tight text-white">Zynka</span>
+                        <Typography variant={TypographyVariant.BODY_BOLD} className="text-xl font-bold tracking-tight text-white">Zynka</Typography>
                     </div>
-                    <h1 className="text-5xl font-black leading-[1.1] tracking-tight">
+                    <Typography variant={TypographyVariant.HEADER} as="h1" className="text-5xl font-black leading-[1.1] tracking-tight text-white">
                         Tu clínica organizada, <br />
                         simple y <br />
-                        <span className="text-[#14B8A6] underline decoration-[#14B8A6]/30 underline-offset-8">
+                        <Typography variant={TypographyVariant.ACCENT} inline className="text-[#14B8A6] underline decoration-[#14B8A6]/30 underline-offset-8">
                             profesional.
-                        </span>
-                    </h1>
-                    <p className="mt-8 text-neutral-300 font-medium text-lg max-w-xs leading-relaxed">
+                        </Typography>
+                    </Typography>
+                    <Typography variant={TypographyVariant.BODY} className="mt-8 text-neutral-300 font-medium text-lg max-w-xs leading-relaxed">
                         Digitaliza tu clínica sin complicaciones.
-                    </p>
+                    </Typography>
                 </div>
                 <div className="relative z-10 flex items-center gap-4">
                     <div className="h-[1px] w-8 bg-neutral-500" />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-neutral-300">
+                    <Typography variant={TypographyVariant.OVERLINE} className="text-neutral-300">
                         Plataforma para clínicas independientes
-                    </span>
+                    </Typography>
                 </div>
             </div>
 
@@ -148,9 +148,9 @@ export const LoginForm: React.FC<{ onSubmit: (values: { email: string; password:
                                         />
                                         <div>
                                             <div className="flex justify-between items-center mb-2 px-1">
-                                                <label className="text-[11px] font-black uppercase tracking-widest text-neutral-400">
+                                                <Typography variant={TypographyVariant.OVERLINE} as="label">
                                                     {t(TEXT.AUTH.LOGIN.PASSWORD_LABEL)}
-                                                </label>
+                                                </Typography>
                                                 <button
                                                     type="button"
                                                     onClick={() => setView('forgot')}
@@ -209,10 +209,10 @@ export const LoginForm: React.FC<{ onSubmit: (values: { email: string; password:
                                 {t(TEXT.AUTH.FORGOT.SUBTITLE)}
                             </Typography>
                             <div className="p-5 bg-warning/10 border border-warning/30 rounded-app-md text-center space-y-2">
-                                <p className="text-sm font-black text-warning">Recuperación de contraseña</p>
-                                <p className="text-xs text-warning leading-relaxed">
+                                <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-black text-warning">Recuperación de contraseña</Typography>
+                                <Typography variant={TypographyVariant.CAPTION} className="text-xs text-warning leading-relaxed">
                                     Esta función estará disponible próximamente. Por ahora, contacta al administrador de tu clínica para restablecer tu contraseña.
-                                </p>
+                                </Typography>
                                 <button
                                     onClick={() => setView('login')}
                                     className="mt-3 text-[10px] font-black text-warning uppercase tracking-widest hover:opacity-80 transition-colors"

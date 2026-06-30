@@ -2,6 +2,7 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import Link from 'next/link';
+import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import {
   AudioWaveform,
   ArrowRight,
@@ -38,9 +39,9 @@ const RegisterInput = ({
 }: RegisterInputProps) => (
   <div className="relative">
     <Icon className="absolute left-4 top-[38px] text-neutral-300" size={18} />
-    <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1 mb-1 block">
+    <Typography variant={TypographyVariant.OVERLINE} as="label" className="ml-1 mb-1 block">
       {label}
-    </label>
+    </Typography>
     <Field
       name={name}
       type={type}
@@ -101,7 +102,7 @@ export const RegisterForm: React.FC = () => {
           <AudioWaveform className="h-6 w-6 text-white" />
         </div>
 
-          <h2 className="text-3xl font-black text-neutral-900 tracking-tight">Crear Cuenta</h2>
+          <Typography variant={TypographyVariant.SUBTITLE} as="h2" className="text-3xl font-black text-neutral-900 tracking-tight">Crear Cuenta</Typography>
       </div>
 
       <Formik
@@ -113,9 +114,9 @@ export const RegisterForm: React.FC = () => {
             <Form className="space-y-5">
               {/* Sección: La organización */}
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1 mb-3">
+                <Typography variant={TypographyVariant.OVERLINE} className="ml-1 mb-3">
                   Tu clínica u organización
-                </p>
+                </Typography>
                 <RegisterInput
                   name="businessName"
                   label="Nombre de la Clínica"
@@ -127,9 +128,9 @@ export const RegisterForm: React.FC = () => {
 
                 {/* Selector de tipo de clínica */}
                 <div className="mt-4">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1 mb-2 block">
+                  <Typography variant={TypographyVariant.OVERLINE} as="label" className="ml-1 mb-2 block">
                     Tipo de Especialidad
-                  </label>
+                  </Typography>
                   <div className="grid grid-cols-2 gap-2">
                     {BUSINESS_TYPE_OPTIONS.map((option) => {
                       const isSelected = values.businessType === option.value;
@@ -146,8 +147,8 @@ export const RegisterForm: React.FC = () => {
                         >
                           <span className="text-lg">{option.icon}</span>
                           <div>
-                            <p className="text-xs font-black">{option.label}</p>
-                            <p className="text-[10px] opacity-60">{option.description}</p>
+                            <Typography variant={TypographyVariant.CAPTION} className="text-xs font-black">{option.label}</Typography>
+                            <Typography variant={TypographyVariant.CAPTION} className="opacity-60">{option.description}</Typography>
                           </div>
                         </button>
                       );
@@ -163,9 +164,9 @@ export const RegisterForm: React.FC = () => {
 
               {/* Sección: El administrador */}
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1 mb-3 mt-2">
+                <Typography variant={TypographyVariant.OVERLINE} className="ml-1 mb-3 mt-2">
                   Tu cuenta de acceso
-                </p>
+                </Typography>
                 <div className="grid grid-cols-2 gap-4">
                   <RegisterInput
                     name="ownerName"
@@ -221,16 +222,15 @@ export const RegisterForm: React.FC = () => {
                       className={values.isSpecialist ? 'text-primary' : 'text-neutral-400'}
                     />
                     <div>
-                      <p
-                        className={`text-sm font-black ${
-                          values.isSpecialist ? 'text-primary-dark' : 'text-neutral-700'
-                        }`}
+                      <Typography
+                        variant={TypographyVariant.BODY_BOLD}
+                        className={`text-sm font-black ${values.isSpecialist ? 'text-primary-dark' : 'text-neutral-700'}`}
                       >
                         También soy especialista en esta clínica
-                      </p>
-                      <p className="text-[10px] text-neutral-400 mt-0.5">
+                      </Typography>
+                      <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400 mt-0.5">
                         Actívalo si atiendes pacientes directamente
-                      </p>
+                      </Typography>
                     </div>
                   </div>
                   <div
@@ -248,9 +248,9 @@ export const RegisterForm: React.FC = () => {
 
                 {values.isSpecialist && (
                   <div className="mt-3" onClick={(event) => event.stopPropagation()}>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1 mb-1 block">
+                    <Typography variant={TypographyVariant.OVERLINE} as="label" className="ml-1 mb-1 block">
                       Mi especialidad
-                    </label>
+                    </Typography>
                     <Field
                       name="specialty"
                       placeholder="Ej. Audiólogo, Odontólogo general..."
@@ -270,9 +270,9 @@ export const RegisterForm: React.FC = () => {
               </div>
 
               {error && (
-                <p className="text-danger text-xs text-center font-bold bg-danger/10 py-3 rounded-app-md">
+                <Typography variant={TypographyVariant.CAPTION} className="text-danger text-xs text-center font-bold bg-danger/10 py-3 rounded-app-md block">
                   {error}
-                </p>
+                </Typography>
               )}
 
               <button
@@ -284,12 +284,12 @@ export const RegisterForm: React.FC = () => {
                 <ArrowRight size={18} />
               </button>
 
-              <p className="text-center text-xs text-neutral-400 mt-2">
+              <Typography variant={TypographyVariant.CAPTION} className="text-center text-neutral-400 mt-2 block">
                 ¿Ya tienes cuenta?{' '}
                 <Link href={routesPublic.login} className="text-primary font-bold hover:underline">
                   Inicia sesión
                 </Link>
-              </p>
+              </Typography>
             </Form>
           )}
         </Formik>

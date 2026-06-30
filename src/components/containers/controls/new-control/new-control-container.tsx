@@ -264,10 +264,10 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                         const inputClass = 'w-full px-4 py-3 rounded-app-sm border border-neutral-100 bg-neutral-50/30 text-sm outline-none focus:bg-white focus:border-primary/40 transition-colors';
                                         return (
                                             <div key={field.id} className={field.fieldType === 'textarea' ? 'col-span-2' : ''}>
-                                                <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1.5">
+                                                <Typography variant={TypographyVariant.OVERLINE} as="label" className="block mb-1.5">
                                                     {field.label}
-                                                    {field.required && <span className="text-danger ml-1">*</span>}
-                                                </label>
+                                                    {field.required && <Typography variant={TypographyVariant.OVERLINE} inline className="text-danger ml-1">*</Typography>}
+                                                </Typography>
                                                 {field.fieldType === 'textarea' && (
                                                     <textarea className={`${inputClass} min-h-[90px]`} placeholder={field.label} value={String(currentValue)}
                                                         onChange={(event) => setters.setDynamicFieldValue(field.id, event.target.value)} />
@@ -289,7 +289,7 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                                         <input type="checkbox" id={`field-${field.id}`} checked={Boolean(currentValue)}
                                                             onChange={(event) => setters.setDynamicFieldValue(field.id, event.target.checked)}
                                                             className="w-4 h-4 rounded border-neutral-300" />
-                                                        <label htmlFor={`field-${field.id}`} className="text-sm text-neutral-600">{field.label}</label>
+                                                        <Typography variant={TypographyVariant.BODY} as="label" htmlFor={`field-${field.id}`}>{field.label}</Typography>
                                                     </div>
                                                 )}
                                                 {field.fieldType === 'select' && field.options && (

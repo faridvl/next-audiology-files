@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { TEXT } from '@/static/texts/i18n';
 import { tailwind } from '@/utils/tailwind-utils';
+import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
 const itemsPerPage = 5;
 
@@ -28,9 +29,9 @@ export function Pagination({ currentPage, onPageChange, startIndex, endIndex, to
 
     return (
         <div className="flex items-center justify-between gap-4 flex-wrap">
-            <span className="text-[13px] text-neutral-400 font-sans">
+            <Typography variant={TypographyVariant.HELPER} className="text-[13px]">
                 {t(TEXT.GENERAL.PAGINATION.SHOWING, { start: startIndex, end: endIndex, total: totalRows })}
-            </span>
+            </Typography>
 
             <div className="flex items-center gap-1">
                 <button
@@ -59,9 +60,9 @@ export function Pagination({ currentPage, onPageChange, startIndex, endIndex, to
                         }, [])
                         .map((entry, index) =>
                             entry === 'ellipsis' ? (
-                                <span key={`ellipsis-${index}`} className="w-8 h-8 flex items-center justify-center text-neutral-300 text-sm">
+                                <Typography key={`ellipsis-${index}`} variant={TypographyVariant.BODY} className="w-8 h-8 flex items-center justify-center text-neutral-300">
                                     ···
-                                </span>
+                                </Typography>
                             ) : (
                                 <button
                                     key={entry}

@@ -61,9 +61,9 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
             </Typography>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-black text-primary uppercase tracking-widest ml-1">
+                <Typography variant={TypographyVariant.OVERLINE} as="label" className="block text-primary ml-1">
                   Oído derecho (OD)
-                </label>
+                </Typography>
                 <textarea
                   className={`${textareaClass} border-primary-soft bg-primary-soft/20 focus:border-primary/30`}
                   placeholder="Hallazgos oído derecho..."
@@ -72,9 +72,9 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-black text-danger uppercase tracking-widest ml-1">
+                <Typography variant={TypographyVariant.OVERLINE} as="label" className="block text-danger ml-1">
                   Oído izquierdo (OI)
-                </label>
+                </Typography>
                 <textarea
                   className={`${textareaClass} border-danger/20 bg-danger/5 focus:border-danger/30`}
                   placeholder="Hallazgos oído izquierdo..."
@@ -89,9 +89,9 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
         {/* SELECTOR DE PLANTILLA */}
         {templates.length > 1 && (
           <section className="space-y-2 pt-2 border-t border-neutral-50">
-            <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">
+            <Typography variant={TypographyVariant.OVERLINE} as="label" className="block ml-1">
               Plantilla clínica
-            </label>
+            </Typography>
             <select
               className={`${inputClass} bg-white`}
               value={selectedTemplateUuid ?? ''}
@@ -115,10 +115,10 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
                 const currentValue = fields.fieldValues[field.id] ?? '';
                 return (
                   <div key={field.id} className="bg-neutral-50 rounded-app-md p-4 space-y-2">
-                    <label className="block text-xs font-bold text-neutral-600">
+                    <Typography variant={TypographyVariant.CAPTION} as="label" className="block font-bold text-neutral-600">
                       {field.label}
-                      {field.required && <span className="text-danger ml-1">*</span>}
-                    </label>
+                      {field.required && <Typography variant={TypographyVariant.CAPTION} inline className="text-danger ml-1">*</Typography>}
+                    </Typography>
 
                     {field.fieldType === 'boolean' && (
                       <div className="flex gap-3">
@@ -191,9 +191,9 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
 
         {/* DIAGNÓSTICO */}
         <section className="space-y-2 pt-2 border-t border-neutral-50">
-          <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">
-            Diagnóstico <span className="text-danger">*</span>
-          </label>
+          <Typography variant={TypographyVariant.OVERLINE} as="label" className="block ml-1">
+            Diagnóstico <Typography variant={TypographyVariant.OVERLINE} inline className="text-danger">*</Typography>
+          </Typography>
           <textarea
             className={`${textareaClass} min-h-[120px]`}
             placeholder="Escribe el diagnóstico de esta consulta..."
