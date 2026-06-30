@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTranslation } from 'react-i18next';
@@ -10,10 +10,8 @@ export default function DesktopSidebar() {
   const router = useRouter();
   const { t } = useTranslation();
   const { userRoleLabel, businessName, tenantLogoUrl, isLoading, filteredNavigation } = useSidebar();
-  const [zynkaLogoError, setZynkaLogoError] = useState(false);
-
   const tenantInitials = useMemo(() => {
-    if (!businessName || businessName === 'Zynka') return '??';
+    if (!businessName || businessName === 'Zynka') return 'Z';
     const words = businessName.trim().split(/\s+/);
     if (words.length >= 2) return `${words[0][0]}${words[1][0]}`.toUpperCase();
     return words[0].substring(0, 2).toUpperCase();
@@ -26,12 +24,24 @@ export default function DesktopSidebar() {
       <div className="flex h-[80px] items-center px-8 mb-2">
         <Link href={routesPrivate.dashboard} className="flex items-center gap-3 group">
 
-          <div className="h-10 w-10 rounded-app-md flex items-center justify-center text-white font-extrabold text-sm tracking-tight transition-all duration-300 group-hover:scale-105 overflow-hidden">
-            {!zynkaLogoError ? (
-              <img src="/zynka-logo.png" alt="Zynka" className="h-full w-full object-contain" onError={() => setZynkaLogoError(true)} />
-            ) : (
-              <div className="h-full w-full bg-primary flex items-center justify-center">Z</div>
-            )}
+          <div className="h-10 w-10 rounded-app-md transition-all duration-300 group-hover:scale-105 overflow-hidden flex-shrink-0">
+            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" className="h-full w-full">
+              <defs>
+                <linearGradient id="zg" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#38bdf8" />
+                  <stop offset="100%" stopColor="#1d4ed8" />
+                </linearGradient>
+              </defs>
+              <rect width="40" height="40" rx="9" fill="url(#zg)" />
+              {/* Z top bar */}
+              <rect x="10" y="10" width="20" height="4" rx="2" fill="white" />
+              {/* Z diagonal */}
+              <rect x="10" y="10" width="22.5" height="4" rx="2" fill="white" transform="rotate(50 20 20)" />
+              {/* Z bottom bar */}
+              <rect x="10" y="26" width="20" height="4" rx="2" fill="white" />
+              {/* dot */}
+              <circle cx="17.5" cy="20" r="2.5" fill="white" />
+            </svg>
           </div>
 
           <div className="flex flex-col">
