@@ -1,6 +1,8 @@
 import { useRegisterMutation } from '@/shared/api/mutations/auth/use-register-mutation';
 import { RegisterPayload, BusinessType } from '@/types/auth/auth';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { routesPublic } from '@/shared/navigation/routes';
 
 export type RegisterFormValues = {
   businessName: string;
@@ -25,8 +27,8 @@ export const REGISTER_INITIAL_VALUES: RegisterFormValues = {
 };
 
 export const useRegister = () => {
+  const router = useRouter();
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<RegisterPayload | null>(null);
 
   const { executeRegister, isPending: isLoading, error } = useRegisterMutation();
 
@@ -46,9 +48,8 @@ export const useRegister = () => {
     };
 
     executeRegister(payload, {
-      onSuccess: (data) => {
-        setFormData(data as RegisterPayload);
-        nextStep();
+      onSuccess: () => {
+        router.push(`${routesPublic.login}?registered=true`);
       },
     });
   };
@@ -60,6 +61,5 @@ export const useRegister = () => {
     handleAccountInfo,
     isLoading,
     error: error?.message || null,
-    formData,
   };
 };

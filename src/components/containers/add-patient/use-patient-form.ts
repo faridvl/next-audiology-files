@@ -15,7 +15,7 @@ export type PatientFormValues = {
   gender: 'male' | 'female' | '';
 };
 
-const PHONE_REGEX = /^\+?[\d\s\-]{7,15}$/;
+const PHONE_REGEX = /^\+?[\d\s\-]{7,20}$/;
 const NAME_REGEX = /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]+$/;
 const today = new Date().toISOString().split('T')[0];
 

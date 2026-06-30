@@ -269,7 +269,6 @@ const ProfileSettingsPage: React.FC = () => {
                                                     </button>
                                                 </div>
                                             )}
-                                            <input type="file" ref={signatureRef} className="hidden" accept="image/png" onChange={(event) => { const file = event.target.files?.[0]; if (file) setSignatureUrl(URL.createObjectURL(file)); }} />
                                         </div>
                                     </div>
                                 )}

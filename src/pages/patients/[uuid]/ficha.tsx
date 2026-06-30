@@ -138,6 +138,7 @@ const FichaPage: React.FC = () => {
           {controls.length === 0 ? (
             <p className="text-xs text-slate-400 italic">Sin controles registrados.</p>
           ) : (
+            <div className="overflow-x-auto">
             <table className="w-full text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-50">
@@ -166,6 +167,7 @@ const FichaPage: React.FC = () => {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </section>
 
@@ -177,6 +179,7 @@ const FichaPage: React.FC = () => {
           {appointments.length === 0 ? (
             <p className="text-xs text-slate-400 italic">Sin citas registradas.</p>
           ) : (
+            <div className="overflow-x-auto">
             <table className="w-full text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-50">
@@ -203,6 +206,7 @@ const FichaPage: React.FC = () => {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </section>
 

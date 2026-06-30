@@ -133,7 +133,7 @@ export const LoginForm: React.FC<{ onSubmit: (values: { email: string; password:
                             )}
 
                             <Formik
-                                initialValues={{ email: 'admin@audioflow.com', password: 'Password1' }}
+                                initialValues={{ email: '', password: '' }}
                                 validationSchema={loginSchema}
                                 onSubmit={onSubmit}
                             >
@@ -208,21 +208,18 @@ export const LoginForm: React.FC<{ onSubmit: (values: { email: string; password:
                             <Typography variant={TypographyVariant.CAPTION} className="text-slate-400 font-medium text-sm mb-10 leading-relaxed italic">
                                 {t(TEXT.AUTH.FORGOT.SUBTITLE)}
                             </Typography>
-                            <Formik initialValues={{ email: '' }} onSubmit={() => setView('success')}>
-                                <Form className="space-y-6">
-                                    <LoginInput
-                                        name="email"
-                                        label={t(TEXT.AUTH.FORGOT.EMAIL_LABEL)}
-                                        placeholder={t(TEXT.AUTH.FORGOT.EMAIL_PLACEHOLDER)}
-                                    />
-                                    <button
-                                        type="submit"
-                                        className="w-full bg-[#14B8A6] hover:opacity-90 text-white font-black py-4.5 rounded-2xl shadow-lg flex items-center justify-center gap-3"
-                                    >
-                                        {t(TEXT.AUTH.FORGOT.SUBMIT_BUTTON)} <Mail size={18} />
-                                    </button>
-                                </Form>
-                            </Formik>
+                            <div className="p-5 bg-amber-50 border border-amber-200 rounded-2xl text-center space-y-2">
+                                <p className="text-sm font-black text-amber-700">Recuperación de contraseña</p>
+                                <p className="text-xs text-amber-600 leading-relaxed">
+                                    Esta función estará disponible próximamente. Por ahora, contacta al administrador de tu clínica para restablecer tu contraseña.
+                                </p>
+                                <button
+                                    onClick={() => setView('login')}
+                                    className="mt-3 text-[10px] font-black text-amber-700 uppercase tracking-widest hover:text-amber-900 transition-colors"
+                                >
+                                    Volver al login
+                                </button>
+                            </div>
                         </div>
                     )}
 

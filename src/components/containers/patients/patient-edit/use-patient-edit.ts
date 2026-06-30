@@ -16,7 +16,7 @@ export interface PatientEditFormValues {
   gender: string;
 }
 
-const PHONE_REGEX = /^\+?[\d\s\-]{7,15}$/;
+const PHONE_REGEX = /^\+?[\d\s\-]{7,20}$/;
 const NAME_REGEX = /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]+$/;
 
 export const patientEditValidationSchema = Yup.object().shape({
