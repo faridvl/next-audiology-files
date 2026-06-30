@@ -32,6 +32,7 @@ export interface DocumentItem {
   id: string;
   patientId: string;
   name: string;
+  url: string;
   category: DocumentCategory;
   date: string;
   size: string;

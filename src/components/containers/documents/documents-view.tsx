@@ -183,7 +183,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientI
                   </div>
                   <div className="flex items-center gap-1 ml-4">
                     <a
-                      href={`${process.env.NEXT_PUBLIC_MEDICAL_RECORDS_API_URL}/uploads/${document.name}`}
+                      href={document.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-2 text-slate-300 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"

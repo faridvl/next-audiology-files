@@ -38,6 +38,7 @@ function mapApiDocumentToItem(patientUuid: string, document: PatientDocument): D
     id: document.id,
     patientId: patientUuid,
     name: document.originalName,
+    url: document.url,
     category: displayCategory,
     date: formatDate(document.uploadedAt),
     size: formatFileSize(document.size),
