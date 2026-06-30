@@ -9,15 +9,15 @@
 ## 🎯 Próximo paso
 
 **Branch activo:** `main`  
-**Última etapa completada:** StorageModule en core (Cloudflare R2), soft delete de pacientes, PatientDevice (múltiples audífonos), correctionNotes en controles, logo+firma conectados al PDF. Migraciones aplicadas. Typecheck limpio en ambos repos.  
-**Siguiente:** UI de múltiples audífonos en patient-detail (el endpoint existe, falta el listado+formulario en el site). O soft delete en la lista de pacientes (filtrar `isActive: false`).
+**Última etapa completada:** Auditoría completa pre-producción. Limpieza de login/registro, bugs de sesión y WhatsApp corregidos. Sistema listo para pruebas en Railway/Vercel.  
+**Siguiente:** Pruebas en producción (Railway + Vercel). UI de múltiples audífonos en patient-detail (P2-1) si se necesita antes del lanzamiento.
 
 ---
 
 ## 📋 Pendientes
 
 ### 🔴 P0 — Roto ahora
-_Ninguno conocido._
+_Ninguno. Sistema listo para pruebas en producción._
 
 ---
 
@@ -25,7 +25,7 @@ _Ninguno conocido._
 
 | # | Tarea | Esfuerzo | Repo | Notas |
 |---|-------|----------|------|-------|
-| P1-1 | **Soft delete de pacientes** | M | API+Site | `Patient` en Medical Records no tiene `isActive`/`deletedAt`. Agregar campos + migración + filtro en `GET /patients` + botón "Desactivar" en patient detail. |
+| ~~P1-1~~ | ~~**Soft delete de pacientes**~~ | — | — | ✅ Completado. `isActive`/`deletedAt` en schema, `DELETE /patients/:uuid`, botón con confirmación en patient-detail. |
 | P1-5 | **Patient documents: UI listado** | M | Site | Endpoints de upload a R2 listos: `POST /upload/patients/:uuid/audiometrias|imagenes|informes`. Falta UI de lista de documentos vinculados. |
 | P1-6 | **Filtro/cambio de estado en citas en lote** | S | Site | UI de `statusFilter` existe. Falta acción de cambio por ítem desde la lista. |
 
@@ -71,6 +71,10 @@ _Ninguno conocido._
 - **correctionNotes en controles:** `PATCH /medical-controls/:uuid/correction-note`. UI inline en control-detail con confirmación tipo amber.
 - **Logo y firma en PDF:** `MedicalControlReport` muestra `<Image>` con logo en header y firma encima de la línea de firma en footer. Props `logoUrl` y `signatureUrl` inyectados desde sesión.
 
+- **Auditoría pre-producción:** Login sin credenciales hardcodeadas, forgot-password con aviso honesto, registro flujo directo (sin PaymentStep falso), tablas responsive en ficha, validación de teléfono ampliada.
+- **Bug sesión expirada:** `ApiServiceClient` intercepta 401, limpia cookies y redirige a `/login?expired=true` con alerta amber.
+- **Bug WhatsApp:** Quitar número hardcodeado `88165808`. Si paciente no tiene teléfono muestra toast de error.
+- **StatCards patient-detail:** "Próx. mantenimiento" y "Mantenimientos" con datos reales de API y navegación a `/maintenance`.
 - **Guard de especialidad en listado:** `GET /medical-controls/patient/:uuid` ahora filtra por `user.specialty` del JWT. Antes devolvía todos sin filtrar.
 - **Filtro de timeline por tipo:** patient-detail ahora muestra Todos / Controles / Audiogramas / Mantenimientos. Los mantenimientos se mezclan en el mismo timeline.
 - **Selector de plantilla en consulta:** nuevo endpoint `GET /clinical-templates/speciality/:s/all` devuelve array. Site muestra dropdown cuando hay >1 plantilla activa.
