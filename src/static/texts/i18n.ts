@@ -439,6 +439,8 @@ export const TEXT = {
     AVATAR: {
       TITLE: 'profile.avatar.title',
       SUBTITLE: 'profile.avatar.subtitle',
+      UPLOAD_SUCCESS: 'profile.avatar.uploadSuccess',
+      UPLOAD_ERROR: 'profile.avatar.uploadError',
     },
     FIELDS: {
       PASSWORD_PLACEHOLDER: 'profile.fields.passwordPlaceholder',

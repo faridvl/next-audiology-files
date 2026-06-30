@@ -72,6 +72,7 @@ export type UserDomain = {
   specialty?: UserSpecialty;
   phoneNumber?: string | null;
   signatureUrl?: string | null;
+  avatarUrl?: string | null;
   tenantId: number;
   createdAt: string;
 };

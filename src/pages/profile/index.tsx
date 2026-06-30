@@ -15,6 +15,8 @@ import { useSession } from '@/hooks/use-session';
 import { TEXT } from '@/static/texts/i18n';
 import { useUpdateUserMutation } from '@/shared/api/mutations/users/update-user-mutation';
 import { useUploadSignatureMutation } from '@/shared/api/mutations/identity/use-upload-signature-mutation';
+import { useUploadAvatarMutation } from '@/shared/api/mutations/identity/use-upload-avatar-mutation';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 // --- COMPONENTES ATÓMICOS REUTILIZABLES ---
@@ -46,6 +48,8 @@ const ProfileSettingsPage: React.FC = () => {
     const { user, isLoading: isSessionLoading } = useSession();
     const { executeUpdateUser, isPending, isSuccess, error } = useUpdateUserMutation();
     const { uploadSignature, isPending: isUploadingSignature } = useUploadSignatureMutation(user?.uuid ?? '');
+    const { uploadAvatar, isPending: isUploadingAvatar } = useUploadAvatarMutation(user?.uuid ?? '');
+    const queryClient = useQueryClient();
     const [activeTab, setActiveTab] = useState<'general' | 'medical'>('general');
 
     const [fullName, setFullName] = useState('');
@@ -53,7 +57,7 @@ const ProfileSettingsPage: React.FC = () => {
     const [specialty, setSpecialty] = useState('');
     const [signatureUrl, setSignatureUrl] = useState('');
 
-    const [avatar, setAvatar] = useState<string | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const avatarRef = useRef<HTMLInputElement>(null);
     const signatureRef = useRef<HTMLInputElement>(null);
 
@@ -78,9 +82,18 @@ const ProfileSettingsPage: React.FC = () => {
         }
     }, [error]);
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, setter: (value: string) => void) => {
+    const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (file) setter(URL.createObjectURL(file));
+        if (!file || !user?.uuid) return;
+        setAvatarPreview(URL.createObjectURL(file));
+        try {
+            await uploadAvatar(file);
+            queryClient.invalidateQueries({ queryKey: ['auth-me'] });
+            toast.success(t(TEXT.PROFILE.AVATAR.UPLOAD_SUCCESS));
+        } catch {
+            setAvatarPreview(null);
+            toast.error(t(TEXT.PROFILE.AVATAR.UPLOAD_ERROR));
+        }
     };
 
     const handleSubmit = (event: React.FormEvent) => {
@@ -130,8 +143,8 @@ const ProfileSettingsPage: React.FC = () => {
                                         <div className="flex flex-col md:flex-row items-center gap-8 bg-slate-50/50 p-8 rounded-[2.5rem] border border-neutral-100">
                                             <div className="relative group">
                                                 <div className="h-28 w-28 bg-white rounded-[2.2rem] border-2 border-neutral-200 overflow-hidden flex items-center justify-center shadow-inner">
-                                                    {avatar ? (
-                                                        <img src={avatar} className="h-full w-full object-cover" alt="Profile" />
+                                                    {avatarPreview || user?.avatarUrl ? (
+                                                        <img src={avatarPreview ?? user?.avatarUrl ?? ''} className="h-full w-full object-cover" alt="Profile" />
                                                     ) : (
                                                         <User size={40} className="text-neutral-200" />
                                                     )}
@@ -139,11 +152,12 @@ const ProfileSettingsPage: React.FC = () => {
                                                 <button
                                                     type="button"
                                                     onClick={() => avatarRef.current?.click()}
-                                                    className="absolute -bottom-2 -right-2 p-2.5 bg-[#1E3A8A] text-white rounded-xl shadow-lg hover:scale-110 transition-transform"
+                                                    disabled={isUploadingAvatar}
+                                                    className="absolute -bottom-2 -right-2 p-2.5 bg-[#1E3A8A] text-white rounded-xl shadow-lg hover:scale-110 transition-transform disabled:opacity-60"
                                                 >
-                                                    <Camera size={16} />
+                                                    {isUploadingAvatar ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
                                                 </button>
-                                                <input type="file" ref={avatarRef} className="hidden" onChange={(event) => handleFileChange(event, setAvatar)} />
+                                                <input type="file" ref={avatarRef} className="hidden" accept="image/*" onChange={handleAvatarChange} />
                                             </div>
                                             <div className="text-center md:text-left">
                                                 <Typography variant={TypographyVariant.ACCENT} className="!text-lg">{t(TEXT.PROFILE.AVATAR.TITLE)}</Typography>

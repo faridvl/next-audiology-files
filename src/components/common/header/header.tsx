@@ -61,8 +61,10 @@ export function Header({ title }: { title?: string }) {
               </div>
 
               {/* Avatar */}
-              <div className="h-9 w-9 rounded-app-sm bg-primary flex items-center justify-center font-semibold text-white uppercase text-[11px] transition-all duration-200 group-hover:opacity-90">
-                {isLoading ? '?' : initials}
+              <div className="h-9 w-9 rounded-app-sm bg-primary flex items-center justify-center font-semibold text-white uppercase text-[11px] transition-all duration-200 group-hover:opacity-90 overflow-hidden">
+                {isLoading ? '?' : user?.avatarUrl ? (
+                  <img src={user.avatarUrl} alt={userName} className="h-full w-full object-cover" />
+                ) : initials}
               </div>
             </MenuButton>
 

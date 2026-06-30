@@ -487,7 +487,9 @@
     },
     "avatar": {
       "title": "Fotografía de Perfil",
-      "subtitle": "Esta imagen será visible en el directorio del staff."
+      "subtitle": "Esta imagen será visible en el directorio del staff.",
+      "uploadSuccess": "Foto de perfil actualizada.",
+      "uploadError": "No se pudo actualizar la foto de perfil."
     },
     "fields": {
       "passwordPlaceholder": "••••••••",
