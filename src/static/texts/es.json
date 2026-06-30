@@ -117,28 +117,38 @@
       }
     },
     "create": {
-      "layoutTitle": "Nuevo Miembro",
-      "title": "Información del Usuario",
-      "description": "Completa los datos para dar de alta un nuevo acceso.",
+      "layoutTitle": "Agregar usuario",
+      "sectionAccess": "Acceso al sistema",
+      "sectionAccessDesc": "Credenciales con las que el usuario iniciará sesión.",
+      "sectionProfile": "Perfil profesional",
+      "sectionProfileDesc": "Datos de identificación y contacto del miembro.",
+      "sectionRole": "Permisos y especialidad",
+      "sectionRoleDesc": "El rol define qué puede ver y hacer en el sistema. La especialidad filtra los controles clínicos.",
       "form": {
-        "fullName": "Nombre Completo",
+        "fullName": "Nombre completo",
         "fullNamePlaceholder": "Ej. Roberto Gómez",
-        "email": "Correo Electrónico",
+        "email": "Correo electrónico",
         "emailPlaceholder": "nombre@clinica.com",
-        "password": "Contraseña Temporal",
-        "passwordPlaceholder": "••••••••",
-        "role": "Rol de Sistema",
-        "specialty": "Especialidad / Área",
-        "specialtyPlaceholder": "Ej. Audiología Clínica",
+        "password": "Contraseña temporal",
+        "passwordPlaceholder": "Mínimo 8 caracteres",
+        "role": "Rol de sistema",
+        "roleHelper": "Define los permisos de acceso.",
+        "specialty": "Especialidad clínica",
+        "specialtyHelper": "Opcional. Filtra los controles médicos por disciplina.",
         "phoneNumber": "Teléfono",
         "phoneNumberPlaceholder": "8888-8888",
-        "submit": "Guardar Usuario"
+        "submit": "Agregar usuario"
       },
       "roles": {
         "OWNER": "Dueño",
         "ADMIN": "Administrador",
-        "DOCTOR": "Médico",
+        "DOCTOR": "Médico / Doctor",
         "STAFF": "Recepcionista / Staff"
+      },
+      "specialties": {
+        "AUDIOLOGY": "Audiología",
+        "DENTAL": "Odontología",
+        "GENERAL": "Medicina General"
       }
     }
   },

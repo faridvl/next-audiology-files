@@ -11,15 +11,19 @@ import { Table } from '@/components/common/table/table';
 import { Action } from '@/components/common/menu-item/menu-item';
 
 import { useNavigation } from '@/hooks/use-navigation';
+import { useSession } from '@/hooks/use-session';
 import { tailwind } from '@/utils/tailwind-utils';
 import { useUsersContainer, ROLES_FILTER } from './use-user-list';
 import { User } from '@/types/users/user.type';
+import { UserRole } from '@/types/auth/auth';
 import { TEXT } from '@/static/texts/i18n';
 
 
 export function UsersContainer() {
     const { t } = useTranslation();
     const navigation = useNavigation();
+    const { user: sessionUser } = useSession();
+    const canManageUsers = sessionUser?.role === UserRole.OWNER || sessionUser?.role === UserRole.ADMIN;
 
     const {
         users,
@@ -90,7 +94,7 @@ export function UsersContainer() {
         }));
     }, [users]);
 
-    const tableActions: Action[] = [
+    const tableActions: Action[] = canManageUsers ? [
         {
             name: 'Editar Usuario',
             icon: <Edit size={14} />,
@@ -101,7 +105,7 @@ export function UsersContainer() {
             icon: <Trash2 size={14} />,
             onClick: (row) => handleDeleteUser(row.uuid),
         },
-    ];
+    ] : [];
 
     return (
         <div className="max-w-[1400px] mx-auto px-4 md:px-6 pb-20">
@@ -111,10 +115,12 @@ export function UsersContainer() {
                     {t(TEXT.USERS.LIST.TITLE)}
                 </Typography>
 
-                <Button variant={ButtonVariant.PRIMARY} onClick={() => navigation.users.create()}>
-                    <UserPlus size={18} className="mr-0 md:mr-2" />
-                    <span className="hidden md:inline">{t(TEXT.USERS.CREATE.FORM.SUBMIT)}</span>
-                </Button>
+                {canManageUsers && (
+                    <Button variant={ButtonVariant.PRIMARY} onClick={() => navigation.users.create()}>
+                        <UserPlus size={18} className="mr-0 md:mr-2" />
+                        <span className="hidden md:inline">{t(TEXT.USERS.CREATE.FORM.SUBMIT)}</span>
+                    </Button>
+                )}
             </div>
 
             {/* Filtros */}

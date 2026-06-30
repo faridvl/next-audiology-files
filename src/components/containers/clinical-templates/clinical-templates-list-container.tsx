@@ -68,7 +68,7 @@ export const ClinicalTemplatesListContainer: React.FC = () => {
           </div>
           {templates.map((template: ClinicalTemplate) => (
             <div
-              key={template.id}
+              key={template.uuid}
               className="flex items-center justify-between p-6 bg-white border border-neutral-100 rounded-app-md shadow-sm hover:border-primary/30 transition-all"
             >
               <div className="flex-1 grid grid-cols-3 gap-4 items-center min-w-0">
@@ -89,14 +89,14 @@ export const ClinicalTemplatesListContainer: React.FC = () => {
               </div>
               <div className="flex gap-2 ml-4">
                 <button
-                  onClick={() => handleEdit(template.id ?? '')}
+                  onClick={() => handleEdit(template.uuid)}
                   className="p-2 text-neutral-400 hover:text-primary hover:bg-primary-soft rounded-lg transition-colors"
                   title="Editar plantilla"
                 >
                   <Edit2 size={16} />
                 </button>
                 <button
-                  onClick={() => handleDelete(template.id ?? '')}
+                  onClick={() => handleDelete(template.uuid)}
                   className="p-2 text-neutral-400 hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
                   title="Eliminar plantilla"
                 >

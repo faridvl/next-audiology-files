@@ -1,13 +1,13 @@
 import { useCreateUserMutation } from '@/shared/api/mutations/users/create-user-matation';
-import { UserRole } from '@/types/auth/auth';
+import { UserRole, UserSpecialty } from '@/types/auth/auth';
 import { useForm, UseFormReturn } from 'react-hook-form';
-//todo(!): cambiar alerta por showSucces
 import { toast } from 'sonner';
+
 export type UserFormValues = {
   fullName: string;
   email: string;
   role: UserRole;
-  specialty: string;
+  specialty?: UserSpecialty | '';
   phoneNumber?: string;
   password?: string;
 };
@@ -16,7 +16,14 @@ type useUserFormReturn = {
   form: UseFormReturn<UserFormValues>;
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
   isLoading: boolean;
+  handlePhoneChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
+
+function applyPhoneMask(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 8);
+  if (digits.length <= 4) return digits;
+  return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+}
 
 export function useUserForm(onSuccess?: () => void): useUserFormReturn {
   const { executeCreateUser, isPending } = useCreateUserMutation();
@@ -32,15 +39,26 @@ export function useUserForm(onSuccess?: () => void): useUserFormReturn {
     },
   });
 
+  function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const masked = applyPhoneMask(e.target.value);
+    form.setValue('phoneNumber', masked, { shouldValidate: true });
+  }
+
   async function handleSave(values: UserFormValues) {
-    executeCreateUser(values, {
+    const payload = {
+      ...values,
+      specialty: values.specialty || undefined,
+      phoneNumber: values.phoneNumber || undefined,
+    };
+
+    executeCreateUser(payload, {
       onSuccess: () => {
-        toast.success('Operación realizada con éxito');
+        toast.success('Usuario creado correctamente.');
         form.reset();
         if (onSuccess) onSuccess();
       },
       onError: () => {
-        toast.error('No se pudo completar la solicitud. Intente más tarde.');
+        toast.error('No se pudo crear el usuario. Intente más tarde.');
       },
     });
   }
@@ -49,5 +67,6 @@ export function useUserForm(onSuccess?: () => void): useUserFormReturn {
     form,
     onSubmit: form.handleSubmit(handleSave),
     isLoading: form.formState.isSubmitting || isPending,
+    handlePhoneChange,
   };
 }
