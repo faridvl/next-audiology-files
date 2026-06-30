@@ -8,13 +8,14 @@ import { MedicalSpeciality } from '@/types/medical-controls/medical-control.type
 import { useConsultaControl } from './use-consulta-control';
 import { useTranslation } from 'react-i18next';
 import { TEXT } from '@/static/texts/i18n';
+import { MedicalHistorySidebar } from '@/components/containers/controls/control-history/control-history';
 
 interface Props {
   patientUuid: string;
 }
 
 const inputClass = 'w-full px-4 py-3 rounded-app-sm border border-neutral-200 bg-neutral-50/30 text-sm outline-none focus:bg-white focus:border-primary/30 transition-colors';
-const textareaClass = `${inputClass} min-h-[100px]`;
+const textareaClass = `${inputClass} min-h-[100px] resize-none`;
 
 export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
   const { t } = useTranslation();
@@ -34,7 +35,11 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
   const isAudiology = apiSpeciality === MedicalSpeciality.AUDIOLOGY;
 
   return (
-    <div className="max-w-2xl mx-auto p-4 md:p-6 pb-24 space-y-6 animate-in fade-in duration-500">
+    <div className="p-4 md:p-6 pb-24 animate-in fade-in duration-500">
+      <div className="flex gap-6 items-start">
+
+        {/* COLUMNA PRINCIPAL — formulario */}
+        <div className="flex-1 min-w-0 space-y-6">
 
       {/* HEADER */}
       <div className="flex items-center gap-4">
@@ -173,7 +178,7 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
 
                     {field.fieldType === 'textarea' && (
                       <textarea
-                        className={`${inputClass} min-h-[80px]`}
+                        className={`${inputClass} min-h-[80px] resize-none`}
                         placeholder={t(TEXT.CONSULTA.CONTROL.ADDITIONAL_NOTES)}
                         value={String(currentValue)}
                         onChange={(e) => fields.setFieldValue(field.id, e.target.value)}
@@ -245,6 +250,15 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
           <Save size={16} className="mr-2" />
           {isPending ? t(TEXT.CONSULTA.CONTROL.SAVING) : t(TEXT.CONSULTA.CONTROL.SAVE)}
         </Button>
+      </div>
+
+        </div>{/* fin columna principal */}
+
+        {/* COLUMNA HISTORIAL — solo desktop */}
+        <div className="hidden xl:block w-96 shrink-0">
+          <MedicalHistorySidebar patientId={patientUuid} />
+        </div>
+
       </div>
     </div>
   );

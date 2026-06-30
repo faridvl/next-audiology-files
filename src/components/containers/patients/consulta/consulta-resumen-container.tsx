@@ -57,7 +57,7 @@ export const ConsultaResumenContainer: React.FC<Props> = ({ patientUuid }) => {
   });
 
   return (
-    <div className="max-w-xl mx-auto p-4 md:p-6 pb-24 space-y-6 animate-in fade-in duration-500">
+    <div className="p-4 md:p-6 pb-24 space-y-6 animate-in fade-in duration-500">
 
       {/* HEADER */}
       <div className="flex items-center gap-4">

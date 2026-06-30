@@ -18,9 +18,10 @@ interface Props {
   patientUuid: string;
 }
 
+// DENTAL not yet in API schema — falls back to GENERAL until endpoint supports it
 const userSpecialtyToApiSpeciality: Record<UserSpecialty, MedicalSpeciality> = {
   [UserSpecialty.AUDIOLOGY]: MedicalSpeciality.AUDIOLOGY,
-  [UserSpecialty.DENTAL]: MedicalSpeciality.DENTAL,
+  [UserSpecialty.DENTAL]: MedicalSpeciality.GENERAL,
   [UserSpecialty.GENERAL]: MedicalSpeciality.GENERAL,
 };
 
@@ -66,7 +67,7 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid }) =>
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-4 md:p-6 pb-24 space-y-6 animate-in fade-in duration-500">
+    <div className="p-4 md:p-6 pb-24 space-y-6 animate-in fade-in duration-500">
 
       {/* HEADER */}
       <div className="flex items-center gap-4">
@@ -86,7 +87,7 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid }) =>
         </div>
       </div>
 
-      <div className="bg-white border border-neutral-100 rounded-app-md p-5 md:p-8 shadow-sm">
+      <div className="shadow-sm">
         <AudiometryCapture onChange={setAudiogramData} />
       </div>
 

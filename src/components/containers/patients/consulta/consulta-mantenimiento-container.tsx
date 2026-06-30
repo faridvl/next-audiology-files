@@ -15,6 +15,7 @@ interface Props {
 }
 
 const inputClass = 'w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm outline-none focus:bg-white focus:border-warning/40 transition-colors';
+const textareaClass = `${inputClass} resize-none`;
 
 export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid }) => {
   const { t } = useTranslation();
@@ -62,7 +63,7 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
   ];
 
   return (
-    <div className="max-w-xl mx-auto p-4 md:p-6 pb-24 space-y-6 animate-in fade-in duration-500">
+    <div className="p-4 md:p-6 pb-24 space-y-6 animate-in fade-in duration-500">
 
       {/* HEADER */}
       <div className="flex items-center gap-4">
@@ -89,7 +90,7 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
             {t(TEXT.CONSULTA.MAINTENANCE.DESCRIPTION_LABEL)} <Typography variant={TypographyVariant.OVERLINE} inline className="text-danger">*</Typography>
           </Typography>
           <textarea
-            className={`${inputClass} min-h-[140px]`}
+            className={`${textareaClass} min-h-[140px]`}
             placeholder={t(TEXT.CONSULTA.MAINTENANCE.DESCRIPTION_PLACEHOLDER)}
             value={description}
             onChange={(e) => setDescription(e.target.value)}

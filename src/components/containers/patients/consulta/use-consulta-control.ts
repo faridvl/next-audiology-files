@@ -8,9 +8,10 @@ import { MedicalSpeciality } from '@/types/medical-controls/medical-control.type
 import { UserSpecialty } from '@/types/auth/auth';
 import { ConsultaSessionStorage } from '@/shared/utils/consulta-session';
 
+// DENTAL not yet in API schema — falls back to GENERAL until endpoint supports it
 const userSpecialtyToApiSpeciality: Record<UserSpecialty, MedicalSpeciality> = {
   [UserSpecialty.AUDIOLOGY]: MedicalSpeciality.AUDIOLOGY,
-  [UserSpecialty.DENTAL]: MedicalSpeciality.DENTAL,
+  [UserSpecialty.DENTAL]: MedicalSpeciality.GENERAL,
   [UserSpecialty.GENERAL]: MedicalSpeciality.GENERAL,
 };
 

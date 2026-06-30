@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Maximize2 } from "lucide-react";
+import { Maximize2, Volume2, Activity } from "lucide-react";
 import { useAudiometryData } from "./use-audiometry-data";
 import { AudiogramModal } from "../audiogram-modal/audiogram-modal";
 import { AudiogramPoint } from "../audiogram-modal/use-audiogram";
@@ -9,9 +9,36 @@ interface AudiometryCaptureProps {
     onChange?: (data: { OD: Record<number, string>; OI: Record<number, string> }) => void;
 }
 
-export const AudiometryCapture: React.FC<AudiometryCaptureProps> = ({ onChange }) => {
-    const frequencies = [125, 250, 500, 1000, 2000, 4000, 8000];
+const frequencies = [125, 250, 500, 1000, 2000, 4000, 8000];
 
+function formatFrequency(hz: number): string {
+    return hz >= 1000 ? `${hz / 1000}k` : String(hz);
+}
+
+const earConfig = {
+    OD: {
+        label: 'Oído Derecho',
+        shortLabel: 'OD',
+        color: 'text-danger',
+        dotColor: 'bg-danger',
+        ringColor: 'focus:ring-danger/30',
+        borderColor: 'border-danger/20',
+        bgColor: 'bg-danger/5',
+        headerBg: 'bg-danger/5 border-danger/20',
+    },
+    OI: {
+        label: 'Oído Izquierdo',
+        shortLabel: 'OI',
+        color: 'text-primary',
+        dotColor: 'bg-primary',
+        ringColor: 'focus:ring-primary/30',
+        borderColor: 'border-primary/20',
+        bgColor: 'bg-primary/5',
+        headerBg: 'bg-primary/5 border-primary/20',
+    },
+} as const;
+
+export const AudiometryCapture: React.FC<AudiometryCaptureProps> = ({ onChange }) => {
     const {
         modalSide,
         setModalSide,
@@ -20,7 +47,6 @@ export const AudiometryCapture: React.FC<AudiometryCaptureProps> = ({ onChange }
         syncFromModal
     } = useAudiometryData();
 
-    // Sincronización con el formulario padre cada vez que cambian los datos locales
     useEffect(() => {
         if (onChange) {
             onChange(auditData);
@@ -28,8 +54,7 @@ export const AudiometryCapture: React.FC<AudiometryCaptureProps> = ({ onChange }
     }, [auditData, onChange]);
 
     return (
-        <div className="space-y-6">
-            {/* Modal para captura visual mediante gráfico */}
+        <div className="space-y-0">
             <AudiogramModal
                 isOpen={!!modalSide}
                 side={modalSide || 'OD'}
@@ -41,49 +66,104 @@ export const AudiometryCapture: React.FC<AudiometryCaptureProps> = ({ onChange }
                 }}
             />
 
-            {/* Contenedor de inputs numéricos por oído */}
-            <div className="bg-neutral-50 p-5 md:p-8 rounded-app-xl border border-neutral-100 space-y-6">
-                {(['OI', 'OD'] as const).map((side) => (
-                    <div key={side} className="space-y-3">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <div className={`h-3.5 w-3.5 rounded-full ${side === 'OD' ? 'bg-danger' : 'bg-primary'}`} />
-                                <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm">
-                                    Oído {side === 'OD' ? 'Derecho' : 'Izquierdo'}
-                                </Typography>
+            {/* Leyenda de frecuencias — encabezado compartido */}
+            <div className="bg-neutral-50 border border-neutral-100 rounded-t-app-xl px-6 pt-5 pb-3">
+                <div className="flex items-center gap-2 mb-4">
+                    <Activity size={15} className="text-neutral-400" />
+                    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
+                        Audiometría tonal — Hz
+                    </Typography>
+                </div>
+                <div className="grid grid-cols-7 gap-2 pl-0">
+                    {frequencies.map((hz) => (
+                        <div key={hz} className="flex flex-col items-center gap-1">
+                            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black text-neutral-400 tracking-tight text-center">
+                                {formatFrequency(hz)}
+                            </Typography>
+                            <div className="w-px h-3 bg-neutral-200" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Oídos */}
+            {(['OD', 'OI'] as const).map((side, index) => {
+                const config = earConfig[side];
+                const isLast = index === 1;
+                return (
+                    <div
+                        key={side}
+                        className={`border border-t-0 border-neutral-100 bg-white px-6 py-5 space-y-4 ${isLast ? 'rounded-b-app-xl' : ''}`}
+                    >
+                        {/* Header del oído */}
+                        <div className={`flex items-center justify-between px-4 py-3 rounded-app-md border ${config.headerBg}`}>
+                            <div className="flex items-center gap-3">
+                                <div className={`h-8 w-8 rounded-app-sm ${config.bgColor} border ${config.borderColor} flex items-center justify-center`}>
+                                    <Volume2 size={14} className={config.color} />
+                                </div>
+                                <div>
+                                    <Typography variant={TypographyVariant.BODY_BOLD} className={`text-sm font-black ${config.color}`}>
+                                        {config.label}
+                                    </Typography>
+                                    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] text-neutral-400 font-bold uppercase tracking-widest">
+                                        dB HL · Via aérea
+                                    </Typography>
+                                </div>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => setModalSide(side)}
-                                className="flex items-center gap-1.5 text-[10px] font-black uppercase text-neutral-500 hover:text-primary transition-all bg-white px-3 py-1.5 rounded-full shadow-sm border border-neutral-100 active:scale-95"
+                                className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-wide px-3 py-2 rounded-app-sm bg-white border border-neutral-200 hover:border-neutral-300 shadow-sm transition-all active:scale-95 ${config.color}`}
                             >
-                                <Maximize2 size={12} /> Abrir Plano
+                                <Maximize2 size={12} />
+                                Plano
                             </button>
                         </div>
 
-                        {/* 7 columnas — una por frecuencia, sin overflow */}
+                        {/* Inputs de frecuencia */}
                         <div className="grid grid-cols-7 gap-2">
-                            {frequencies.map(hz => (
-                                <div key={`${side}-${hz}`} className="flex flex-col gap-1.5">
-                                    <span className="text-[8px] font-black text-neutral-400 text-center uppercase tracking-tight">
-                                        {hz >= 1000 ? `${hz / 1000}k` : hz}
-                                    </span>
-                                    <input
-                                        type="number"
-                                        placeholder="—"
-                                        min="-10"
-                                        max="120"
-                                        value={auditData[side][hz] ?? ''}
-                                        onChange={(e) => updateValue(side, hz, e.target.value)}
-                                        className="w-full py-2.5 rounded-app-sm border-none text-center text-xs font-semibold shadow-inner bg-white focus:ring-2 focus:ring-primary/40 outline-none transition-all"
-                                    />
-                                </div>
-                            ))}
+                            {frequencies.map((hz) => {
+                                const value = auditData[side][hz] ?? '';
+                                const filled = value !== '';
+                                return (
+                                    <div key={`${side}-${hz}`} className="flex flex-col items-center gap-1.5">
+                                        <input
+                                            type="number"
+                                            placeholder="—"
+                                            min="-10"
+                                            max="120"
+                                            value={value}
+                                            onChange={(e) => updateValue(side, hz, e.target.value)}
+                                            className={`w-full py-3 rounded-app-md border text-center text-sm font-bold outline-none transition-all focus:ring-2 ${config.ringColor} ${
+                                                filled
+                                                    ? `${config.borderColor} ${config.bgColor} ${config.color}`
+                                                    : 'border-neutral-100 bg-neutral-50 text-neutral-400 hover:border-neutral-200'
+                                            }`}
+                                        />
+                                        {filled && (
+                                            <div className={`w-1.5 h-1.5 rounded-full ${config.dotColor} opacity-60`} />
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
-
-                        {side === 'OI' && <div className="border-t border-neutral-200 pt-2" />}
                     </div>
-                ))}
+                );
+            })}
+
+            {/* Footer informativo */}
+            <div className="mt-3 flex items-center gap-4 px-1">
+                <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-danger" />
+                    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] text-neutral-400">OD = Oído derecho</Typography>
+                </div>
+                <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-primary" />
+                    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] text-neutral-400">OI = Oído izquierdo</Typography>
+                </div>
+                <Typography variant={TypographyVariant.CAPTION} className="text-[9px] text-neutral-300 ml-auto">
+                    Valores en dB HL (−10 a 120)
+                </Typography>
             </div>
         </div>
     );

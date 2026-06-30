@@ -9,7 +9,7 @@
 ## 🎯 Próximo paso
 
 **Branch activo:** `main`  
-**Última etapa completada:** Edad del paciente en header de ficha. Detalle expandible de mantenimientos en /maintenance (sin endpoint nuevo — expande inline).  
+**Última etapa completada:** Refactor UI área de consulta: layout full-width, historial integrado en Control Clínico, fix payload DENTAL→GENERAL, audiograma UI profesional, resize-none en textareas.  
 **Siguiente:** Investigar error 500 en upload de documentos (problema en StorageService/R2 en API). Probar flujo completo con usuarios.
 
 ---
@@ -64,6 +64,7 @@
 
 ## ✅ Completado (últimas etapas)
 
+- **Refactor UI consulta médica:** Layout full-width (sin `max-w-2xl`) en Control, Audiograma, Mantenimiento y Resumen. `MedicalHistorySidebar` integrado en Control Clínico (columna lateral XL). Fix 400 en `POST /medical-controls`: `DENTAL` specialty mapeada a `GENERAL` (API no tiene schema DENTAL aún). `resize-none` en todos los textareas de la consulta. Audiograma rediseñado con frecuencia header compartido, inputs con color-coding por oído (rojo/azul), indicadores de valor lleno, footer con leyenda.
 - **Edad del paciente en header:** Calculada desde `birthDate` con `calculateAge()`. Se muestra junto a cédula/teléfono/correo en el header de la ficha. Clave i18n `patients.detail.ageYears`.
 - **Detalle expandible de mantenimientos:** Filas en `/maintenance` ahora son expandibles (click expande inline) mostrando fecha realizada, fecha próximo mantenimiento, descripción completa, realizado por, y botón "Ver ficha del paciente".
 
