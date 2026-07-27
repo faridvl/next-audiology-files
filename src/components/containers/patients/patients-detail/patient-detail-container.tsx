@@ -1,7 +1,7 @@
 import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigation } from "@/hooks/use-navigation";
-import { usePatientDetail } from "./use-patient-detail";
+import { usePatientDetail, EncounterGroup } from "./use-patient-detail";
 import { Typography, TypographyVariant } from "@/components/common/typography/typography";
 import {
     EnvelopeIcon,
@@ -21,9 +21,9 @@ import {
 } from "lucide-react";
 import { Button, ButtonVariant } from "@/components/common/button/button";
 import { MedicalSpeciality } from "@/types/medical-controls/medical-control.types";
-import { ClinicalControl, ControlType } from "@/types/otros/clinical";
+import { ControlType } from "@/types/otros/clinical";
 import { useSession } from "@/hooks/use-session";
-import { UserRole, UserSpecialty } from "@/types/auth/auth";
+import { UserRole, UserSpecialty, BusinessType } from "@/types/auth/auth";
 
 const userSpecialtyToMedicalSpeciality: Record<UserSpecialty, MedicalSpeciality> = {
   [UserSpecialty.AUDIOLOGY]: MedicalSpeciality.AUDIOLOGY,
@@ -104,9 +104,109 @@ const SpecFilterButton = ({ label, isActive, onClick }: SpecFilterButtonProps) =
     </button>
 );
 
-const getTypeStyle = (type: ControlType) => {
+interface EncounterGroupRowProps {
+    group: EncounterGroup;
+    patientId: string;
+}
+
+// MAINTENANCE y AUDIOGRAM no tienen página de detalle propia (el mantenimiento
+// se ve inline, el estudio no es un MedicalControl) — solo los controles navegan.
+const isNavigableRecord = (type: string): boolean => type !== 'MAINTENANCE' && type !== 'AUDIOGRAM';
+
+const EncounterGroupRow = ({ group, patientId }: EncounterGroupRowProps) => {
+    const { t } = useTranslation();
+    const navigation = useNavigation();
+    const [isExpanded, setIsExpanded] = useState(false);
+    const isSingleItem = group.items.length === 1;
+    const singleItem = group.items[0];
+
+    if (isSingleItem) {
+        return (
+            <div
+                onClick={() => {
+                    if (isNavigableRecord(singleItem.type)) {
+                        navigation.patients.viewControl(patientId, singleItem.id);
+                    }
+                }}
+                className={`bg-white p-4 md:p-5 rounded-app-lg md:rounded-app-md border border-neutral-100 transition-all flex items-center gap-3 md:gap-6 group ${isNavigableRecord(singleItem.type) ? 'hover:border-primary/40 cursor-pointer' : ''}`}
+            >
+                <div className="shrink-0">
+                    <Typography variant={TypographyVariant.OVERLINE} inline className={`px-2 py-1 rounded-lg border ${getTypeStyle(singleItem.type as ControlType)}`}>
+                        {singleItem.type}
+                    </Typography>
+                    <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 font-bold mt-2 uppercase tracking-tight whitespace-nowrap">
+                        {singleItem.date}
+                    </Typography>
+                </div>
+                <div className="flex-1 min-w-0">
+                    <Typography variant={TypographyVariant.BODY} className="text-sm font-bold text-neutral-700 group-hover:text-primary transition-colors line-clamp-2">
+                        {singleItem.note}
+                    </Typography>
+                </div>
+                <ChevronRightIcon className="h-4 w-4 text-neutral-300 group-hover:translate-x-1 transition-transform shrink-0" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="bg-white rounded-app-lg md:rounded-app-md border border-neutral-100 overflow-hidden">
+            <button
+                onClick={() => setIsExpanded((expanded) => !expanded)}
+                className="w-full p-4 md:p-5 flex items-center gap-3 md:gap-6 hover:bg-neutral-50 transition-colors text-left"
+            >
+                <div className="shrink-0">
+                    <Typography variant={TypographyVariant.OVERLINE} inline className="px-2 py-1 rounded-lg border bg-neutral-50 text-neutral-600 border-neutral-100">
+                        {group.especialidad}
+                    </Typography>
+                    <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 font-bold mt-2 uppercase tracking-tight whitespace-nowrap">
+                        {group.date}
+                    </Typography>
+                </div>
+                <div className="flex-1 min-w-0">
+                    <Typography variant={TypographyVariant.BODY} className="text-sm font-bold text-neutral-700 line-clamp-2">
+                        {t(TEXT.PATIENTS.DETAIL.HISTORY.ENCOUNTER_ITEM_COUNT, { count: group.items.length })}
+                    </Typography>
+                </div>
+                {isExpanded ? <ChevronUp className="h-4 w-4 text-neutral-300 shrink-0" /> : <ChevronDown className="h-4 w-4 text-neutral-300 shrink-0" />}
+            </button>
+
+            {isExpanded && (
+                <div className="border-t border-neutral-100 divide-y divide-neutral-50">
+                    {group.items.map((item) => (
+                        <div
+                            key={item.id}
+                            onClick={() => {
+                                if (isNavigableRecord(item.type)) {
+                                    navigation.patients.viewControl(patientId, item.id);
+                                }
+                            }}
+                            className={`p-4 md:p-5 flex items-center gap-3 md:gap-6 group ${isNavigableRecord(item.type) ? 'hover:bg-neutral-50 cursor-pointer' : ''}`}
+                        >
+                            <div className="shrink-0">
+                                <Typography variant={TypographyVariant.OVERLINE} inline className={`px-2 py-1 rounded-lg border ${getTypeStyle(item.type as ControlType)}`}>
+                                    {item.type}
+                                </Typography>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <Typography variant={TypographyVariant.BODY} className="text-sm font-bold text-neutral-700 group-hover:text-primary transition-colors line-clamp-2">
+                                    {item.note}
+                                </Typography>
+                            </div>
+                            {isNavigableRecord(item.type) && (
+                                <ChevronRightIcon className="h-4 w-4 text-neutral-300 group-hover:translate-x-1 transition-transform shrink-0" />
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
+const getTypeStyle = (type: ControlType | string) => {
     switch (type) {
-        case ControlType.AUDIOLOGY: return "bg-accent/10 text-accent border-accent/20";
+        case ControlType.AUDIOLOGY:
+        case 'AUDIOGRAM': return "bg-accent/10 text-accent border-accent/20";
         case ControlType.DENTAL: return "bg-primary-soft text-primary border-primary-soft";
         case ControlType.GENERAL: return "bg-success/10 text-success border-success/20";
         default: return "bg-neutral-50 text-neutral-600 border-neutral-100";
@@ -553,16 +653,22 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
     const [isConfirmDelete, setIsConfirmDelete] = useState(false);
     const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
     const queryClient = useQueryClient();
-    const { user } = useSession();
+    const { user, tenant } = useSession();
     const canStartConsulta = user?.role && user.role !== UserRole.STAFF;
+    // STAFF (recepción) ve agenda, contacto y documentos administrativos, pero no
+    // notas clínicas, estudios ni antecedentes (Ley 8968 — datos de salud sensibles).
+    const canReadClinicalData = user?.role !== UserRole.STAFF;
     const isAdmin = user?.role === UserRole.OWNER || user?.role === UserRole.ADMIN;
+    // Dispositivos, mantenimientos y audiograma son módulos de audiología —
+    // una clínica de psicología no los usa (DOMAIN_ANALYSIS.md §4.8).
+    const isAudiologyTenant = tenant?.businessType === BusinessType.AUDIOLOGY;
     const { deletePatient, isPending: isDeletingPatient } = useDeletePatientMutation();
 
     const {
-        patient, history, summary, isLoading, isFetching,
+        patient, history, groupedHistory, summary, isLoading, isFetching,
         hasMore, searchTerm, setSearchTerm, selectedSpec, setSelectedSpec, loadMore,
         latestAudiogram, recordTypeFilter, setRecordTypeFilter, nextAppointmentData,
-    } = usePatientDetail(id, user?.specialty);
+    } = usePatientDetail(id, canReadClinicalData);
 
     if (isLoading || !patient) return (
         <div className="p-20 text-center animate-pulse text-neutral-400 font-bold uppercase tracking-widest">
@@ -570,9 +676,9 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
         </div>
     );
 
-    const specialityOptions = user?.specialty
-        ? [user.specialty as unknown as MedicalSpeciality]
-        : Object.values(MedicalSpeciality);
+    // El filtro por especialidad es una preferencia de vista del usuario, no una
+    // restricción de lectura (NOM-004 5.14): siempre se ofrecen todas las especialidades.
+    const specialityOptions = Object.values(MedicalSpeciality);
 
     return (
         <>
@@ -655,7 +761,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
             </div>
 
             {/* INDICADORES RÁPIDOS */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className={`grid grid-cols-1 gap-4 ${isAudiologyTenant ? 'md:grid-cols-3' : ''}`}>
                 <div className="flex flex-col gap-2">
                     <StatCard
                         title={t(TEXT.PATIENTS.DETAIL.STATS.NEXT_APPOINTMENT)}
@@ -672,11 +778,13 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                         </button>
                     )}
                 </div>
+                {isAudiologyTenant && (
+                <>
                 <div className="flex flex-col gap-2">
                     <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.NEXT_MAINTENANCE)} value={summary.warrantyExpiration} icon={<ShieldCheckIcon className="h-5 w-5 text-success" />} onClick={() => navigation.maintenance.list()} />
                     {summary.pendingMaintenance.length === 0 && (
                         <button
-                            onClick={() => navigation.patients.consultaMantenimiento(id)}
+                            onClick={() => navigation.patients.consulta(id)}
                             className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-success/30 rounded-app-md text-[10px] font-black uppercase tracking-widest text-success/70 hover:border-success hover:text-success transition-all"
                         >
                             <PlusIcon className="h-3 w-3" /> {t(TEXT.PATIENTS.DETAIL.STATS.SCHEDULE_MAINTENANCE)}
@@ -684,128 +792,132 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                     )}
                 </div>
                 <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.MAINTENANCE_COUNT)} value={t(TEXT.PATIENTS.DETAIL.STATS.MAINTENANCE_COUNT_VALUE, { count: summary.pendingMaintenance.length })} icon={<WrenchScrewdriverIcon className="h-5 w-5 text-warning" />} onClick={() => navigation.maintenance.listFromPatient(id)} />
+                </>
+                )}
             </div>
 
-            {/* ANTECEDENTES Y AUDÍFONOS */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <BackgroundPanel patientUuid={id} />
-                <DevicesPanel patientUuid={id} />
+            {/* NIVEL 2 — ESTADO CLÍNICO (1, se actualiza): antecedentes + dispositivos
+                activos son contexto permanente del paciente, no eventos en el tiempo. */}
+            {(canReadClinicalData || isAudiologyTenant) && (
+            <div className="space-y-3">
+                <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1">
+                    {t(TEXT.PATIENTS.DETAIL.LEVELS.CLINICAL_STATE)}
+                </Typography>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {canReadClinicalData && <BackgroundPanel patientUuid={id} />}
+                    {isAudiologyTenant && <DevicesPanel patientUuid={id} />}
+                </div>
             </div>
+            )}
 
-            {/* HISTORIAL CLÍNICO */}
-            <div className="space-y-4">
-                <div className="flex flex-col gap-3 bg-white p-4 rounded-app-md border border-neutral-100 shadow-sm">
-                    <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                        <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_ALL)} isActive={recordTypeFilter === 'ALL'} onClick={() => setRecordTypeFilter('ALL')} />
-                        <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_CONTROLS)} isActive={recordTypeFilter === 'CONTROL'} onClick={() => setRecordTypeFilter('CONTROL')} />
-                        <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_AUDIOGRAMS)} isActive={recordTypeFilter === 'AUDIOGRAM'} onClick={() => setRecordTypeFilter('AUDIOGRAM')} />
-                        <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_MAINTENANCE)} isActive={recordTypeFilter === 'MAINTENANCE'} onClick={() => setRecordTypeFilter('MAINTENANCE')} />
-                    </div>
-                    {specialityOptions.length > 1 && (
+            {/* NIVEL 3 — CRONOLOGÍA (N, crece): encuentros, estudios y documentos —
+                lo que le PASÓ al paciente, en el tiempo. Documentos es fuente principal
+                (DOMAIN_ANALYSIS.md §4.9), no un apéndice al final. */}
+            <div className="space-y-6">
+                <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1">
+                    {t(TEXT.PATIENTS.DETAIL.LEVELS.TIMELINE)}
+                </Typography>
+
+                {/* HISTORIAL CLÍNICO — STAFF no tiene acceso a notas clínicas ni estudios */}
+                {canReadClinicalData && (
+                <div className="space-y-4">
+                    <div className="flex flex-col gap-3 bg-white p-4 rounded-app-md border border-neutral-100 shadow-sm">
                         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                            <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_ALL_SPECIALTY)} isActive={selectedSpec === 'ALL'} onClick={() => setSelectedSpec('ALL')} />
-                            {specialityOptions.map((spec) => (
-                                <SpecFilterButton key={spec} label={spec} isActive={selectedSpec === spec} onClick={() => setSelectedSpec(spec)} />
-                            ))}
+                            <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_ALL)} isActive={recordTypeFilter === 'ALL'} onClick={() => setRecordTypeFilter('ALL')} />
+                            <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_CONTROLS)} isActive={recordTypeFilter === 'CONTROL'} onClick={() => setRecordTypeFilter('CONTROL')} />
+                            {isAudiologyTenant && (
+                                <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_AUDIOGRAMS)} isActive={recordTypeFilter === 'AUDIOGRAM'} onClick={() => setRecordTypeFilter('AUDIOGRAM')} />
+                            )}
+                            {isAudiologyTenant && (
+                                <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_MAINTENANCE)} isActive={recordTypeFilter === 'MAINTENANCE'} onClick={() => setRecordTypeFilter('MAINTENANCE')} />
+                            )}
+                        </div>
+                        {specialityOptions.length > 1 && (
+                            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                                <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_ALL_SPECIALTY)} isActive={selectedSpec === 'ALL'} onClick={() => setSelectedSpec('ALL')} />
+                                {specialityOptions.map((spec) => (
+                                    <SpecFilterButton key={spec} label={spec} isActive={selectedSpec === spec} onClick={() => setSelectedSpec(spec)} />
+                                ))}
+                            </div>
+                        )}
+                        <div className="relative w-full">
+                            <MagnifyingGlassIcon className="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" />
+                            <input
+                                type="text"
+                                placeholder={t(TEXT.PATIENTS.DETAIL.HISTORY.SEARCH_PLACEHOLDER)}
+                                className="w-full pl-10 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-app-sm text-xs outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                                value={searchTerm}
+                                onChange={(event) => setSearchTerm(event.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    {/* AUDIOGRAMA MÁS RECIENTE */}
+                    {isAudiologyTenant && latestAudiogram && (
+                        <div className="bg-white p-5 rounded-app-md border border-neutral-100 shadow-sm space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">
+                                        {t(TEXT.PATIENTS.DETAIL.HISTORY.LATEST_AUDIOGRAM)}
+                                    </Typography>
+                                    <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 font-medium">
+                                        {history.find(record => record.type === 'AUDIOGRAM')?.date ?? ''}
+                                    </Typography>
+                                </div>
+                                <div className="flex gap-2">
+                                    {(['OD', 'OI'] as const).map((side) => {
+                                        const hasData = Object.values(latestAudiogram[side] ?? {}).some(v => v !== '');
+                                        if (!hasData) return null;
+                                        const classification = classifyHearingLoss(latestAudiogram, side);
+                                        return (
+                                            <div
+                                                key={side}
+                                                className="px-2.5 py-1.5 rounded-app-sm text-center"
+                                                style={{ backgroundColor: `${classification.color}12`, border: `1px solid ${classification.color}30` }}
+                                            >
+                                                <div className="text-[8px] font-black uppercase tracking-widest text-neutral-400">{side}</div>
+                                                <div className="text-[10px] font-black" style={{ color: classification.color }}>
+                                                    {classification.label}
+                                                </div>
+                                                <div className="text-[8px] text-neutral-400">{classification.pta} dB</div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            <AudiogramChart audiogram={latestAudiogram} compact showClassification={false} />
                         </div>
                     )}
-                    <div className="relative w-full">
-                        <MagnifyingGlassIcon className="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" />
-                        <input
-                            type="text"
-                            placeholder={t(TEXT.PATIENTS.DETAIL.HISTORY.SEARCH_PLACEHOLDER)}
-                            className="w-full pl-10 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-app-sm text-xs outline-none focus:ring-2 focus:ring-primary/10 transition-all"
-                            value={searchTerm}
-                            onChange={(event) => setSearchTerm(event.target.value)}
-                        />
+
+                    {/* REGISTROS — agrupados por encuentro (una visita = una entrada) */}
+                    <div className="space-y-3">
+                        {groupedHistory.length === 0 ? (
+                            <div className="py-16 text-center bg-white rounded-app-xl border border-dashed border-neutral-200 text-neutral-400 text-xs font-bold uppercase tracking-widest">
+                                {t(TEXT.PATIENTS.DETAIL.HISTORY.EMPTY)}
+                            </div>
+                        ) : (
+                            <>
+                                {groupedHistory.map((group) => (
+                                    <EncounterGroupRow key={group.encounterUuid} group={group} patientId={id} />
+                                ))}
+                                {hasMore && (
+                                    <button
+                                        onClick={loadMore}
+                                        disabled={isFetching}
+                                        className="w-full py-3 text-center text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:text-primary border border-dashed border-neutral-200 rounded-app-lg hover:border-primary/40 transition-all disabled:opacity-50"
+                                    >
+                                        {isFetching ? t(TEXT.PATIENTS.DETAIL.HISTORY.LOADING) : t(TEXT.PATIENTS.DETAIL.HISTORY.LOAD_MORE)}
+                                    </button>
+                                )}
+                            </>
+                        )}
                     </div>
                 </div>
-
-                {/* AUDIOGRAMA MÁS RECIENTE */}
-                {latestAudiogram && (
-                    <div className="bg-white p-5 rounded-app-md border border-neutral-100 shadow-sm space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">
-                                    {t(TEXT.PATIENTS.DETAIL.HISTORY.LATEST_AUDIOGRAM)}
-                                </Typography>
-                                <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 font-medium">
-                                    {history.find(record => record.type === 'AUDIOLOGY')?.date ?? ''}
-                                </Typography>
-                            </div>
-                            <div className="flex gap-2">
-                                {(['OD', 'OI'] as const).map((side) => {
-                                    const hasData = Object.values(latestAudiogram[side] ?? {}).some(v => v !== '');
-                                    if (!hasData) return null;
-                                    const classification = classifyHearingLoss(latestAudiogram, side);
-                                    return (
-                                        <div
-                                            key={side}
-                                            className="px-2.5 py-1.5 rounded-app-sm text-center"
-                                            style={{ backgroundColor: `${classification.color}12`, border: `1px solid ${classification.color}30` }}
-                                        >
-                                            <div className="text-[8px] font-black uppercase tracking-widest text-neutral-400">{side}</div>
-                                            <div className="text-[10px] font-black" style={{ color: classification.color }}>
-                                                {classification.label}
-                                            </div>
-                                            <div className="text-[8px] text-neutral-400">{classification.pta} dB</div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                        <AudiogramChart audiogram={latestAudiogram} compact showClassification={false} />
-                    </div>
                 )}
 
-                {/* REGISTROS */}
-                <div className="space-y-3">
-                    {history.length === 0 ? (
-                        <div className="py-16 text-center bg-white rounded-app-xl border border-dashed border-neutral-200 text-neutral-400 text-xs font-bold uppercase tracking-widest">
-                            {t(TEXT.PATIENTS.DETAIL.HISTORY.EMPTY)}
-                        </div>
-                    ) : (
-                        <>
-                            {history.map((record: ClinicalControl) => (
-                                <div
-                                    key={record.id}
-                                    onClick={() => {
-                                        if (record.type !== 'MAINTENANCE') {
-                                            navigation.patients.viewControl(id, record.id);
-                                        }
-                                    }}
-                                    className={`bg-white p-4 md:p-5 rounded-app-lg md:rounded-app-md border border-neutral-100 transition-all flex items-center gap-3 md:gap-6 group ${record.type === 'MAINTENANCE' ? '' : 'hover:border-primary/40 cursor-pointer'}`}
-                                >
-                                    <div className="shrink-0">
-                                        <Typography variant={TypographyVariant.OVERLINE} inline className={`px-2 py-1 rounded-lg border ${getTypeStyle(record.type as ControlType)}`}>
-                                            {record.type}
-                                        </Typography>
-                                        <Typography variant={TypographyVariant.CAPTION} className="text-[10px] text-neutral-400 font-bold mt-2 uppercase tracking-tight whitespace-nowrap">
-                                            {record.date}
-                                        </Typography>
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <Typography variant={TypographyVariant.BODY} className="text-sm font-bold text-neutral-700 group-hover:text-primary transition-colors line-clamp-2">
-                                            {record.note}
-                                        </Typography>
-                                    </div>
-                                    <ChevronRightIcon className="h-4 w-4 text-neutral-300 group-hover:translate-x-1 transition-transform shrink-0" />
-                                </div>
-                            ))}
-                            {hasMore && (
-                                <button
-                                    onClick={loadMore}
-                                    disabled={isFetching}
-                                    className="w-full py-3 text-center text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:text-primary border border-dashed border-neutral-200 rounded-app-lg hover:border-primary/40 transition-all disabled:opacity-50"
-                                >
-                                    {isFetching ? t(TEXT.PATIENTS.DETAIL.HISTORY.LOADING) : t(TEXT.PATIENTS.DETAIL.HISTORY.LOAD_MORE)}
-                                </button>
-                            )}
-                        </>
-                    )}
-                </div>
-
-                {/* DOCUMENTOS */}
+                {/* DOCUMENTOS — visible para todos los roles, incluido STAFF (administrativo).
+                    Vínculo a un encuentro es opcional; la mayoría no nace de una visita
+                    (facturas, garantías) — DocumentsContainer nunca lo exige al subir. */}
                 <div className="bg-white rounded-app-md border border-neutral-100 shadow-sm p-5">
                     <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800 mb-4">
                         {t(TEXT.PATIENTS.DETAIL.DOCUMENTS.TITLE)}

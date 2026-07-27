@@ -8,12 +8,12 @@ import { ConsultaAudiogramaContainer } from '@/components/containers/patients/co
 
 const ConsultaAudiogramaPage: React.FC = () => {
   const router = useRouter();
-  const { uuid } = router.query;
+  const { uuid, encounterUuid } = router.query;
   return (
     <>
       <Head><title>Audiograma — Zynka</title></Head>
       <DashboardLayout isMainPage={false} contentStyle={BoxedLayoutStyle.FULL} title="Audiograma">
-        <ConsultaAudiogramaContainer patientUuid={uuid as string} />
+        <ConsultaAudiogramaContainer patientUuid={uuid as string} encounterUuid={encounterUuid as string} />
       </DashboardLayout>
     </>
   );

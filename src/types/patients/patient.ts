@@ -15,6 +15,7 @@ export interface Patient {
   tenantUuid: string;
   createdAt: string;
   linkedProductUuid?: string | null;
+  isActive?: boolean;
 }
 
 export interface CreatePatientPayload {

@@ -1,24 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 import { TEXT } from '@/static/texts/i18n';
 import { Printer, ArrowLeft } from 'lucide-react';
 import { authorizeServerSidePage } from '@/hocs/auth';
-import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
-import { useMedicalControlsQuery } from '@/shared/api/querys/medical-controls-query';
-import { useAppointmentByPatientQuery } from '@/shared/api/querys/get-appoinment-by-patient-query';
 import { useNavigation } from '@/hooks/use-navigation';
-import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+import { usePatientDetail, EncounterGroup } from '@/components/containers/patients/patients-detail/use-patient-detail';
+import { useAppointmentByPatientQuery } from '@/shared/api/querys/get-appoinment-by-patient-query';
 import { usePatientBackgroundQuery } from '@/shared/api/querys/patient-background-query';
+import { usePatientDocumentsQuery } from '@/shared/api/querys/patient-documents-query';
 import { PatientBackgroundEntity } from '@/types/patients/patient-background.types';
+import { PatientDocument } from '@/types/documents/document.types';
+import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
-const specialityLabels: Record<string, string> = {
-  [MedicalSpeciality.AUDIOLOGY]: 'Audiología',
-  [MedicalSpeciality.DENTAL]: 'Odontología',
-  [MedicalSpeciality.GENERAL]: 'Medicina General',
-};
-
+// Modo impresión del expediente — misma fuente de datos que /patients/[uuid]
+// (usePatientDetail), sin queries propias duplicadas (DOMAIN_ANALYSIS.md §4.8).
 const FichaPage: React.FC = () => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -27,22 +24,30 @@ const FichaPage: React.FC = () => {
 
   const patientUuid = uuid as string;
 
-  const { data: patient, isLoading: isLoadingPatient } = usePatientDetailQuery(patientUuid);
-  const { data: controlsData, isLoading: isLoadingControls } = useMedicalControlsQuery(patientUuid, 1, 50);
+  const {
+    patient, groupedHistory, isLoading: isLoadingDetail, isFetching: isFetchingHistory, hasMore, loadMore,
+  } = usePatientDetail(patientUuid);
   const { data: appointmentsData, isLoading: isLoadingAppointments } = useAppointmentByPatientQuery(patientUuid);
-  const { data: background } = usePatientBackgroundQuery(patientUuid);
+  const { data: background, isLoading: isLoadingBackground } = usePatientBackgroundQuery(patientUuid);
+  const { data: documentsData, isLoading: isLoadingDocuments } = usePatientDocumentsQuery(patientUuid);
 
-  const isLoading = isLoadingPatient || isLoadingControls || isLoadingAppointments;
+  // La ficha es una copia completa del expediente (Ley 8239 art. 2.k) — a
+  // diferencia del expediente en pantalla, no pagina: carga todo antes de mostrar.
+  useEffect(() => {
+    if (hasMore && !isFetchingHistory) loadMore();
+  }, [hasMore, isFetchingHistory, loadMore]);
 
-  const controls = controlsData?.data ?? [];
+  const isLoading = isLoadingDetail || isLoadingAppointments || isLoadingBackground || isLoadingDocuments || hasMore;
+
   const appointments = appointmentsData?.appointments ?? [];
+  const documents = documentsData ?? [];
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-neutral-400 font-bold uppercase tracking-widest text-xs animate-pulse">
+        <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400 font-bold uppercase tracking-widest text-xs animate-pulse">
           {t(TEXT.FICHA.LOADING)}
-        </p>
+        </Typography>
       </div>
     );
   }
@@ -50,15 +55,15 @@ const FichaPage: React.FC = () => {
   if (!patient) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-neutral-400 font-bold uppercase tracking-widest text-xs">
+        <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400 font-bold uppercase tracking-widest text-xs">
           {t(TEXT.FICHA.NOT_FOUND)}
-        </p>
+        </Typography>
       </div>
     );
   }
 
   const patientFullName = `${patient.firstName} ${patient.lastName}`.toUpperCase();
-  const patientIdShort = patient.uuid.split('-')[0].toUpperCase();
+  const patientIdShort = patient.documentId ?? patient.uuid.split('-')[0].toUpperCase();
 
   return (
     <>
@@ -95,23 +100,23 @@ const FichaPage: React.FC = () => {
         {/* ENCABEZADO */}
         <div className="border-b-4 border-neutral-900 pb-6 mb-8 flex justify-between items-end">
           <div>
-            <p className="text-2xl font-black text-neutral-900 uppercase tracking-tighter">
+            <Typography variant={TypographyVariant.HEADER} className="text-2xl font-black text-neutral-900 uppercase tracking-tighter">
               {t(TEXT.FICHA.TITLE)}
-            </p>
-            <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.3em] mt-1">
+            </Typography>
+            <Typography variant={TypographyVariant.CAPTION} className="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.3em] mt-1">
               {t(TEXT.FICHA.SUBTITLE)}
-            </p>
+            </Typography>
           </div>
-          <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+          <Typography variant={TypographyVariant.CAPTION} className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
             {t(TEXT.FICHA.ISSUED_AT)} {new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-          </p>
+          </Typography>
         </div>
 
-        {/* SECCIÓN 1: DATOS DEL PACIENTE */}
+        {/* SECCIÓN 1: DATOS DEL PACIENTE (IDENTIDAD) */}
         <section className="mb-10">
-          <h2 className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em] mb-4 border-b border-neutral-100 pb-2">
+          <Typography variant={TypographyVariant.OVERLINE} as="h2" className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em] mb-4 border-b border-neutral-100 pb-2 block">
             {t(TEXT.FICHA.SECTION_1)}
-          </h2>
+          </Typography>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <DataField label={t(TEXT.FICHA.FIELDS.FULL_NAME)} value={patientFullName} />
             <DataField label={t(TEXT.FICHA.FIELDS.IDENTIFIER)} value={patientIdShort} />
@@ -133,54 +138,52 @@ const FichaPage: React.FC = () => {
           </div>
         </section>
 
-        {/* SECCIÓN 2: HISTORIAL DE CONTROLES */}
+        {/* SECCIÓN 2: CRONOLOGÍA — agrupada por encuentro, igual que el expediente */}
         <section className="mb-10">
-          <h2 className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em] mb-4 border-b border-neutral-100 pb-2">
+          <Typography variant={TypographyVariant.OVERLINE} as="h2" className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em] mb-4 border-b border-neutral-100 pb-2 block">
             {t(TEXT.FICHA.SECTION_2)}
-          </h2>
-          {controls.length === 0 ? (
-            <p className="text-xs text-neutral-400 italic">{t(TEXT.FICHA.CONTROLS.EMPTY)}</p>
+          </Typography>
+          {groupedHistory.length === 0 ? (
+            <Typography variant={TypographyVariant.CAPTION} className="text-xs text-neutral-400 italic">{t(TEXT.FICHA.CONTROLS.EMPTY)}</Typography>
           ) : (
             <div className="overflow-x-auto">
-            <table className="w-full text-xs border-collapse">
-              <thead>
-                <tr className="bg-neutral-50">
-                  <th className="text-left p-3 text-[9px] font-black uppercase tracking-widest text-neutral-500 border border-neutral-200">{t(TEXT.FICHA.CONTROLS.COL_DATE)}</th>
-                  <th className="text-left p-3 text-[9px] font-black uppercase tracking-widest text-neutral-500 border border-neutral-200">{t(TEXT.FICHA.CONTROLS.COL_SPECIALITY)}</th>
-                  <th className="text-left p-3 text-[9px] font-black uppercase tracking-widest text-neutral-500 border border-neutral-200">{t(TEXT.FICHA.CONTROLS.COL_DIAGNOSIS)}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {controls.map((control) => (
-                  <tr key={control.uuid} className="hover:bg-neutral-50">
-                    <td className="p-3 border border-neutral-200 text-neutral-700 font-medium whitespace-nowrap">
-                      {new Date(control.createdAt).toLocaleDateString('es-ES', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                      })}
-                    </td>
-                    <td className="p-3 border border-neutral-200 text-neutral-700 font-medium">
-                      {specialityLabels[control.header.speciality] ?? control.header.speciality}
-                    </td>
-                    <td className="p-3 border border-neutral-200 text-neutral-600">
-                      {control.clinicalData.diagnosis || '—'}
-                    </td>
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="bg-neutral-50">
+                    <th className="text-left p-3 text-[9px] font-black uppercase tracking-widest text-neutral-500 border border-neutral-200">{t(TEXT.FICHA.CONTROLS.COL_DATE)}</th>
+                    <th className="text-left p-3 text-[9px] font-black uppercase tracking-widest text-neutral-500 border border-neutral-200">{t(TEXT.FICHA.CONTROLS.COL_SPECIALITY)}</th>
+                    <th className="text-left p-3 text-[9px] font-black uppercase tracking-widest text-neutral-500 border border-neutral-200">{t(TEXT.FICHA.CONTROLS.COL_DIAGNOSIS)}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {(groupedHistory as EncounterGroup[]).flatMap((group) =>
+                    group.items.map((item) => (
+                      <tr key={item.id} className="hover:bg-neutral-50">
+                        <td className="p-3 border border-neutral-200 text-neutral-700 font-medium whitespace-nowrap">
+                          {item.date}
+                        </td>
+                        <td className="p-3 border border-neutral-200 text-neutral-700 font-medium">
+                          {item.type}
+                        </td>
+                        <td className="p-3 border border-neutral-200 text-neutral-600">
+                          {item.note || '—'}
+                        </td>
+                      </tr>
+                    )),
+                  )}
+                </tbody>
+              </table>
             </div>
           )}
         </section>
 
         {/* SECCIÓN 3: CITAS */}
         <section className="mb-10">
-          <h2 className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em] mb-4 border-b border-neutral-100 pb-2">
+          <Typography variant={TypographyVariant.OVERLINE} as="h2" className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em] mb-4 border-b border-neutral-100 pb-2 block">
             {t(TEXT.FICHA.SECTION_3)}
-          </h2>
+          </Typography>
           {appointments.length === 0 ? (
-            <p className="text-xs text-neutral-400 italic">{t(TEXT.FICHA.APPOINTMENTS.EMPTY)}</p>
+            <Typography variant={TypographyVariant.CAPTION} className="text-xs text-neutral-400 italic">{t(TEXT.FICHA.APPOINTMENTS.EMPTY)}</Typography>
           ) : (
             <div className="overflow-x-auto">
             <table className="w-full text-xs border-collapse">
@@ -213,22 +216,63 @@ const FichaPage: React.FC = () => {
           )}
         </section>
 
-        {/* SECCIÓN 4: ANTECEDENTES MÉDICOS */}
+        {/* SECCIÓN 4: ANTECEDENTES MÉDICOS (ESTADO CLÍNICO) */}
         <section className="mb-10">
-          <h2 className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em] mb-4 border-b border-neutral-100 pb-2">
+          <Typography variant={TypographyVariant.OVERLINE} as="h2" className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em] mb-4 border-b border-neutral-100 pb-2 block">
             {t(TEXT.FICHA.SECTION_4)}
-          </h2>
+          </Typography>
           {!background ? (
-            <p className="text-xs text-neutral-400 italic">{t(TEXT.FICHA.BACKGROUND.EMPTY)}</p>
+            <Typography variant={TypographyVariant.CAPTION} className="text-xs text-neutral-400 italic">{t(TEXT.FICHA.BACKGROUND.EMPTY)}</Typography>
           ) : (
             <BackgroundSection background={background} />
           )}
         </section>
 
+        {/* SECCIÓN 5: DOCUMENTOS — fuente principal del expediente (DOMAIN_ANALYSIS.md §4.9) */}
+        <section className="mb-10">
+          <Typography variant={TypographyVariant.OVERLINE} as="h2" className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em] mb-4 border-b border-neutral-100 pb-2 block">
+            {t(TEXT.FICHA.SECTION_5)}
+          </Typography>
+          {documents.length === 0 ? (
+            <Typography variant={TypographyVariant.CAPTION} className="text-xs text-neutral-400 italic">{t(TEXT.FICHA.DOCUMENTS.EMPTY)}</Typography>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="bg-neutral-50">
+                    <th className="text-left p-3 text-[9px] font-black uppercase tracking-widest text-neutral-500 border border-neutral-200">{t(TEXT.FICHA.DOCUMENTS.COL_NAME)}</th>
+                    <th className="text-left p-3 text-[9px] font-black uppercase tracking-widest text-neutral-500 border border-neutral-200">{t(TEXT.FICHA.DOCUMENTS.COL_CATEGORY)}</th>
+                    <th className="text-left p-3 text-[9px] font-black uppercase tracking-widest text-neutral-500 border border-neutral-200">{t(TEXT.FICHA.DOCUMENTS.COL_DATE)}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(documents as PatientDocument[]).map((document) => (
+                    <tr key={document.uuid} className="hover:bg-neutral-50">
+                      <td className="p-3 border border-neutral-200 text-neutral-700 font-medium">
+                        {document.originalName}
+                      </td>
+                      <td className="p-3 border border-neutral-200 text-neutral-600">
+                        {document.category}
+                      </td>
+                      <td className="p-3 border border-neutral-200 text-neutral-700 font-medium whitespace-nowrap">
+                        {new Date(document.uploadedAt).toLocaleDateString('es-ES', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
         {/* PIE */}
-        <div className="border-t border-neutral-200 pt-6 text-center text-[9px] font-bold text-neutral-400 uppercase tracking-[0.2em]">
+        <Typography variant={TypographyVariant.CAPTION} className="block border-t border-neutral-200 pt-6 text-center text-[9px] font-bold text-neutral-400 uppercase tracking-[0.2em]">
           {t(TEXT.FICHA.FOOTER)}
-        </div>
+        </Typography>
       </div>
     </>
   );
@@ -260,20 +304,20 @@ const BackgroundSection: React.FC<{ background: PatientBackgroundEntity }> = ({ 
   return (
     <div className="space-y-3">
       {positiveKeys.length === 0 ? (
-        <p className="text-xs text-neutral-400 italic">{t(TEXT.FICHA.BACKGROUND.NO_POSITIVE)}</p>
+        <Typography variant={TypographyVariant.CAPTION} className="text-xs text-neutral-400 italic">{t(TEXT.FICHA.BACKGROUND.NO_POSITIVE)}</Typography>
       ) : (
         <div className="flex flex-wrap gap-2">
           {positiveKeys.map((key) => (
-            <span key={key} className="px-3 py-1 bg-danger/10 text-danger border border-danger/20 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+            <Typography key={key} variant={TypographyVariant.CAPTION} inline className="px-3 py-1 bg-danger/10 text-danger border border-danger/20 rounded-lg text-[10px] font-bold uppercase tracking-wider">
               {backgroundLabels[key]}
-            </span>
+            </Typography>
           ))}
         </div>
       )}
       {background.notes && (
         <div className="bg-neutral-50 rounded-xl p-4 mt-2">
-          <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest mb-1">{t(TEXT.FICHA.BACKGROUND.NOTES)}</p>
-          <p className="text-xs text-neutral-700">{background.notes}</p>
+          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black text-neutral-400 uppercase tracking-widest mb-1">{t(TEXT.FICHA.BACKGROUND.NOTES)}</Typography>
+          <Typography variant={TypographyVariant.CAPTION} className="text-xs text-neutral-700">{background.notes}</Typography>
         </div>
       )}
     </div>
@@ -282,8 +326,8 @@ const BackgroundSection: React.FC<{ background: PatientBackgroundEntity }> = ({ 
 
 const DataField: React.FC<{ label: string; value: string }> = ({ label, value }) => (
   <div className="bg-neutral-50 rounded-xl p-4">
-    <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest mb-1">{label}</p>
-    <p className="text-xs font-bold text-neutral-800">{value}</p>
+    <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black text-neutral-400 uppercase tracking-widest mb-1">{label}</Typography>
+    <Typography variant={TypographyVariant.CAPTION} className="text-xs font-bold text-neutral-800">{value}</Typography>
   </div>
 );
 

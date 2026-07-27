@@ -3,9 +3,12 @@ import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
 import { useMedicalControlsQuery } from '@/shared/api/querys/medical-controls-query';
 import { useAppointmentByPatientQuery } from '@/shared/api/querys/get-appoinment-by-patient-query';
 import { useMaintenanceByPatientQuery } from '@/shared/api/querys/maintenance-query';
+import { useEncountersByPatientQuery, EncounterResponse } from '@/shared/api/querys/encounters-query';
+import { useStudiesByPatientQuery } from '@/shared/api/querys/studies-query';
 import { MaintenanceEntity } from '@/types/maintenance/maintenance.types';
 import { ClinicalControl, ControlType } from '@/types/otros/clinical';
-import { AudiogramData, MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+import { AudiometriaTonalPayload, StudyType } from '@/types/studies/study.types';
 import { AppointmentStatus } from '@/types/appointments/appointment';
 
 interface MedicalControlResponse {
@@ -13,6 +16,7 @@ interface MedicalControlResponse {
   createdAt: string;
   header: {
     patientUUID: string;
+    encounterUuid: string | null;
     speciality: MedicalSpeciality;
     schemaVersion: number;
     doctorName?: string;
@@ -21,6 +25,14 @@ interface MedicalControlResponse {
     findings: Record<string, unknown>;
     diagnosis: string;
   };
+}
+
+export interface EncounterGroup {
+  encounterUuid: string;
+  especialidad: string;
+  startedAt: string;
+  date: string;
+  items: ClinicalControl[];
 }
 
 interface AppointmentResponse {
@@ -33,7 +45,7 @@ interface AppointmentResponse {
 
 export type RecordTypeFilter = 'ALL' | 'CONTROL' | 'AUDIOGRAM' | 'MAINTENANCE';
 
-export function usePatientDetail(uuid: string, userSpecialty?: string) {
+export function usePatientDetail(uuid: string, canReadClinicalData = true) {
   // --- ESTADOS ---
   const [page, setPage] = useState(1);
   const [allRecords, setAllRecords] = useState<MedicalControlResponse[]>([]);
@@ -50,10 +62,12 @@ export function usePatientDetail(uuid: string, userSpecialty?: string) {
     data: historyData,
     isLoading: isLoadingHistory,
     isFetching,
-  } = useMedicalControlsQuery(uuid, page, 10);
+  } = useMedicalControlsQuery(uuid, page, 10, canReadClinicalData);
 
   const { data: appointmentsData } = useAppointmentByPatientQuery(uuid);
   const { data: maintenancesData } = useMaintenanceByPatientQuery(uuid);
+  const { data: encountersData } = useEncountersByPatientQuery(uuid, canReadClinicalData);
+  const { data: studiesData } = useStudiesByPatientQuery(uuid, canReadClinicalData);
 
   // --- EFECTO: ACUMULACIÓN ---
   // Este efecto se encarga de "unir" las páginas conforme se cargan
@@ -71,23 +85,18 @@ export function usePatientDetail(uuid: string, userSpecialty?: string) {
 
   // --- LÓGICA DE CLIENTE: FILTRADO, MAPEO Y ORDEN ---
   const mappedHistory = useMemo(() => {
-    // 1. Filtrar la lista acumulada de controles (In-Memory)
+    // 1. Filtrar la lista acumulada de controles (In-Memory). El audiograma ya
+    // no vive en MedicalControl.findings — es su propia entidad Study (§2 abajo).
     const filtered = allRecords.filter((item) => {
-      const matchesUserSpecialty =
-        userSpecialty === undefined || item.header.speciality === userSpecialty;
       const matchesSpec = selectedSpec === 'ALL' || item.header.speciality === selectedSpec;
 
       const matchesSearch =
         item.clinicalData.diagnosis.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.header.speciality.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const hasAudiogram = !!item.clinicalData.findings?.audiogram;
-      const matchesRecordType =
-        recordTypeFilter === 'ALL' ||
-        (recordTypeFilter === 'CONTROL') ||
-        (recordTypeFilter === 'AUDIOGRAM' && hasAudiogram);
+      const matchesRecordType = recordTypeFilter === 'ALL' || recordTypeFilter === 'CONTROL';
 
-      return matchesUserSpecialty && matchesSpec && matchesSearch && matchesRecordType;
+      return matchesSpec && matchesSearch && matchesRecordType;
     });
 
     // 2. Transformar controles al formato que espera la UI (ClinicalControl)
@@ -102,9 +111,30 @@ export function usePatientDetail(uuid: string, userSpecialty?: string) {
       type: item.header.speciality as ControlType,
       note: item.clinicalData.diagnosis,
       specialistName: item.header.doctorName || 'Médico Asignado',
+      encounterUuid: item.header.encounterUuid,
     }));
 
-    // 3. Transformar mantenimientos al mismo formato, si el filtro los incluye
+    // 3. Transformar estudios (audiometrías) al mismo formato, si el filtro los incluye
+    const studyItems: ClinicalControl[] =
+      recordTypeFilter === 'ALL' || recordTypeFilter === 'AUDIOGRAM'
+        ? (studiesData ?? [])
+            .filter((study) => study.tipo === StudyType.AUDIOMETRIA_TONAL)
+            .map((study) => ({
+              id: study.uuid,
+              patientId: study.patientUuid,
+              date: new Date(study.createdAt).toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+              }),
+              type: 'AUDIOGRAM',
+              note: 'Audiometría tonal',
+              specialistName: 'Médico Asignado',
+              encounterUuid: study.encounterUuid,
+            }))
+        : [];
+
+    // 4. Transformar mantenimientos al mismo formato, si el filtro los incluye
     const maintenanceItems: ClinicalControl[] =
       recordTypeFilter === 'ALL' || recordTypeFilter === 'MAINTENANCE'
         ? ((maintenancesData ?? []) as MaintenanceEntity[])
@@ -122,14 +152,54 @@ export function usePatientDetail(uuid: string, userSpecialty?: string) {
               type: 'MAINTENANCE',
               note: maintenance.description,
               specialistName: 'Mantenimiento',
+              encounterUuid: maintenance.encounterUuid,
             }))
         : [];
 
-    // 4. Unir y ordenar siempre por fecha (los más nuevos primero)
-    return [...controlItems, ...maintenanceItems].sort(
+    // 5. Unir y ordenar siempre por fecha (los más nuevos primero)
+    return [...controlItems, ...studyItems, ...maintenanceItems].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     );
-  }, [allRecords, maintenancesData, searchTerm, selectedSpec, userSpecialty, recordTypeFilter]);
+  }, [allRecords, studiesData, maintenancesData, searchTerm, selectedSpec, recordTypeFilter]);
+
+  // --- AGRUPACIÓN POR ENCUENTRO ---
+  // Una entrada por visita, no por registro suelto (DOMAIN_ANALYSIS.md §4.8, §5.2):
+  // un audiograma y su consulta del mismo día son el mismo encuentro, no dos filas.
+  // Registros previos a la migración de Encounter (encounterUuid null) se muestran
+  // sueltos, sin agrupar — no hay encuentro al que asociarlos retroactivamente.
+  const groupedHistory = useMemo((): EncounterGroup[] => {
+    const encounters: EncounterResponse[] = encountersData ?? [];
+    const groups: EncounterGroup[] = [];
+
+    for (const encounter of encounters) {
+      const items = mappedHistory.filter((record) => record.encounterUuid === encounter.uuid);
+      if (items.length === 0) continue;
+      groups.push({
+        encounterUuid: encounter.uuid,
+        especialidad: encounter.especialidad,
+        startedAt: encounter.startedAt,
+        date: new Date(encounter.startedAt).toLocaleDateString('es-ES', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+        }),
+        items,
+      });
+    }
+
+    const ungroupedItems = mappedHistory.filter((record) => !record.encounterUuid);
+    for (const item of ungroupedItems) {
+      groups.push({
+        encounterUuid: item.id,
+        especialidad: item.type,
+        startedAt: item.date,
+        date: item.date,
+        items: [item],
+      });
+    }
+
+    return groups.sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime());
+  }, [encountersData, mappedHistory]);
 
   // --- RESUMEN (SUMMARY) ---
   const appointments = appointmentsData?.appointments ?? [];
@@ -163,15 +233,15 @@ export function usePatientDetail(uuid: string, userSpecialty?: string) {
     });
   }, [maintenancesData]);
 
-  const latestAudiogram = useMemo((): AudiogramData | null => {
-    const audiologyControls = allRecords
-      .filter((record) => record.header?.speciality === 'AUDIOLOGY')
+  const latestAudiogram = useMemo((): AudiometriaTonalPayload | null => {
+    const audiometryStudies = (studiesData ?? [])
+      .filter((study) => study.tipo === StudyType.AUDIOMETRIA_TONAL)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    const audiogram = audiologyControls[0]?.clinicalData?.findings?.audiogram;
-    if (!audiogram) return null;
-    return audiogram as AudiogramData;
-  }, [allRecords]);
+    const latest = audiometryStudies[0];
+    if (!latest) return null;
+    return latest.payload as unknown as AudiometriaTonalPayload;
+  }, [studiesData]);
 
   const summary = {
     nextAppointment,
@@ -184,6 +254,7 @@ export function usePatientDetail(uuid: string, userSpecialty?: string) {
     // Datos de carga
     patient,
     history: mappedHistory,
+    groupedHistory,
     summary,
     latestAudiogram,
     nextAppointmentData,

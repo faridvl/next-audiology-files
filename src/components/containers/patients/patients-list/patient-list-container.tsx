@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Table } from '@/components/common/table/table';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { usePatientList } from './use-patient-list';
-import { Edit2, Eye, FileSpreadsheet, Search, UserPlus } from 'lucide-react';
+import { AlertCircle, Edit2, Eye, FileSpreadsheet, Inbox, RefreshCw, Search, UserPlus } from 'lucide-react';
 import { TEXT } from '@/static/texts/i18n';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { PatientStatusFilter } from '@/shared/api/querys/patients-query';
@@ -24,13 +24,16 @@ export const PatientListContainer: React.FC = () => {
         searchTerm,
         statusFilter,
         page,
+        hasActiveFilters,
         handleSearch,
         handleStatusFilter,
         handlePageChange,
+        handleRetry,
         navigateToCreate,
         navigateToDetail,
         navigateToEdit,
         isLoading,
+        isError,
     } = usePatientList();
 
     const formattedData = useMemo(() => {
@@ -40,14 +43,20 @@ export const PatientListContainer: React.FC = () => {
             fullName: `${patient.firstName} ${patient.lastName}`,
             documentIdDisplay: patient.documentId || '—',
             createdAtDisplay: new Date(patient.createdAt).toLocaleDateString('es-CR'),
+            statusDisplay: patient.isActive === false ? (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-neutral-100 text-neutral-500">
+                    {t(TEXT.PATIENTS.LIST.STATUS_INACTIVE)}
+                </span>
+            ) : null,
         }));
-    }, [patients]);
+    }, [patients, t]);
 
     const columns = [
-        { header: t(TEXT.PATIENTS.LIST.COLUMNS.PATIENT), accessor: 'fullName', width: '35%' },
-        { header: t(TEXT.PATIENTS.LIST.COLUMNS.DOCUMENT_ID), accessor: 'documentIdDisplay', width: '20%' },
-        { header: t(TEXT.PATIENTS.LIST.COLUMNS.PHONE), accessor: 'phone', width: '20%' },
+        { header: t(TEXT.PATIENTS.LIST.COLUMNS.PATIENT), accessor: 'fullName', width: '30%' },
+        { header: t(TEXT.PATIENTS.LIST.COLUMNS.DOCUMENT_ID), accessor: 'documentIdDisplay', width: '18%' },
+        { header: t(TEXT.PATIENTS.LIST.COLUMNS.PHONE), accessor: 'phone', width: '18%' },
         { header: t(TEXT.PATIENTS.LIST.COLUMNS.REGISTERED_AT), accessor: 'createdAtDisplay', width: '15%' },
+        { header: t(TEXT.PATIENTS.LIST.COLUMNS_STATUS), accessor: 'statusDisplay', width: '12%' },
     ];
 
     const actions = [
@@ -126,7 +135,59 @@ export const PatientListContainer: React.FC = () => {
                 onPageChange={handlePageChange}
                 actions={actions}
                 isLoading={isLoading}
+                isError={isError}
                 onRowClick={(row) => navigateToDetail(row.uuid)}
+                errorState={
+                    <div className="flex flex-col items-center justify-center py-16 gap-3 text-center px-4">
+                        <div className="w-12 h-12 rounded-app-md bg-red-50 flex items-center justify-center">
+                            <AlertCircle size={22} className="text-red-400" />
+                        </div>
+                        <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="text-neutral-700">
+                            {t(TEXT.PATIENTS.LIST.ERROR.TITLE)}
+                        </Typography>
+                        <Typography variant={TypographyVariant.HELPER}>
+                            {t(TEXT.PATIENTS.LIST.ERROR.DESCRIPTION)}
+                        </Typography>
+                        <button
+                            onClick={() => handleRetry()}
+                            className="flex items-center gap-2 mt-1 px-4 py-2 border border-neutral-200 text-neutral-600 hover:border-primary/40 hover:text-primary bg-white rounded-app-sm text-sm font-bold transition-colors"
+                        >
+                            <RefreshCw size={16} />
+                            {t(TEXT.PATIENTS.LIST.ERROR.RETRY_BUTTON)}
+                        </button>
+                    </div>
+                }
+                emptyState={
+                    hasActiveFilters ? (
+                        <div className="flex flex-col items-center justify-center py-16 gap-3 text-center px-4">
+                            <div className="w-12 h-12 rounded-app-md bg-neutral-50 flex items-center justify-center">
+                                <Search size={22} className="text-neutral-300" />
+                            </div>
+                            <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="text-neutral-700">
+                                {t(TEXT.PATIENTS.LIST.EMPTY.NO_RESULTS_TITLE)}
+                            </Typography>
+                            <Typography variant={TypographyVariant.HELPER}>
+                                {t(TEXT.PATIENTS.LIST.EMPTY.NO_RESULTS_DESCRIPTION)}
+                            </Typography>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-16 gap-3 text-center px-4">
+                            <div className="w-12 h-12 rounded-app-md bg-neutral-50 flex items-center justify-center">
+                                <Inbox size={22} className="text-neutral-300" />
+                            </div>
+                            <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="text-neutral-700">
+                                {t(TEXT.PATIENTS.LIST.EMPTY.NO_PATIENTS_TITLE)}
+                            </Typography>
+                            <Typography variant={TypographyVariant.HELPER}>
+                                {t(TEXT.PATIENTS.LIST.EMPTY.NO_PATIENTS_DESCRIPTION)}
+                            </Typography>
+                            <Button variant={ButtonVariant.PRIMARY} onClick={navigateToCreate} className="mt-1">
+                                <UserPlus size={16} className="mr-2" />
+                                {t(TEXT.PATIENTS.LIST.EMPTY.NEW_BUTTON)}
+                            </Button>
+                        </div>
+                    )
+                }
             />
 
             <PatientImportModal

@@ -12,12 +12,13 @@ import { MedicalHistorySidebar } from '@/components/containers/controls/control-
 
 interface Props {
   patientUuid: string;
+  encounterUuid: string;
 }
 
 const inputClass = 'w-full px-4 py-3 rounded-app-sm border border-neutral-200 bg-neutral-50/30 text-sm outline-none focus:bg-white focus:border-primary/30 transition-colors';
 const textareaClass = `${inputClass} min-h-[100px] resize-none`;
 
-export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
+export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid, encounterUuid }) => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const { data: patient } = usePatientDetailQuery(patientUuid);
@@ -30,7 +31,7 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid }) => {
     fields,
     isPending,
     handleSave,
-  } = useConsultaControl(patientUuid);
+  } = useConsultaControl(patientUuid, encounterUuid);
 
   const isAudiology = apiSpeciality === MedicalSpeciality.AUDIOLOGY;
 

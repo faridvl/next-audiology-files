@@ -2,13 +2,16 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { UserIcon, PhoneIcon, EnvelopeIcon, CalendarIcon, IdentificationIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { TEXT } from '@/static/texts/i18n';
+import { usePatientCreate } from './use-patient-create';
 import {
-  usePatientForm,
   DocumentType,
+  PatientGender,
   DOCUMENT_MASKS,
   formatNationalId,
   formatPhone,
-} from './use-patient-form';
+} from '@/components/containers/patients/patient-validation';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 
@@ -16,17 +19,6 @@ const inputBase =
   'w-full pl-11 pr-4 py-3 bg-neutral-50 border-2 border-transparent focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 rounded-app-md outline-none transition-all font-semibold text-neutral-700 text-sm placeholder:font-normal placeholder:text-neutral-400';
 const inputError =
   'border-danger/30 bg-danger/5 focus:border-danger focus:ring-danger/5';
-
-const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
-  [DocumentType.NATIONAL]: 'Nacional',
-  [DocumentType.DIMEX]: 'DIMEX',
-  [DocumentType.PASSPORT]: 'Pasaporte',
-};
-
-const GENDER_OPTIONS = [
-  { value: 'male', label: 'Masculino' },
-  { value: 'female', label: 'Femenino' },
-];
 
 interface FieldGroupProps {
   label: string;
@@ -59,17 +51,33 @@ const FieldGroup: React.FC<FieldGroupProps> = ({ label, name, icon, error, touch
   </div>
 );
 
-export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
-  const { initialValues, validationSchema, handleSubmit, isLoading } = usePatientForm(onShowSuccess);
+interface Props {
+  onShowSuccess: () => void;
+}
+
+export const PatientCreateContainer: React.FC<Props> = ({ onShowSuccess }) => {
+  const { t } = useTranslation();
+  const { initialValues, validationSchema, handleSubmit, isLoading } = usePatientCreate(onShowSuccess);
+
+  const documentTypeLabels: Record<DocumentType, string> = {
+    [DocumentType.NATIONAL]: t(TEXT.PATIENTS.CREATE.FORM.DOCUMENT_TYPE_NATIONAL),
+    [DocumentType.DIMEX]: t(TEXT.PATIENTS.CREATE.FORM.DOCUMENT_TYPE_DIMEX),
+    [DocumentType.PASSPORT]: t(TEXT.PATIENTS.CREATE.FORM.DOCUMENT_TYPE_PASSPORT),
+  };
+
+  const genderOptions = [
+    { value: PatientGender.MALE, label: t(TEXT.PATIENTS.CREATE.FORM.GENDER_MALE) },
+    { value: PatientGender.FEMALE, label: t(TEXT.PATIENTS.CREATE.FORM.GENDER_FEMALE) },
+  ];
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
       <div className="mb-8">
         <Typography variant={TypographyVariant.HEADER} as="h1" className="text-2xl font-black text-neutral-900 tracking-tight">
-          Nuevo Paciente
+          {t(TEXT.PATIENTS.CREATE.TITLE)}
         </Typography>
         <Typography variant={TypographyVariant.CAPTION} className="text-neutral-400 mt-1 italic">
-          Completa los datos para crear el expediente clínico
+          {t(TEXT.PATIENTS.CREATE.SUBTITLE)}
         </Typography>
       </div>
 
@@ -103,24 +111,24 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
               {/* Sección: Identidad */}
               <div className="space-y-5">
                 <Typography variant={TypographyVariant.OVERLINE} className="text-[10px] font-black tracking-widest uppercase text-neutral-400 border-b border-neutral-100 pb-2 block">
-                  Identidad
+                  {t(TEXT.PATIENTS.CREATE.SECTIONS.IDENTITY)}
                 </Typography>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <FieldGroup label="Nombre" name="firstName" icon={<UserIcon />} error={!!errors.firstName} touched={touched.firstName}>
+                  <FieldGroup label={t(TEXT.PATIENTS.CREATE.FORM.FIRST_NAME)} name="firstName" icon={<UserIcon />} error={!!errors.firstName} touched={touched.firstName}>
                     <Field
                       name="firstName"
                       maxLength={60}
-                      placeholder="Ej. Andrea"
+                      placeholder={t(TEXT.PATIENTS.CREATE.FORM.FIRST_NAME_PLACEHOLDER)}
                       className={`${inputBase} ${errors.firstName && touched.firstName ? inputError : ''}`}
                     />
                   </FieldGroup>
 
-                  <FieldGroup label="Apellidos" name="lastName" icon={<UserIcon />} error={!!errors.lastName} touched={touched.lastName}>
+                  <FieldGroup label={t(TEXT.PATIENTS.CREATE.FORM.LAST_NAME)} name="lastName" icon={<UserIcon />} error={!!errors.lastName} touched={touched.lastName}>
                     <Field
                       name="lastName"
                       maxLength={60}
-                      placeholder="Ej. Mora Jiménez"
+                      placeholder={t(TEXT.PATIENTS.CREATE.FORM.LAST_NAME_PLACEHOLDER)}
                       className={`${inputBase} ${errors.lastName && touched.lastName ? inputError : ''}`}
                     />
                   </FieldGroup>
@@ -129,7 +137,7 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                 {/* Tipo de documento + Número */}
                 <div>
                   <Typography variant={TypographyVariant.OVERLINE} as="label" className="ml-1 mb-1.5 block text-[11px] font-bold tracking-widest uppercase text-neutral-500">
-                    Identificación
+                    {t(TEXT.PATIENTS.CREATE.FORM.IDENTIFICATION)}
                   </Typography>
                   <div className="flex gap-2">
                     {/* Selector de tipo */}
@@ -144,7 +152,7 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                         className="appearance-none pl-3 pr-8 py-3 bg-neutral-50 border-2 border-transparent focus:border-primary rounded-app-md outline-none text-sm font-bold text-neutral-700 cursor-pointer transition-all"
                       >
                         {Object.values(DocumentType).map((type) => (
-                          <option key={type} value={type}>{DOCUMENT_TYPE_LABELS[type]}</option>
+                          <option key={type} value={type}>{documentTypeLabels[type]}</option>
                         ))}
                       </select>
                     </div>
@@ -177,10 +185,10 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                   {/* Género */}
                   <div>
                     <Typography variant={TypographyVariant.OVERLINE} as="label" className="ml-1 mb-1 block text-[11px] font-bold tracking-widest uppercase text-neutral-500">
-                      Género
+                      {t(TEXT.PATIENTS.CREATE.FORM.GENDER)}
                     </Typography>
                     <div className="flex gap-2">
-                      {GENDER_OPTIONS.map((option) => (
+                      {genderOptions.map((option) => (
                         <button
                           key={option.value}
                           type="button"
@@ -208,7 +216,7 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                   {/* Fecha de nacimiento */}
                   <div>
                     <Typography variant={TypographyVariant.OVERLINE} as="label" className="ml-1 mb-1 block text-[11px] font-bold tracking-widest uppercase text-neutral-500">
-                      Fecha de Nacimiento
+                      {t(TEXT.PATIENTS.CREATE.FORM.BIRTH_DATE)}
                     </Typography>
                     <div className="relative group">
                       <div className="absolute left-4 top-3.5 h-4 w-4 text-neutral-300 group-focus-within:text-primary transition-colors pointer-events-none">
@@ -236,13 +244,13 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
               {/* Sección: Contacto */}
               <div className="space-y-5">
                 <Typography variant={TypographyVariant.OVERLINE} className="text-[10px] font-black tracking-widest uppercase text-neutral-400 border-b border-neutral-100 pb-2 block">
-                  Contacto
+                  {t(TEXT.PATIENTS.CREATE.SECTIONS.CONTACT)}
                 </Typography>
 
                 {/* Teléfono con prefijo CR */}
                 <div>
                   <Typography variant={TypographyVariant.OVERLINE} as="label" className="ml-1 mb-1 block text-[11px] font-bold tracking-widest uppercase text-neutral-500">
-                    Teléfono Móvil
+                    {t(TEXT.PATIENTS.CREATE.FORM.PHONE)}
                   </Typography>
                   <div className="flex gap-2">
                     <div className="flex items-center gap-2 px-4 py-3 bg-neutral-50 border-2 border-transparent rounded-app-md shrink-0">
@@ -259,7 +267,7 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                         value={values.phone}
                         onChange={(event) => handlePhoneChange(event.target.value)}
                         onBlur={() => setFieldTouched('phone', true)}
-                        placeholder="8888-8888"
+                        placeholder={t(TEXT.PATIENTS.CREATE.FORM.PHONE_PLACEHOLDER)}
                         maxLength={9}
                         className={`${inputBase} ${errors.phone && touched.phone ? inputError : ''}`}
                       />
@@ -272,11 +280,11 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                   )}
                 </div>
 
-                <FieldGroup label="Correo Electrónico" name="email" icon={<EnvelopeIcon />} error={!!errors.email} touched={touched.email}>
+                <FieldGroup label={t(TEXT.PATIENTS.CREATE.FORM.EMAIL)} name="email" icon={<EnvelopeIcon />} error={!!errors.email} touched={touched.email}>
                   <Field
                     name="email"
                     type="email"
-                    placeholder="paciente@ejemplo.com"
+                    placeholder={t(TEXT.PATIENTS.CREATE.FORM.EMAIL_PLACEHOLDER)}
                     className={`${inputBase} ${errors.email && touched.email ? inputError : ''}`}
                   />
                 </FieldGroup>
@@ -284,7 +292,7 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                 {/* Dirección como textarea */}
                 <div>
                   <Typography variant={TypographyVariant.OVERLINE} as="label" className="ml-1 mb-1 block text-[11px] font-bold tracking-widest uppercase text-neutral-500">
-                    Dirección
+                    {t(TEXT.PATIENTS.CREATE.FORM.ADDRESS)}
                   </Typography>
                   <div className="relative group">
                     <div className="absolute left-4 top-3.5 h-4 w-4 text-neutral-300 group-focus-within:text-primary transition-colors">
@@ -295,7 +303,7 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                       name="address"
                       maxLength={240}
                       rows={3}
-                      placeholder="Ej. Provincia, cantón, barrio y señas adicionales"
+                      placeholder={t(TEXT.PATIENTS.CREATE.FORM.ADDRESS_PLACEHOLDER)}
                       className={`${inputBase} pl-11 resize-none leading-relaxed ${errors.address && touched.address ? inputError : ''}`}
                     />
                   </div>
@@ -321,7 +329,7 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
                 className="w-full py-4 rounded-app-md text-base shadow-lg"
                 disabled={isLoading}
               >
-                {isLoading ? 'Registrando...' : 'Registrar Paciente'}
+                {isLoading ? t(TEXT.PATIENTS.CREATE.FORM.SUBMITTING) : t(TEXT.PATIENTS.CREATE.FORM.SUBMIT)}
               </Button>
             </Form>
           );
@@ -329,4 +337,4 @@ export function PatientForm({ onShowSuccess }: { onShowSuccess: () => void }) {
       </Formik>
     </div>
   );
-}
+};

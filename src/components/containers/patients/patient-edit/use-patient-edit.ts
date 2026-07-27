@@ -1,4 +1,3 @@
-import * as Yup from 'yup';
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePatientDetailQuery, FETCH_PATIENT_DETAIL_KEY } from '@/shared/api/querys/get-patient-query';
@@ -6,36 +5,23 @@ import { useUpdatePatientMutation } from '@/shared/api/mutations/patients/update
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
 import { useNavigation } from '@/hooks/use-navigation';
 import { toast } from 'sonner';
+import {
+  DocumentType,
+  PatientGender,
+  patientEditValidationSchema,
+} from '@/components/containers/patients/patient-validation';
 
-export interface PatientEditFormValues {
+export type PatientEditFormValues = {
   firstName: string;
   lastName: string;
+  documentType: DocumentType;
+  documentId: string;
   phone: string;
+  birthDate: string;
   address: string;
   email: string;
-  gender: string;
-}
-
-const PHONE_REGEX = /^\+?[\d\s\-]{7,20}$/;
-const NAME_REGEX = /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]+$/;
-
-export const patientEditValidationSchema = Yup.object().shape({
-  firstName: Yup.string()
-    .matches(NAME_REGEX, 'Solo letras y espacios')
-    .max(60, 'Máximo 60 caracteres')
-    .required('Nombre requerido'),
-  lastName: Yup.string()
-    .matches(NAME_REGEX, 'Solo letras y espacios')
-    .max(60, 'Máximo 60 caracteres')
-    .required('Apellido requerido'),
-  phone: Yup.string()
-    .matches(PHONE_REGEX, 'Formato: +XXX XXXX-XXXX, solo dígitos')
-    .max(15, 'Máximo 15 caracteres')
-    .required('Teléfono requerido'),
-  address: Yup.string().max(120, 'Máximo 120 caracteres'),
-  email: Yup.string().email('Correo inválido'),
-  gender: Yup.string(),
-});
+  gender: PatientGender;
+};
 
 export function usePatientEdit(patientUuid: string) {
   const navigation = useNavigation();
@@ -62,10 +48,13 @@ export function usePatientEdit(patientUuid: string) {
   const initialValues: PatientEditFormValues = {
     firstName: patient?.firstName ?? '',
     lastName: patient?.lastName ?? '',
+    documentType: DocumentType.NATIONAL,
+    documentId: patient?.documentId ?? '',
     phone: patient?.phone ?? '',
+    birthDate: patient?.birthDate ? patient.birthDate.split('T')[0] : '',
     address: patient?.address ?? '',
     email: patient?.email ?? '',
-    gender: patient?.gender ?? '',
+    gender: (patient?.gender as PatientGender) ?? PatientGender.MALE,
   };
 
   const handleSubmit = (values: PatientEditFormValues) => {
@@ -74,9 +63,11 @@ export function usePatientEdit(patientUuid: string) {
       firstName: values.firstName.trim(),
       lastName: values.lastName.trim(),
       phone: values.phone,
-      address: values.address,
-      email: values.email,
-      gender: values.gender || undefined,
+      address: values.address.trim(),
+      email: values.email.trim().toLowerCase(),
+      gender: values.gender,
+      documentId: values.documentId,
+      birthDate: values.birthDate,
     });
   };
 
@@ -92,6 +83,5 @@ export function usePatientEdit(patientUuid: string) {
     handleSubmit,
     handleCancel,
     validationSchema: patientEditValidationSchema,
-    documentId: patient?.documentId ?? null,
   };
 }

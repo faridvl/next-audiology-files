@@ -7,11 +7,11 @@ const URL = env.API.MEDICAL_RECORDS_URL;
 
 export const FETCH_PATIENT_BACKGROUND_KEY = 'fetchPatientBackground';
 
-export function usePatientBackgroundQuery(patientUuid: string) {
+export function usePatientBackgroundQuery(patientUuid: string, enabled = true) {
   return useQuery({
     queryKey: [FETCH_PATIENT_BACKGROUND_KEY, patientUuid],
     queryFn: () =>
       ApiServiceClient(URL).get<PatientBackgroundEntity>(`/patients/${patientUuid}/background`),
-    enabled: !!patientUuid,
+    enabled: !!patientUuid && enabled,
   });
 }

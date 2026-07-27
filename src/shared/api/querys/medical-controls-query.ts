@@ -14,6 +14,7 @@ export interface MedicalControlResponse {
   header: {
     patientUUID: string;
     appointmentUUID: string | null;
+    encounterUuid: string | null;
     speciality: string;
     schemaVersion: number;
   };
@@ -37,10 +38,10 @@ export const MedicalControlService = {
 
 export const FETCH_CONTROLS_KEY = 'fetchMedicalControls';
 
-export function useMedicalControlsQuery(patientUuid: string, page = 1, limit = 10) {
+export function useMedicalControlsQuery(patientUuid: string, page = 1, limit = 10, enabled = true) {
   return useQuery({
     queryKey: [FETCH_CONTROLS_KEY, patientUuid, page, limit],
     queryFn: () => MedicalControlService.fetchHistory(patientUuid, page, limit),
-    enabled: !!patientUuid,
+    enabled: !!patientUuid && enabled,
   });
 }

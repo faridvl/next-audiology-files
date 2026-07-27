@@ -53,10 +53,21 @@ Full API contract: `C:\Users\Personal\Desktop\standard-saas-api\.claude\ENDPOINT
 | GET | `/appointments/patient/:uuid` | `querys/get-appoinment-by-patient-query.ts` | |
 | PATCH | `/appointments/:uuid` | `mutations/appointments/update-appointment-mutation.ts` | |
 | DELETE | `/appointments/:uuid` | `mutations/appointments/delete-appointment-mutation.ts` | |
-| POST | `/medical-controls` | `mutations/medical-control-mutation/medical-control-mutation.ts` | |
-| GET | `/medical-controls/patient/:uuid` | `querys/get-medical-controls-query.ts` | Listado paginado |
-| GET | `/medical-controls/:uuid` | `querys/medical-controls-query.ts` | Detail |
+| POST | `/medical-controls` | `mutations/medical-control-mutation/medical-control-mutation.ts` | `header.encounterUuid` opcional/nullable — vincula el control al `Encounter` de la visita (S4) |
+| GET | `/medical-controls/patient/:uuid` | `querys/get-medical-controls-query.ts` | Listado paginado. **No filtra por especialidad** (NOM-004 5.14 — un solo expediente). 403 si `user.role === STAFF` |
+| GET | `/medical-controls/:uuid` | `querys/medical-controls-query.ts` | Detail. 403 si `user.role === STAFF` |
+| GET | `/patients/:uuid/background` | `querys/patient-background-query.ts` | Antecedentes clínicos. 403 si `user.role === STAFF` |
+| GET | `/patients/:uuid/documents` | `querys/patient-documents-query.ts` | Listado de documentos administrativos/clínicos. Visible para todos los roles incluido STAFF |
+| POST | `/patients/:uuid/documents` | `mutations/documents/upload-document-mutation.ts` | Sube a R2. **Devuelve 500 en producción — ver Inconsistencias #7** |
+| POST | `/maintenance` | `mutations/maintenance/create-maintenance-mutation.ts` | `encounterUuid` opcional/nullable — vincula el mantenimiento al `Encounter` de la visita (S4) |
 | GET | `/maintenance/patient/:uuid` | `querys/maintenance-query.ts` | Para `warrantyExpiration` en patient detail |
+| POST | `/encounters` | `mutations/encounters/create-encounter-mutation.ts` | Abre un `Encounter` (visita). 403 si `role === STAFF` |
+| GET | `/encounters/patient/:uuid` | `querys/encounters-query.ts` | Lista para agrupar el timeline del expediente. Sin paginar |
+| GET | `/encounters/:uuid` | `querys/encounters-query.ts` | Detalle con `medicalControls` + `maintenances` + `studies` anidados |
+| PATCH | `/encounters/:uuid/close` | `mutations/encounters/close-encounter-mutation.ts` | Cierra el encuentro. Idempotente si ya está `CLOSED` |
+| POST | `/studies` | `mutations/studies/create-study-mutation.ts` | Crea un `Study` (medición estructurada, ej. audiometría). Inmutable — sin `PATCH`/`PUT` |
+| GET | `/studies/patient/:uuid` | `querys/studies-query.ts` | Lista todos los estudios del paciente, más reciente primero |
+| GET | `/studies/:uuid` | `querys/studies-query.ts` | Detalle de un estudio |
 | POST | `/products` | `mutations/inventory/inventory-mutation.ts` | Body incluye `brand` (opcional) |
 | GET | `/products` | `querys/inventory/inventory-query.ts` | `?includeInactive` |
 | GET | `/products/:uuid` | `querys/inventory/get-product-query.ts` | |
@@ -72,14 +83,10 @@ Full API contract: `C:\Users\Personal\Desktop\standard-saas-api\.claude\ENDPOINT
 | GET | `/maintenance/upcoming` | Dashboard — próximos mantenimientos | Sin UI |
 | PATCH | `/appointment-types/:uuid` | Editar tipo de cita | Sin UI |
 | DELETE | `/appointment-types/:uuid` | Eliminar tipo de cita | Sin UI |
-| GET | `/patient-background/:uuid` | Antecedentes clínicos del paciente | Query existe (`patient-background-query.ts`), sin UI conectada |
 
 ## Endpoints que el site necesita y NO existen en la API
 
-| Endpoint | Needed for | Prioridad |
-|----------|------------|-----------|
-| `POST /patients/:uuid/documents` | Subir documento de paciente | P1-3 |
-| `GET /patients/:uuid/documents` | Listar documentos del paciente | P1-3 |
+Ninguno pendiente. `GET/POST /patients/:uuid/documents` **ya existen** en `patient-document.controller.ts` — la entrada previa de este documento estaba desactualizada. El `POST` sí falla en runtime (ver Inconsistencia #7), pero es un problema de configuración, no de código faltante.
 
 ## Inconsistencias entre site y API
 
@@ -109,3 +116,13 @@ Frontend espera `{ patient: { phone, email, idNumber }, appointments: [...] }`. 
 ### 6. `AppointmentType` — `id` vs `uuid`
 
 El tipo frontend `AppointmentType` usa `id: string` pero la DB usa `uuid` como identificador público. El payload de creación de citas envía `typeUUID` correctamente, pero la definición del tipo es inconsistente.
+
+### 7. `POST /patients/:uuid/documents` — 500 en producción (config, no código)
+
+`StorageService` (`packages/core/src/storage/storage.service.ts`) lee `process.env.CF_ACCOUNT_ID`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` directo, sin declararlas en `env.ts` ni tener fallback — si faltan, el `PutObjectCommand` contra R2 falla y el endpoint devuelve 500. No hay `.env` en el repo local del API. Verificar que estas 5 variables estén configuradas en el entorno donde corre el API (no es un bug de código — es un secreto/config faltante).
+
+### 8. ~~Audiograma guardado como `MedicalControl` falso~~ ✅ RESUELTO (S6, 2026-07-27)
+
+Antes: `consulta-audiograma-container.tsx` creaba un `MedicalControl` con `diagnosis: "Audiograma"` y `findings: { audiogram, type: 'audiogram-only' }` — un resultado de medición disfrazado de diagnóstico (DOMAIN_ANALYSIS.md §2.2).
+
+Ahora: el audiograma se guarda como `Study` (`tipo: AUDIOMETRIA_TONAL`) vía `POST /studies`, con `payload: { OD, OI }` y `documentUuid` opcional si se adjuntó el archivo del equipo. `use-pdf-report.ts` busca el `Study` por `encounterUuid` compartido con el control; si no lo encuentra (registro anterior a esta migración), usa el fallback legacy `findings.audiogram`. Sin migración de datos existentes (decisión tomada) — los registros viejos conservan la forma anterior y siguen leyéndose vía fallback.

@@ -36,10 +36,14 @@ export const useNavigation = () => {
       viewControl: (patientUUID: string | number, controlUUID: string) =>
         router.push(routesPrivate.controls.detail(patientUUID, controlUUID)),
       consulta: (uuid: string | number) => router.push(routesPrivate.patients.consulta(uuid)),
-      consultaControl: (uuid: string | number) => router.push(routesPrivate.patients.consultaControl(uuid)),
-      consultaAudiograma: (uuid: string | number) => router.push(routesPrivate.patients.consultaAudiograma(uuid)),
-      consultaMantenimiento: (uuid: string | number) => router.push(routesPrivate.patients.consultaMantenimiento(uuid)),
-      consultaResumen: (uuid: string | number) => router.push(routesPrivate.patients.consultaResumen(uuid)),
+      consultaControl: (uuid: string | number, encounterUuid: string) =>
+        router.push(routesPrivate.patients.consultaControl(uuid, encounterUuid)),
+      consultaAudiograma: (uuid: string | number, encounterUuid: string) =>
+        router.push(routesPrivate.patients.consultaAudiograma(uuid, encounterUuid)),
+      consultaMantenimiento: (uuid: string | number, encounterUuid: string) =>
+        router.push(routesPrivate.patients.consultaMantenimiento(uuid, encounterUuid)),
+      consultaResumen: (uuid: string | number, encounterUuid: string) =>
+        router.push(routesPrivate.patients.consultaResumen(uuid, encounterUuid)),
     },
 
     maintenance: {

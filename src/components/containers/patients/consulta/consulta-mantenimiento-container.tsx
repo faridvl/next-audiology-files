@@ -1,25 +1,28 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Save } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { useNavigation } from '@/hooks/use-navigation';
 import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
 import { useCreateMaintenanceMutation } from '@/shared/api/mutations/maintenance/create-maintenance-mutation';
-import { ConsultaSessionStorage } from '@/shared/utils/consulta-session';
+import { FETCH_ENCOUNTER_KEY } from '@/shared/api/querys/encounters-query';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { TEXT } from '@/static/texts/i18n';
 
 interface Props {
   patientUuid: string;
+  encounterUuid: string;
 }
 
 const inputClass = 'w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm outline-none focus:bg-white focus:border-warning/40 transition-colors';
 const textareaClass = `${inputClass} resize-none`;
 
-export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid }) => {
+export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid, encounterUuid }) => {
   const { t } = useTranslation();
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
   const { data: patient } = usePatientDetailQuery(patientUuid);
   const [description, setDescription] = useState('');
   const [nextMaintenanceAt, setNextMaintenanceAt] = useState('');
@@ -42,12 +45,12 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid })
       {
         patientUuid,
         description,
+        encounterUuid,
         ...(nextMaintenanceAt ? { nextMaintenanceAt: new Date(nextMaintenanceAt).toISOString() } : {}),
       },
       {
-        onSuccess: (data) => {
-          const saved = data as { uuid: string };
-          ConsultaSessionStorage.update(patientUuid, { savedMaintenanceUuid: saved.uuid });
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: [FETCH_ENCOUNTER_KEY, encounterUuid] });
           toast.success(t(TEXT.CONSULTA.MAINTENANCE.SAVE_SUCCESS));
           navigation.patients.consulta(patientUuid);
         },

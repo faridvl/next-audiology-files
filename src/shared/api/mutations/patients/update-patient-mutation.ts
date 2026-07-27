@@ -12,6 +12,8 @@ export interface UpdatePatientPayload {
   email?: string;
   gender?: string;
   bloodType?: string;
+  documentId?: string;
+  birthDate?: string;
   linkedProductUuid?: string | null;
 }
 

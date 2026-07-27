@@ -4,8 +4,10 @@
 import { useMemo } from 'react';
 import { useControlDetailQuery } from '@/shared/api/querys/get-medical-controls-query';
 import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
+import { useStudiesByPatientQuery } from '@/shared/api/querys/studies-query';
 import { useSession } from '@/hooks/use-session';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+import { StudyType, AudiometriaTonalPayload } from '@/types/studies/study.types';
 import { PdfReportProps, PdfReportAudiogramRow } from '@/types/pdf/report.types';
 
 const AUDIOLOGY_AUDIOGRAM_FREQUENCIES = [250, 500, 1000, 2000, 4000, 8000];
@@ -41,26 +43,31 @@ const formatBirthDate = (isoString?: string): string => {
   });
 };
 
-// Extrae filas del audiograma si existen en los findings de audiología
-const extractAudiogramRows = (
+// El audiograma vive en su propia entidad Study (payload AudiometriaTonalPayload,
+// anidado por oído, claves = frecuencia, valores = umbral en dB HL como string).
+// Antes se guardaba disfrazado de MedicalControl.findings.audiogram — esa forma
+// legacy se soporta como fallback para registros creados antes de esta migración.
+const parseThreshold = (value: string | undefined): number | null => {
+  if (value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+const buildAudiogramRows = (audiogramData: AudiometriaTonalPayload): PdfReportAudiogramRow[] => {
+  return AUDIOLOGY_AUDIOGRAM_FREQUENCIES.map((frequency) => ({
+    frequency,
+    thresholdRight: parseThreshold(audiogramData.OD?.[frequency]),
+    thresholdLeft: parseThreshold(audiogramData.OI?.[frequency]),
+  }));
+};
+
+// Fallback: MedicalControl creado antes de que el audiograma pasara a Study.
+const extractLegacyAudiogramRows = (
   findings: Record<string, unknown>,
 ): PdfReportAudiogramRow[] | undefined => {
-  const audiogramData = findings.audiogram as Record<string, unknown> | undefined;
+  const audiogramData = findings.audiogram as AudiometriaTonalPayload | undefined;
   if (!audiogramData) return undefined;
-
-  return AUDIOLOGY_AUDIOGRAM_FREQUENCIES.map((frequency) => {
-    const rightKey = `right_${frequency}`;
-    const leftKey = `left_${frequency}`;
-    const thresholdRight =
-      typeof audiogramData[rightKey] === 'number'
-        ? (audiogramData[rightKey] as number)
-        : null;
-    const thresholdLeft =
-      typeof audiogramData[leftKey] === 'number'
-        ? (audiogramData[leftKey] as number)
-        : null;
-    return { frequency, thresholdRight, thresholdLeft };
-  });
+  return buildAudiogramRows(audiogramData);
 };
 
 // Construye el mapa de findings para mostrar en la tabla key-value
@@ -69,7 +76,7 @@ const buildFindingsMap = (
 ): Record<string, string | boolean | number> => {
   const result: Record<string, string | boolean | number> = {};
   for (const [key, value] of Object.entries(findings)) {
-    if (key === 'audiogram') continue; // audiograma va en su sección propia
+    if (key === 'audiogram') continue; // audiograma va en su sección propia (legacy)
     if (typeof value === 'string' || typeof value === 'boolean' || typeof value === 'number') {
       result[key] = value;
     }
@@ -90,6 +97,8 @@ export function usePdfReport(controlUuid: string, patientUuid: string): UsePdfRe
   const { data: patientRaw, isLoading: isLoadingPatient, isError: isErrorPatient } =
     usePatientDetailQuery(patientUuid);
 
+  const { data: studiesRaw, isLoading: isLoadingStudies } = useStudiesByPatientQuery(patientUuid);
+
   const { tenant, user } = useSession();
 
   const pdfProps = useMemo<PdfReportProps | null>(() => {
@@ -98,9 +107,16 @@ export function usePdfReport(controlUuid: string, patientUuid: string): UsePdfRe
     const findings = controlRaw.clinicalData.findings as Record<string, unknown>;
     const speciality = controlRaw.header.speciality;
 
+    const encounterUuid = controlRaw.header.encounterUuid;
+    const audiometryStudy = (studiesRaw ?? []).find(
+      (study) => study.tipo === StudyType.AUDIOMETRIA_TONAL && !!encounterUuid && study.encounterUuid === encounterUuid,
+    );
+
     const audiogram =
       speciality === MedicalSpeciality.AUDIOLOGY
-        ? extractAudiogramRows(findings)
+        ? audiometryStudy
+          ? buildAudiogramRows(audiometryStudy.payload as unknown as AudiometriaTonalPayload)
+          : extractLegacyAudiogramRows(findings)
         : undefined;
 
     const followUpRaw = (controlRaw as unknown as { followUp?: { hasFollowUp?: boolean; tentativeDate?: string | null; notes?: string } }).followUp;
@@ -136,11 +152,11 @@ export function usePdfReport(controlUuid: string, patientUuid: string): UsePdfRe
             }
           : undefined,
     };
-  }, [controlRaw, patientRaw, tenant, user]);
+  }, [controlRaw, patientRaw, studiesRaw, tenant, user]);
 
   return {
     pdfProps,
-    isLoading: isLoadingControl || isLoadingPatient,
+    isLoading: isLoadingControl || isLoadingPatient || isLoadingStudies,
     isError: isErrorControl || isErrorPatient,
   };
 }

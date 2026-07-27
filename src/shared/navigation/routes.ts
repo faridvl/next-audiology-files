@@ -13,10 +13,14 @@ export const routesPrivate = {
     ficha: (uuid: string | number) => `/patients/${uuid}/ficha`,
     edit: (uuid: string | number) => `/patients/${uuid}/edit`,
     consulta: (uuid: string | number) => `/patients/${uuid}/consulta`,
-    consultaControl: (uuid: string | number) => `/patients/${uuid}/consulta/control`,
-    consultaAudiograma: (uuid: string | number) => `/patients/${uuid}/consulta/audiograma`,
-    consultaMantenimiento: (uuid: string | number) => `/patients/${uuid}/consulta/mantenimiento`,
-    consultaResumen: (uuid: string | number) => `/patients/${uuid}/consulta/resumen`,
+    consultaControl: (uuid: string | number, encounterUuid: string) =>
+      `/patients/${uuid}/consulta/control?encounterUuid=${encounterUuid}`,
+    consultaAudiograma: (uuid: string | number, encounterUuid: string) =>
+      `/patients/${uuid}/consulta/audiograma?encounterUuid=${encounterUuid}`,
+    consultaMantenimiento: (uuid: string | number, encounterUuid: string) =>
+      `/patients/${uuid}/consulta/mantenimiento?encounterUuid=${encounterUuid}`,
+    consultaResumen: (uuid: string | number, encounterUuid: string) =>
+      `/patients/${uuid}/consulta/resumen?encounterUuid=${encounterUuid}`,
   },
   maintenance: {
     index: '/maintenance',

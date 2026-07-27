@@ -235,11 +235,25 @@
         "patient": "Paciente",
         "documentId": "Cédula / ID",
         "phone": "Teléfono",
-        "registeredAt": "Fecha Registro"
+        "registeredAt": "Fecha Registro",
+        "status": "Estado"
       },
       "actions": {
         "viewFile": "Ver Ficha",
         "edit": "Editar"
+      },
+      "statusInactive": "Inactivo",
+      "empty": {
+        "noPatientsTitle": "Aún no hay pacientes registrados",
+        "noPatientsDescription": "Cuando registres un paciente, aparecerá aquí.",
+        "noResultsTitle": "Sin resultados para tu búsqueda",
+        "noResultsDescription": "Intenta con otro nombre, cédula o teléfono, o ajusta el filtro de estado.",
+        "newButton": "Registrar paciente"
+      },
+      "error": {
+        "title": "No se pudo cargar la lista de pacientes",
+        "description": "Ocurrió un error al conectar con el servidor. Intenta de nuevo.",
+        "retryButton": "Reintentar"
       }
     },
     "edit": {
@@ -258,10 +272,43 @@
         "emailPlaceholder": "paciente@ejemplo.com",
         "address": "Dirección",
         "addressPlaceholder": "Ej. San José, Barrio Escalante...",
+        "birthDate": "Fecha de Nacimiento",
+        "documentType": "Tipo de documento",
         "documentId": "Número de cédula",
-        "documentIdLocked": "La cédula no puede modificarse",
         "saveChanges": "Guardar Cambios",
         "saving": "Guardando..."
+      }
+    },
+    "create": {
+      "pageTitle": "Nuevo Paciente",
+      "title": "Nuevo Paciente",
+      "subtitle": "Completa los datos para crear el expediente clínico",
+      "success": "Paciente registrado correctamente.",
+      "sections": {
+        "identity": "Identidad",
+        "contact": "Contacto"
+      },
+      "form": {
+        "firstName": "Nombre",
+        "firstNamePlaceholder": "Ej. Andrea",
+        "lastName": "Apellidos",
+        "lastNamePlaceholder": "Ej. Mora Jiménez",
+        "identification": "Identificación",
+        "documentTypeNational": "Nacional",
+        "documentTypeDimex": "DIMEX",
+        "documentTypePassport": "Pasaporte",
+        "gender": "Género",
+        "genderMale": "Masculino",
+        "genderFemale": "Femenino",
+        "birthDate": "Fecha de Nacimiento",
+        "phone": "Teléfono Móvil",
+        "phonePlaceholder": "8888-8888",
+        "email": "Correo Electrónico",
+        "emailPlaceholder": "paciente@ejemplo.com",
+        "address": "Dirección",
+        "addressPlaceholder": "Ej. Provincia, cantón, barrio y señas adicionales",
+        "submit": "Registrar Paciente",
+        "submitting": "Registrando..."
       }
     },
     "detail": {
@@ -342,10 +389,16 @@
         "latestAudiogram": "Audiograma más reciente",
         "empty": "No hay registros",
         "loadMore": "Cargar más registros",
-        "loading": "Cargando..."
+        "loading": "Cargando...",
+        "encounterItemCount": "{{count}} registros en esta visita"
       },
       "documents": {
         "title": "Documentos del paciente"
+      },
+      "levels": {
+        "clinicalState": "Estado clínico",
+        "timeline": "Cronología",
+        "documents": "Documentos"
       }
     }
   },
@@ -408,7 +461,8 @@
       "saving": "Guardando...",
       "saveSuccess": "Audiograma guardado",
       "saveError": "Error al guardar el audiograma. Intenta nuevamente.",
-      "emptyError": "Ingresa al menos un valor en el audiograma"
+      "emptyError": "Ingresa al menos un valor en el audiograma o adjunta un archivo",
+      "attachFile": "Adjuntar archivo del equipo (PDF o imagen)"
     },
     "maintenance": {
       "breadcrumb": "Mantenimiento",
@@ -436,7 +490,9 @@
       "documentTitle": "Documento",
       "reportTitle": "Reporte de consulta",
       "reportSubtitle": "Incluye control clínico y hallazgos",
-      "backToFile": "Volver al expediente"
+      "backToFile": "Volver al expediente",
+      "closing": "Cerrando encuentro...",
+      "closeError": "No se pudo cerrar el encuentro. Intenta nuevamente."
     }
   },
   "controls": {
@@ -501,9 +557,10 @@
     "subtitle": "Sistema de Gestión de Expedientes Digitales — Zynka",
     "issuedAt": "Fecha de emisión:",
     "section1": "1. Datos del Paciente",
-    "section2": "2. Historial de Controles Médicos",
+    "section2": "2. Cronología — Encuentros y Registros",
     "section3": "3. Historial de Citas",
     "section4": "4. Antecedentes Médicos",
+    "section5": "5. Documentos",
     "footer": "Documento confidencial — Propiedad privada del paciente — Ley de Protección de Datos",
     "fields": {
       "fullName": "Nombre completo",
@@ -514,7 +571,7 @@
       "birthDate": "Fecha de nacimiento"
     },
     "controls": {
-      "empty": "Sin controles registrados.",
+      "empty": "Sin registros en la cronología.",
       "colDate": "Fecha",
       "colSpeciality": "Especialidad",
       "colDiagnosis": "Diagnóstico"
@@ -528,6 +585,12 @@
       "empty": "Sin antecedentes registrados.",
       "noPositive": "Sin antecedentes positivos.",
       "notes": "Notas"
+    },
+    "documents": {
+      "empty": "Sin documentos adjuntos.",
+      "colName": "Nombre",
+      "colCategory": "Categoría",
+      "colDate": "Fecha"
     }
   },
   "profile": {

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 import { useSession } from '@/hooks/use-session';
 import { useNavigation } from '@/hooks/use-navigation';
 import { useCreateMedicalControlMutation } from '@/shared/api/mutations/medical-control-mutation/medical-control-mutation';
 import { useClinicalTemplatesBySpecialityQuery } from '@/shared/api/querys/clinical-templates-query';
+import { FETCH_ENCOUNTER_KEY } from '@/shared/api/querys/encounters-query';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
 import { UserSpecialty } from '@/types/auth/auth';
-import { ConsultaSessionStorage } from '@/shared/utils/consulta-session';
 
 // DENTAL not yet in API schema — falls back to GENERAL until endpoint supports it
 const userSpecialtyToApiSpeciality: Record<UserSpecialty, MedicalSpeciality> = {
@@ -15,8 +16,9 @@ const userSpecialtyToApiSpeciality: Record<UserSpecialty, MedicalSpeciality> = {
   [UserSpecialty.GENERAL]: MedicalSpeciality.GENERAL,
 };
 
-export function useConsultaControl(patientUuid: string) {
+export function useConsultaControl(patientUuid: string, encounterUuid: string) {
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
   const { user } = useSession();
 
   const apiSpeciality: MedicalSpeciality = user?.specialty
@@ -85,14 +87,13 @@ export function useConsultaControl(patientUuid: string) {
 
     executeCreateControl(
       {
-        header: { patientUUID: patientUuid, speciality: apiSpeciality, schemaVersion: 1 },
+        header: { patientUUID: patientUuid, encounterUuid, speciality: apiSpeciality, schemaVersion: 1 },
         clinicalData: { findings, diagnosis },
         followUp: { hasFollowUp: false, tentativeDate: null },
       },
       {
-        onSuccess: (data) => {
-          const saved = data as { uuid: string };
-          ConsultaSessionStorage.update(patientUuid, { savedControlUuid: saved.uuid });
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: [FETCH_ENCOUNTER_KEY, encounterUuid] });
           toast.success('Control clínico guardado');
           navigation.patients.consulta(patientUuid);
         },

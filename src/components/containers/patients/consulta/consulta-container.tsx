@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ArrowLeft, Stethoscope, Activity, Wrench, CheckCircle, ChevronRight, Flag } from 'lucide-react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { useNavigation } from '@/hooks/use-navigation';
 import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
-import { ConsultaSession, ConsultaSessionStorage } from '@/shared/utils/consulta-session';
+import { useActiveEncounter } from '@/components/containers/patients/consulta/use-active-encounter';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
+import { StudyType } from '@/types/studies/study.types';
 import { useSession } from '@/hooks/use-session';
 import { UserSpecialty } from '@/types/auth/auth';
 import { useTranslation } from 'react-i18next';
@@ -69,7 +70,6 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
   const navigation = useNavigation();
   const { user } = useSession();
   const { data: patient } = usePatientDetailQuery(patientUuid);
-  const [session, setSession] = useState<ConsultaSession | null>(null);
 
   const apiSpeciality: MedicalSpeciality = user?.specialty
     ? userSpecialtyToApiSpeciality[user.specialty]
@@ -77,23 +77,13 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
 
   const isAudiology = apiSpeciality === MedicalSpeciality.AUDIOLOGY;
 
-  useEffect(() => {
-    const s = ConsultaSessionStorage.init(patientUuid);
-    setSession(s);
-  }, [patientUuid]);
+  const { encounterUuid, encounterDetail } = useActiveEncounter(patientUuid, apiSpeciality);
 
-  function refreshSession() {
-    setSession(ConsultaSessionStorage.get(patientUuid));
-  }
+  const savedControl = encounterDetail?.medicalControls[0];
+  const savedAudiogram = encounterDetail?.studies.find((study) => study.tipo === StudyType.AUDIOMETRIA_TONAL);
+  const savedMaintenance = encounterDetail?.maintenances[0];
 
-  useEffect(() => {
-    const onFocus = () => refreshSession();
-    window.addEventListener('focus', onFocus);
-    return () => window.removeEventListener('focus', onFocus);
-  }, [patientUuid]);
-
-  const hasSomethingSaved =
-    !!session?.savedControlUuid || !!session?.savedMaintenanceUuid || session?.savedAudiogram;
+  const hasSomethingSaved = !!savedControl || !!savedAudiogram || !!savedMaintenance;
 
   const today = new Date().toLocaleDateString('es-ES', {
     weekday: 'long',
@@ -102,14 +92,15 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
     year: 'numeric',
   });
 
-  const completedCount = [
-    !!session?.savedControlUuid,
-    isAudiology && !!session?.savedAudiogram,
-    !!session?.savedMaintenanceUuid,
-  ].filter(Boolean).length;
+  const completedCount = [!!savedControl, isAudiology && !!savedAudiogram, !!savedMaintenance].filter(Boolean).length;
 
   const totalCount = isAudiology ? 3 : 2;
   const doneLabel = t(TEXT.CONSULTA.SAVED_CHECK);
+
+  function goToStep(navigate: (uuid: string, encounterUuid: string) => void) {
+    if (!encounterUuid) return;
+    navigate(patientUuid, encounterUuid);
+  }
 
   return (
     <div className="w-full max-w-[1400px] mx-auto pb-24 animate-in fade-in duration-500">
@@ -165,8 +156,8 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
             icon={<Stethoscope size={22} />}
             label={t(TEXT.CONSULTA.SECTIONS.CLINICAL_CONTROL)}
             description={t(TEXT.CONSULTA.SECTIONS.CLINICAL_CONTROL_DESC)}
-            done={!!session?.savedControlUuid}
-            onClick={() => navigation.patients.consultaControl(patientUuid)}
+            done={!!savedControl}
+            onClick={() => goToStep(navigation.patients.consultaControl)}
             color="blue"
             doneLabel={doneLabel}
           />
@@ -176,8 +167,8 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
               icon={<Activity size={22} />}
               label={t(TEXT.CONSULTA.SECTIONS.AUDIOGRAM)}
               description={t(TEXT.CONSULTA.SECTIONS.AUDIOGRAM_DESC)}
-              done={!!session?.savedAudiogram}
-              onClick={() => navigation.patients.consultaAudiograma(patientUuid)}
+              done={!!savedAudiogram}
+              onClick={() => goToStep(navigation.patients.consultaAudiograma)}
               color="purple"
               doneLabel={doneLabel}
             />
@@ -187,8 +178,8 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
             icon={<Wrench size={22} />}
             label={t(TEXT.CONSULTA.SECTIONS.MAINTENANCE)}
             description={t(TEXT.CONSULTA.SECTIONS.MAINTENANCE_DESC)}
-            done={!!session?.savedMaintenanceUuid}
-            onClick={() => navigation.patients.consultaMantenimiento(patientUuid)}
+            done={!!savedMaintenance}
+            onClick={() => goToStep(navigation.patients.consultaMantenimiento)}
             color="amber"
             doneLabel={doneLabel}
           />
@@ -197,7 +188,7 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
           {hasSomethingSaved && (
             <div className="pt-2 md:hidden">
               <button
-                onClick={() => navigation.patients.consultaResumen(patientUuid)}
+                onClick={() => goToStep(navigation.patients.consultaResumen)}
                 className="w-full flex items-center justify-center gap-3 bg-neutral-900 hover:bg-primary text-white font-black py-4 rounded-app-md shadow-lg transition-all text-sm"
               >
                 <Flag size={16} />
@@ -236,9 +227,9 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
               {t(TEXT.CONSULTA.STATUS.TITLE)}
             </Typography>
             {[
-              { label: t(TEXT.CONSULTA.SECTIONS.CLINICAL_CONTROL), done: !!session?.savedControlUuid },
-              ...(isAudiology ? [{ label: t(TEXT.CONSULTA.SECTIONS.AUDIOGRAM), done: !!session?.savedAudiogram }] : []),
-              { label: t(TEXT.CONSULTA.SECTIONS.MAINTENANCE), done: !!session?.savedMaintenanceUuid },
+              { label: t(TEXT.CONSULTA.SECTIONS.CLINICAL_CONTROL), done: !!savedControl },
+              ...(isAudiology ? [{ label: t(TEXT.CONSULTA.SECTIONS.AUDIOGRAM), done: !!savedAudiogram }] : []),
+              { label: t(TEXT.CONSULTA.SECTIONS.MAINTENANCE), done: !!savedMaintenance },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-3">
                 <div className={`h-2 w-2 rounded-full shrink-0 ${item.done ? 'bg-success' : 'bg-neutral-200'}`} />
@@ -260,7 +251,7 @@ export const ConsultaContainer: React.FC<Props> = ({ patientUuid }) => {
           {/* Botón finalizar — solo aparece cuando hay algo */}
           {hasSomethingSaved ? (
             <button
-              onClick={() => navigation.patients.consultaResumen(patientUuid)}
+              onClick={() => goToStep(navigation.patients.consultaResumen)}
               className="w-full flex items-center justify-center gap-3 bg-neutral-900 hover:bg-primary text-white font-black py-4 rounded-app-md shadow-lg transition-all text-sm"
             >
               <Flag size={16} />

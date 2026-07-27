@@ -7,6 +7,7 @@ export interface ClinicalControl {
   type: string;
   date: string;
   note: string;
+  encounterUuid: string | null;
   details?: {
     reason: string;
     diagnosis: string;

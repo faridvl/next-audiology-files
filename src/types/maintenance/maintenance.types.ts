@@ -7,6 +7,7 @@ export interface MaintenanceEntity {
   description: string;
   nextMaintenanceAt: string | null;
   deviceUuid: string | null;
+  encounterUuid: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -16,4 +17,5 @@ export interface CreateMaintenancePayload {
   description: string;
   nextMaintenanceAt?: string;
   deviceUuid?: string;
+  encounterUuid?: string | null;
 }

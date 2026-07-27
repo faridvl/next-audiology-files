@@ -8,14 +8,58 @@
 
 ## 🎯 Próximo paso
 
-**Branch activo:** `main`  
-**Última etapa completada:** Rediseño de inventario por número de serie — Fases 3–6 completas en site (`next-audiology-files`). Tipos, queries, mutations y UI del flujo de seriales y asignación de audífonos implementados. TypeScript limpio.
+**Branch activo:** `main`
 
-**Siguiente:** Integración y pruebas del flujo completo:
-- Verificar que `POST /products/:uuid/units/bulk` persiste los seriales al crear un producto
-- Verificar modal de asignación: seleccionar producto → unidad disponible → oído → confirmar (`POST /patients/:uuid/devices`)
-- Verificar "Devolver": llama `DELETE /patients/:uuid/devices/:uuid` + `PATCH /product-units/:uuid` con `status: AVAILABLE`
-- Considerar vincular desde la tabla de unidades en `/inventory/:uuid` al paciente asignado (link a ficha)
+### 📌 EN CURSO — Reestructuración de Pacientes / Expediente
+
+**S1 — Unificar formularios de paciente: ✅ Completada** (2026-07-26).
+**S2 — Lista de pacientes: ✅ Completada** (2026-07-26).
+**S3 — P0 del expediente: ✅ Completada** (2026-07-26).
+**S7 — Expediente en 3 niveles (solo UI): ✅ Completada** (2026-07-27). Plan de sesiones S1–S7 **cerrado**.
+
+| Doc | Qué contiene |
+|---|---|
+| [SESIONES.md](SESIONES.md) | **Prompts de arranque + checklist de pruebas por sesión** |
+| [PLAN_PACIENTES.md](PLAN_PACIENTES.md) | Plan por sesiones S1–S7 |
+| [DOMAIN_ANALYSIS.md](DOMAIN_ANALYSIS.md) | Qué es un expediente, bugs verificados, investigación clínica |
+| [ROADMAP.md](ROADMAP.md) | Orden general de todo el sitio |
+| [PLAN_AGENDA.md](PLAN_AGENDA.md) | Rediseño de citas (después del expediente) |
+
+**S7 — Expediente en 3 niveles (solo UI, sin migraciones): ✅ Completada** (2026-07-27). `/patients/[uuid]` (`patient-detail-container.tsx`) reestructurado en los tres niveles de cardinalidad distinta de NOM-004 (DOMAIN_ANALYSIS.md §4.8): **Identidad** (header del paciente, siempre visible), **Estado clínico** (`BackgroundPanel` + `DevicesPanel` agrupados bajo un encabezado "Estado clínico" — antes paneles sueltos entre medio), **Cronología** (timeline por encuentro + Documentos bajo un encabezado "Cronología" — Documentos deja de ser apéndice al final, pasa a ser sección principal junto al timeline, sin exigir elegir un encuentro al subir, ya lo hacía bien `DocumentsContainer`). **Multi-especialidad (§7.5):** nuevo `isAudiologyTenant` (`tenant.businessType === BusinessType.AUDIOLOGY`) oculta `DevicesPanel`, los StatCards de mantenimiento, y el filtro/card de audiograma para tenants no-audiología — antes una clínica de psicología vería "Vincular audífono" sin sentido. **`/ficha` (§7.4) reescrita:** dejó de tener sus propias queries duplicadas (`useMedicalControlsQuery`, `usePatientBackgroundQuery` sueltas) — ahora consume `usePatientDetail` (mismo hook que el expediente en pantalla), agregando solo `loadMore()` en bucle para traer el historial completo (la ficha es copia íntegra del expediente, Ley 8239 art. 2.k — a diferencia de la vista en pantalla, que pagina). Se agregó sección de Documentos a la ficha (antes ausente) y la tabla de controles pasó a listar la cronología agrupada (incluye audiogramas y mantenimientos, antes solo `MedicalControl`). Migrados los `<p>`/`<h2>`/`<span>` de `ficha.tsx` a `Typography` (PATTERNS #14, archivo reescrito por completo). `yarn lint` y `tsc --noEmit` limpios — solo warnings preexistentes no relacionados.
+
+**S6 — Modelo `Study` (API + site): ✅ Completada** (2026-07-27). Modelo `Study` nuevo en `standard-saas-api` (`packages/medical-records`) — `uuid`, `encounterUuid`, `patientUuid`, `tenantUuid`, `autorUuid`, `tipo` (`AUDIOMETRIA_TONAL` | `TEST_PSICOMETRICO`), `payload: Json`, `documentUuid?`. Migración `20260727180000_add_study` aplicada (tabla nueva, aditiva — no toca `MedicalControl`). Endpoints: `POST /studies`, `GET /studies/patient/:uuid`, `GET /studies/:uuid`. Mismo gate STAFF 403 que `encounters`/`medical-controls`. **Inmutable por diseño**: `StudyStorage` no tiene método `update` — repetir una medición crea un `Study` nuevo (append-only, NOM-004 5.11). `GET /encounters/:uuid` ahora también devuelve `studies: Study[]` anidados.
+
+**Site — el audiograma deja de ser un `MedicalControl` falso:** `consulta-audiograma-container.tsx` reescrito — ya no envía `diagnosis: "Audiograma"` ni `findings: { audiogram, type: 'audiogram-only' }`. Ahora llama `POST /studies` con `tipo: AUDIOMETRIA_TONAL` y `payload: { OD, OI }`. Se agregó **adjuntar archivo** (PDF/imagen, opcional) — si Matthew ya tiene el audiograma del equipo, lo sube como `PatientDocument` (categoría `EXTERNAL_TEST`) y el `Study` queda con `documentUuid` apuntando a ese archivo; los valores clave (PTA/umbrales) siguen siendo capturables a mano en el mismo formulario. Nuevos archivos: `types/studies/study.types.ts`, `querys/studies-query.ts`, `mutations/studies/create-study-mutation.ts`.
+
+**Site — consumidores de `findings.audiogram` migrados a `Study`:** `consulta-container.tsx` y `consulta-resumen-container.tsx` detectan el audiograma guardado vía `encounterDetail.studies` (antes: `medicalControls[].findings.audiogram`). `use-patient-detail.ts` construye `latestAudiogram` y el filtro de timeline `AUDIOGRAM` desde `GET /studies/patient/:uuid`, no desde controles — un audiograma es ahora un ítem de timeline propio (tipo `'AUDIOGRAM'`) que se agrupa por encuentro igual que controles y mantenimientos, pero no navega a un detalle de control (no es un `MedicalControl`). `use-pdf-report.ts` busca el `Study` cuyo `encounterUuid` coincide con el del control impreso y lee el audiograma de ahí; si no hay `Study` (registro creado antes de esta migración), cae al fallback legacy `findings.audiogram` — **sin migración de datos existentes** (decisión tomada).
+
+**⚠️ Deuda identificada, no resuelta en esta etapa:** `control-detail.tsx`/`use-control-detail.ts` (la página de detalle de un `MedicalControl`) sigue leyendo `findings.audiogram` — correcto únicamente como fallback para registros anteriores a S6, ya que los controles nuevos nunca vuelven a llevar audiograma. `new-control/` y `new-control-v1/` (`/controls/[id]`, sin ruta de navegación activa — huérfanos, DOMAIN_ANALYSIS.md §2.5) tampoco se tocaron: siguen creando el `MedicalControl` con `findings.audiogram` si se usan, pero no son alcanzables desde la navegación actual.
+
+**S4 — `Encuentro` + append-only (API + site): ✅ Completada** (2026-07-27). Modelo `Encounter` en `standard-saas-api` (`packages/medical-records`), migración `20260727120000_add_encounter` aplicada. Endpoints: `POST /encounters`, `GET /encounters/patient/:uuid`, `GET /encounters/:uuid` (con `medicalControls` + `maintenances` anidados), `PATCH /encounters/:uuid/close`. Mismo gate STAFF 403 que `medical-controls`. Append-only verificado: `MedicalControlStorage` solo tiene el `update` de `addCorrectionNote` (nunca reescribe `findings`/`diagnosis`) y `MaintenanceStorage` es create-only.
+
+**API — `encounterUuid` expuesto en creación (gap encontrado y cerrado en esta etapa):** la columna `encounterUuid` existía en DB desde la migración anterior, pero ningún DTO/use-case/storage la aceptaba en create — quedaba siempre `null`. Se agregó a `create-medical-control.dto.ts` (`header.encounterUuid`, ambos schemas AUDIOLOGY/GENERAL), `maintenance.dto.ts` (`encounterUuid` top-level), sus use-cases, storages (`MedicalControlStorage.save`, `MaintenanceStorage.save`) y entities. `tsc --noEmit` limpio en `packages/medical-records`.
+
+**Site — consumo de `Encounter`, reemplazo de `sessionStorage`:** `consulta-session.ts` **eliminado**. Nuevo `useActiveEncounter` (`consulta/use-active-encounter.ts`) resuelve el encuentro activo del paciente: reanuda uno `OPEN` existente o crea uno nuevo vía `POST /encounters` — nunca duplica. `encounterUuid` viaja como query param entre las páginas de consulta (`routes.ts`/`use-navigation.ts` actualizados: `consultaControl`/`consultaAudiograma`/`consultaMantenimiento`/`consultaResumen` ahora requieren `encounterUuid`). Los tres pasos (`control`, `audiograma`, `mantenimiento`) envían `encounterUuid` en el payload de creación. "Finalizar" (`consulta-resumen-container.tsx`) ahora llama `PATCH /encounters/:uuid/close` en vez de limpiar `sessionStorage`. Nuevos archivos: `querys/encounters-query.ts`, `mutations/encounters/create-encounter-mutation.ts`, `mutations/encounters/close-encounter-mutation.ts`.
+
+**BUG QUE ESTO ARREGLA:** guardar un audiograma ya no sobrescribe el control de la misma visita — antes vivían como banderas sueltas en `sessionStorage` (`savedControlUuid`, `savedAudiogram`) que se pisaban entre sí; ahora ambos cuelgan del mismo `encounterUuid` en DB y se leen desde `GET /encounters/:uuid`.
+
+**Site — timeline agrupado por encuentro:** `use-patient-detail.ts` agrega `groupedHistory` (nuevo tipo `EncounterGroup`), construido cruzando `GET /encounters/patient/:uuid` con los controles/mantenimientos ya cargados por `encounterUuid`. `patient-detail-container.tsx` reemplaza el listado plano por `EncounterGroupRow`: una fila por visita si contiene más de un registro (expandible), o la fila simple de siempre si el encuentro tiene un solo registro. Registros anteriores a esta migración (`encounterUuid: null`) se muestran sueltos, sin agrupar — no hay encuentro real al que asociarlos retroactivamente.
+
+**Siguiente:** Plan de sesiones S1–S7 (rediseño de Pacientes/Expediente) **completo**. Revisar [ROADMAP.md](ROADMAP.md) para la próxima etapa del sitio (agenda — ver [PLAN_AGENDA.md](PLAN_AGENDA.md) — o psicología, Etapa 4 del roadmap). Deuda conocida sin resolver: `control-detail.tsx` (detalle de un `MedicalControl`) sigue sin gate STAFF explícito en `/ficha`, igual que antes de S6/S7 — no es una regresión de estas sesiones, ver `use-patient-detail.ts` / `canReadClinicalData` si se aborda.
+
+**Decisiones tomadas:** append-only sí · psicología en el MVP · sin offline · sin producción (sin migración de datos) · el expediente es del paciente, no del médico · email opcional
+
+**Bugs P0 verificados en S3:**
+- ✅ El audiograma del PDF **ya no sale con guiones** — `use-pdf-report.ts` ahora lee la forma `{ OD: {freq: string}, OI: {freq: string} }` que realmente se persiste
+- ✅ El filtro por especialidad **ya no fragmenta el expediente** — quitado en site (`use-patient-detail.ts`) y API (`find-all-medical-controls.use-case.ts`, `medical-control.controller.ts` `findOne`). `selectedSpec` sigue existiendo como preferencia de vista, no como restricción
+- ✅ STAFF (recepción) **ya no puede leer notas clínicas ni antecedentes** — API devuelve 403 en `GET /medical-controls/patient/:uuid`, `GET /medical-controls/:uuid`, `GET/PUT /patients/:uuid/background`; site oculta esas secciones y no dispara esas queries para STAFF (`canReadClinicalData` en `patient-detail-container.tsx`). STAFF sigue viendo agenda, contacto y documentos
+- 🟡 Documentos: `POST /patients/:uuid/documents` sigue devolviendo 500 — **no es código faltante, son credenciales R2 no configuradas** (ver API_CONTRACT.md #7). `GET /patients/:uuid/documents` ya existe y funciona — la entrada previa que lo daba como faltante estaba desactualizada
+- 🔴 `clinical-templates` usa **localStorage**, no persiste — bloquea psicología
+
+**Etapa previa completada:** Rediseño de inventario por número de serie — Fases 3–6 en site. Tipos, queries, mutations y UI de seriales y asignación de audífonos. TypeScript limpio. Pendiente de verificar en integración:
+- `POST /products/:uuid/units/bulk` persiste los seriales al crear producto
+- Modal de asignación: producto → unidad disponible → oído → confirmar
+- "Devolver": `DELETE /patients/:uuid/devices/:uuid` + `PATCH /product-units/:uuid`
 
 ---
 
@@ -24,7 +68,7 @@
 ### 🔴 P0 — Roto ahora
 | # | Tarea | Esfuerzo | Repo | Notas |
 |---|-------|----------|------|-------|
-| P0-1 | **Upload de documentos error 500** | XS | API | `POST /patients/:uuid/documents` devuelve 500. Probablemente StorageService R2 no configurado en producción o credenciales faltantes. El código del site es correcto. |
+| P0-1 | **Upload de documentos error 500** | XS | Infra | `POST /patients/:uuid/documents` devuelve 500. Confirmado: `StorageService` no tiene fallback y las 5 env vars de R2 (`CF_ACCOUNT_ID`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`) no están declaradas ni presentes — no hay `.env` en el repo local del API. No es un bug de código: falta configurar credenciales en el entorno donde corre el API. |
 
 ---
 
@@ -46,7 +90,7 @@
 | P2-4 | **Snapshot de plantilla al guardar control** | M | API | Al crear `MedicalControl`, copiar el contenido de las preguntas en `clinicalData` para que cambios futuros a la plantilla no alteren registros históricos. Sin nuevo modelo — solo guardar el snapshot en el JSON. |
 | ~~P2-5~~ | ~~**Nota de corrección en controles**~~ | — | — | ✅ `PATCH /medical-controls/:uuid/correction-note`. UI inline amber en control-detail. |
 | P2-6 | **Vencimiento de garantía y próxima receta** | L | API+Site | Sin diseño. Requiere campos nuevos en `Patient` o modelo separado. |
-| P2-7 | **Indicador de pacientes inactivos** | M | API+Site | Calcular desde último control/cita. Badge/filtro en lista de pacientes. |
+| ~~P2-7~~ | ~~**Indicador de pacientes inactivos**~~ | — | — | ✅ Badge "Inactivo" en columna Estado de la lista de pacientes, usando `Patient.isActive` (ya existía en API vía soft delete, faltaba el tipo en site). |
 | P2-8 | **Reporte de consulta PDF: contenido completo** | L | Site | `PdfDownloadButton` existe. Revisar que incluya: audiograma, mantenimiento, plantilla clínica, firma del médico. |
 | P2-9 | **Calendar: Google / Apple** | S | Site | `generateCalendarLink()` existe en `use-appointment-detail-panel.ts`. Solo exponer desde UI. |
 | P2-10 | **i18n: eliminar texto quemado restante** | L | Site | Tarea transversal. Por módulo gradualmente. |
@@ -68,6 +112,14 @@
 ---
 
 ## ✅ Completado (últimas etapas)
+
+- **S4 — `Encuentro` + append-only (API + site):** Modelo `Encounter` nuevo en `standard-saas-api/packages/medical-records` — `uuid`, `patientUuid`, `tenantUuid`, `autorUuid` (NOM-004 5.10), `especialidad`, `appointmentUuid` nullable (walk-in vs. cita sin encuentro), `startedAt`, `closedAt`, `status` (OPEN/CLOSED). Migración `20260727120000_add_encounter` aplicada. Endpoints: `POST /encounters`, `GET /encounters/patient/:uuid`, `GET /encounters/:uuid` (con `medicalControls`+`maintenances` anidados), `PATCH /encounters/:uuid/close` (idempotente). Mismo guard STAFF→403 que `medical-controls`. Verificado el requisito append-only: `MedicalControlStorage` solo actualiza `correctionNotes` (adición, nunca reescribe `findings`/`diagnosis`) y `MaintenanceStorage` nunca tuvo `update`. **Gap encontrado al integrar el site:** `encounterUuid` existía como columna en DB pero ningún DTO/use-case/storage la aceptaba en create — se agregó a `create-medical-control.dto.ts`, `maintenance.dto.ts`, sus use-cases, storages y entities. **Site:** `consulta-session.ts` (sessionStorage) eliminado. Nuevo `useActiveEncounter` reanuda un `Encounter` `OPEN` existente o crea uno nuevo — nunca duplica. `encounterUuid` viaja por query param entre páginas de consulta; los tres pasos (control/audiograma/mantenimiento) lo envían en el payload; "Finalizar" cierra el encuentro vía `PATCH`. Bug corregido: guardar un audiograma ya no sobrescribe el control de la misma visita (antes ambos vivían como banderas sueltas en sessionStorage que se pisaban). Timeline de `patient-detail` agrupado por encuentro (`groupedHistory`/`EncounterGroupRow`): una fila por visita, expandible si tiene más de un registro; registros previos a esta migración (`encounterUuid: null`) se muestran sueltos. `tsc --noEmit` limpio en ambos repos; `yarn lint` limpio en site (solo warnings preexistentes no relacionados).
+
+- **S3 — P0 del expediente:** Cuatro bugs P0 independientes, verificados y corregidos. **(1) Filtro por especialidad:** quitado `matchesUserSpecialty` en `use-patient-detail.ts` y el filtro `speciality` del JWT en `find-all-medical-controls.use-case.ts` / `medical-control.controller.ts` (`findByPatient` y `findOne` — este último además tenía un `ForbiddenException` incorrecto que bloqueaba ver un control individual de otra especialidad). `selectedSpec` se mantiene como preferencia de vista del usuario, ya no como restricción de lectura — regla: la especialidad determina qué se crea, nunca qué se ve (NOM-004 5.14). **(2) Audiograma → PDF:** `use-pdf-report.ts` leía `audiogramData['right_1000']` con `typeof === 'number'`, pero se persiste como `{ OD: {'1000': '20'}, OI: {...} }` (anidado por oído, claves string, valores string) — unificado para leer esa forma real y convertir string→number con `parseThreshold`. **(3) Permisos STAFF:** antes solo se ocultaba el botón "Iniciar consulta"; ahora la API devuelve 403 en `GET /medical-controls/patient/:uuid`, `GET /medical-controls/:uuid` y `GET/PUT /patients/:uuid/background` cuando `user.role === 'STAFF'`, y el site no dispara esas queries para STAFF (`canReadClinicalData`, gate agregado a `useMedicalControlsQuery`/`usePatientBackgroundQuery` vía parámetro `enabled`) ni renderiza esas secciones — Documentos queda visible para STAFF por ser administrativo. **(4) Documentos:** investigado — `GET/POST /patients/:uuid/documents` **ya existen** en el API (la entrada previa que los daba como faltantes estaba desactualizada); el 500 en `POST` es config faltante (5 env vars de R2 sin declarar ni presentes), documentado en API_CONTRACT.md, no requiere cambio de código. `yarn lint` y `tsc --noEmit` limpios en site; `tsc --noEmit` limpio en `packages/medical-records` del API.
+
+- **S2 — Lista de pacientes:** Estados vacíos diferenciados — "aún no hay pacientes registrados" (sin filtros activos) vs "sin resultados para tu búsqueda" (con búsqueda o filtro de estado aplicado), vía `hasActiveFilters` en `use-patient-list.ts`. Estado de error dedicado con botón "Reintentar" (`refetch` del query) en vez de caer en el empty state genérico. `Table` (`common/table/table.tsx`) ahora acepta `isError`, `errorState` y `emptyState` opcionales — retrocompatible para `users-list` y `appointment-list`, que siguen usando el empty state por defecto. Badge "Inactivo" en nueva columna Estado, usando `Patient.isActive` (campo agregado al tipo — ya lo devolvía la API). Columnas confirmadas: nombre, cédula, teléfono, fecha de registro, estado — suficientes para identificar un paciente. Textos vía i18n (`patients.list.empty.*`, `patients.list.error.*`, `patients.list.statusInactive`). `yarn lint` y `tsc --noEmit` limpios.
+
+- **S1 — Unificar formularios de paciente crear/editar:** Esquema Yup compartido en `patients/patient-validation.ts` (`patientCreateValidationSchema` + `patientEditValidationSchema`, ambos derivados de campos base comunes; el teléfono se mantiene separado porque crear y editar guardan formatos distintos — `XXXX-XXXX` vs `+506 XXXX-XXXX` ya persistido). Correcciones de divergencia: `birthDate` ahora editable (antes ausente en editar); `documentId` editable con selector de tipo de documento + máscara (antes bloqueado — la API nunca almacenó `documentType`, así que editar ahora deja elegirlo igual que crear); `address` unificado a `maxLength 240` en ambos; `email` opcional en ambos (antes requerido solo al crear — decisión: el canal real es teléfono/WhatsApp). Carpeta `add-patient/` movida a `containers/patients/patient-create/`, `PatientForm` renombrado a `PatientCreateContainer`. `pages/patients/create.tsx` usa `useNavigation` en vez de `router.push` directo, y sus strings van por i18n (`patients.create.*` en `es.json` + `TEXT.PATIENTS.CREATE` en `i18n.ts`). `UpdatePatientPayload` ahora acepta `documentId` y `birthDate`. `yarn lint` y `tsc --noEmit` limpios.
 
 - **Inventario por número de serie — Fases 3–6 (site):** Tipos `ProductUnit` + `ProductUnitStatus` enum. Query `useProductUnitsQuery`. Mutations `useCreateProductUnitsBulkMutation` + `useUpdateProductUnitMutation`. Formulario `/inventory/create` con campo `brand` y tabla dinámica de seriales (bulk al guardar). Detalle `/inventory/:uuid` con tabla de unidades (serial, estado badge, garantía, paciente asignado). Modal `AssignDeviceUnitModal` de 3 pasos (producto → unidad AVAILABLE → oído). `DevicesPanel` usa el nuevo modal; tarjeta enriquecida con foto, serial, garantía con color vencida/vigente, botón "Devolver" que libera la unidad en inventario.
 
@@ -98,7 +150,7 @@
 - **Bug sesión expirada:** `ApiServiceClient` intercepta 401, limpia cookies y redirige a `/login?expired=true` con alerta amber.
 - **Bug WhatsApp:** Quitar número hardcodeado `88165808`. Si paciente no tiene teléfono muestra toast de error.
 - **StatCards patient-detail:** "Próx. mantenimiento" y "Mantenimientos" con datos reales de API y navegación a `/maintenance`.
-- **Guard de especialidad en listado:** `GET /medical-controls/patient/:uuid` ahora filtra por `user.specialty` del JWT. Antes devolvía todos sin filtrar.
+- ~~**Guard de especialidad en listado**~~ — ❌ Revertido en S3: filtrar por `user.specialty` violaba NOM-004 5.14 (un solo expediente con todos los registros). Ver S3 arriba.
 - **Filtro de timeline por tipo:** patient-detail ahora muestra Todos / Controles / Audiogramas / Mantenimientos. Los mantenimientos se mezclan en el mismo timeline.
 - **Selector de plantilla en consulta:** nuevo endpoint `GET /clinical-templates/speciality/:s/all` devuelve array. Site muestra dropdown cuando hay >1 plantilla activa.
 - **signatureUrl en User:** campo agregado a schema Identity, migración aplicada, expuesto en `GET /auth/me`, enviado en `PATCH /users/:uuid`, con URL text input en Profile.
@@ -129,6 +181,5 @@
 
 | Feature | Archivo | Notas |
 |---------|---------|-------|
-| `GET /patients/:uuid/documents` | API (medical-records) | Endpoint no existe aún. El site llama a este endpoint — devolverá 404 hasta que se implemente. La subida de documentos sí funciona. |
 | Report template | `src/pages/report-template/create.tsx` | Feature sin diseñar, P3. |
 | Patient bloodType en summary | `use-patient-summary-header.ts` | Hardcodeado como 'O+'. Campo existe en DB. |

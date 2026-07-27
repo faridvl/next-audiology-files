@@ -1,12 +1,18 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { ArrowLeft, UserIcon } from 'lucide-react';
-import { UserIcon as HeroUserIcon, PhoneIcon, EnvelopeIcon, MapPinIcon, IdentificationIcon } from '@heroicons/react/24/outline';
+import { ChevronDown } from 'lucide-react';
+import { UserIcon as HeroUserIcon, PhoneIcon, EnvelopeIcon, MapPinIcon, IdentificationIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { usePatientEdit } from './use-patient-edit';
 import { useTranslation } from 'react-i18next';
 import { TEXT } from '@/static/texts/i18n';
+import {
+  DocumentType,
+  DOCUMENT_MASKS,
+  formatNationalId,
+} from '@/components/containers/patients/patient-validation';
 
 interface Props {
   patientUuid: string;
@@ -21,8 +27,13 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
     handleSubmit,
     handleCancel,
     validationSchema,
-    documentId,
   } = usePatientEdit(patientUuid);
+
+  const documentTypeLabels: Record<DocumentType, string> = {
+    [DocumentType.NATIONAL]: t(TEXT.PATIENTS.CREATE.FORM.DOCUMENT_TYPE_NATIONAL),
+    [DocumentType.DIMEX]: t(TEXT.PATIENTS.CREATE.FORM.DOCUMENT_TYPE_DIMEX),
+    [DocumentType.PASSPORT]: t(TEXT.PATIENTS.CREATE.FORM.DOCUMENT_TYPE_PASSPORT),
+  };
 
   const inputClasses =
     'w-full pl-11 pr-4 py-3 bg-neutral-50 border border-transparent focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 rounded-app-md outline-none transition-all font-semibold text-neutral-700 text-sm';
@@ -76,27 +87,57 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
           validateOnBlur
           validateOnChange={false}
         >
-          {() => (
+          {({ values, errors, touched, setFieldValue, setFieldTouched }) => {
+            const docMask = DOCUMENT_MASKS[values.documentType];
+
+            const handleDocumentIdChange = (raw: string) => {
+              if (values.documentType === DocumentType.NATIONAL) {
+                setFieldValue('documentId', formatNationalId(raw));
+              } else if (values.documentType === DocumentType.PASSPORT) {
+                setFieldValue('documentId', raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, docMask.maxLength));
+              } else {
+                setFieldValue('documentId', raw.replace(/\D/g, '').slice(0, docMask.maxLength));
+              }
+            };
+
+            return (
             <Form className="p-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 
-                {documentId && (
-                  <div className="md:col-span-2">
-                    <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.DOCUMENT_ID)}</Typography>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={documentId}
-                        disabled
-                        className="w-full pl-11 pr-4 py-3 bg-neutral-100 border border-neutral-200 rounded-app-md text-sm font-semibold text-neutral-400 cursor-not-allowed"
-                      />
-                      <IdentificationIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-300" />
+                <div className="md:col-span-2">
+                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.DOCUMENT_ID)}</Typography>
+                  <div className="flex gap-2">
+                    <div className="relative shrink-0">
+                      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-300 pointer-events-none" />
+                      <select
+                        value={values.documentType}
+                        onChange={(event) => {
+                          setFieldValue('documentType', event.target.value as DocumentType);
+                          setFieldValue('documentId', '');
+                        }}
+                        className="appearance-none pl-3 pr-8 py-3 bg-neutral-50 border-2 border-transparent focus:border-primary rounded-app-md outline-none text-sm font-bold text-neutral-700 cursor-pointer transition-all"
+                      >
+                        {Object.values(DocumentType).map((type) => (
+                          <option key={type} value={type}>{documentTypeLabels[type]}</option>
+                        ))}
+                      </select>
                     </div>
-                    <Typography variant={TypographyVariant.CAPTION} className="ml-2 mt-1 text-neutral-400 italic">
-                      {t(TEXT.PATIENTS.EDIT.FORM.DOCUMENT_ID_LOCKED)}
-                    </Typography>
+                    <div className="relative group flex-1">
+                      <IdentificationIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary transition-colors" />
+                      <input
+                        value={values.documentId}
+                        onChange={(event) => handleDocumentIdChange(event.target.value)}
+                        onBlur={() => setFieldTouched('documentId', true)}
+                        placeholder={docMask.placeholder}
+                        maxLength={docMask.maxLength}
+                        className={inputClasses}
+                      />
+                    </div>
                   </div>
-                )}
+                  {errors.documentId && touched.documentId && (
+                    <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{errors.documentId}</Typography>
+                  )}
+                </div>
 
                 <div>
                   <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.FIRST_NAME)}</Typography>
@@ -138,6 +179,22 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                 </div>
 
                 <div>
+                  <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.BIRTH_DATE)}</Typography>
+                  <div className="relative group">
+                    <Field
+                      name="birthDate"
+                      type="date"
+                      max={new Date().toISOString().split('T')[0]}
+                      className={inputClasses}
+                    />
+                    <CalendarIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary pointer-events-none" />
+                  </div>
+                  <ErrorMessage name="birthDate" render={(msg) => (
+                    <Typography variant={TypographyVariant.CAPTION} textColor="text-danger" className="ml-2 mt-1">{msg}</Typography>
+                  )} />
+                </div>
+
+                <div>
                   <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.GENDER)}</Typography>
                   <Field
                     as="select"
@@ -164,7 +221,7 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                 <div className="md:col-span-2">
                   <Typography variant={TypographyVariant.OVERLINE} className={labelClasses}>{t(TEXT.PATIENTS.EDIT.FORM.ADDRESS)}</Typography>
                   <div className="relative group">
-                    <Field name="address" maxLength={120} className={inputClasses} placeholder={t(TEXT.PATIENTS.EDIT.FORM.ADDRESS_PLACEHOLDER)} />
+                    <Field name="address" maxLength={240} className={inputClasses} placeholder={t(TEXT.PATIENTS.EDIT.FORM.ADDRESS_PLACEHOLDER)} />
                     <MapPinIcon className="absolute left-4 top-3.5 h-5 w-5 text-neutral-400 group-focus-within:text-primary" />
                   </div>
                   <ErrorMessage name="address" render={(msg) => (
@@ -192,7 +249,8 @@ export const PatientEditContainer: React.FC<Props> = ({ patientUuid }) => {
                 </Button>
               </div>
             </Form>
-          )}
+            );
+          }}
         </Formik>
       </div>
     </div>

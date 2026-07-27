@@ -21,6 +21,9 @@ type TableProps = {
     itemsPerPage?: number;
     onRowClick?: (row: any) => void;
     isLoading?: boolean;
+    isError?: boolean;
+    errorState?: React.ReactNode;
+    emptyState?: React.ReactNode;
 };
 
 function TableSkeleton({ columns, actions }: { columns: Column[]; actions: Action[] }) {
@@ -70,7 +73,7 @@ function TableSkeleton({ columns, actions }: { columns: Column[]; actions: Actio
     );
 }
 
-function EmptyState() {
+function DefaultEmptyState() {
     return (
         <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
             <div className="w-12 h-12 rounded-app-md bg-neutral-50 flex items-center justify-center">
@@ -92,12 +95,25 @@ export function Table({
     actions = [],
     itemsPerPage = 10,
     onRowClick,
-    isLoading
+    isLoading,
+    isError,
+    errorState,
+    emptyState,
 }: TableProps) {
 
     if (isLoading) {
         return <TableSkeleton columns={columns} actions={actions} />;
     }
+
+    if (isError) {
+        return (
+            <div className="bg-white rounded-app-md border border-neutral-100 shadow-sm overflow-hidden">
+                {errorState}
+            </div>
+        );
+    }
+
+    const EmptyState = () => <>{emptyState ?? <DefaultEmptyState />}</>;
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + data.length;

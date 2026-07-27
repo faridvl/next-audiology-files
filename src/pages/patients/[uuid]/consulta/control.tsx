@@ -8,12 +8,12 @@ import { ConsultaControlContainer } from '@/components/containers/patients/consu
 
 const ConsultaControlPage: React.FC = () => {
   const router = useRouter();
-  const { uuid } = router.query;
+  const { uuid, encounterUuid } = router.query;
   return (
     <>
       <Head><title>Control Clínico — Zynka</title></Head>
       <DashboardLayout isMainPage={false} contentStyle={BoxedLayoutStyle.FULL} title="Control clínico">
-        <ConsultaControlContainer patientUuid={uuid as string} />
+        <ConsultaControlContainer patientUuid={uuid as string} encounterUuid={encounterUuid as string} />
       </DashboardLayout>
     </>
   );

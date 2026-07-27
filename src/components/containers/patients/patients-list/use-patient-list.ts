@@ -15,7 +15,7 @@ export function usePatientList() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const { data, isLoading, isError } = usePatientsQuery(page, limit, debouncedSearch, statusFilter);
+  const { data, isLoading, isError, refetch } = usePatientsQuery(page, limit, debouncedSearch, statusFilter);
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
@@ -27,6 +27,8 @@ export function usePatientList() {
     setPage(1);
   };
 
+  const hasActiveFilters = debouncedSearch.trim().length > 0 || statusFilter !== 'active';
+
   return {
     patients: data?.data || [],
     meta: data?.meta,
@@ -35,9 +37,11 @@ export function usePatientList() {
     isLoading,
     isError,
     page,
+    hasActiveFilters,
     handleSearch,
     handleStatusFilter,
     handlePageChange: setPage,
+    handleRetry: refetch,
     navigateToCreate: () => navigation.patients.create(),
     navigateToDetail: (uuid: string) => navigation.patients.detail(uuid),
     navigateToEdit: (uuid: string) => navigation.patients.edit(uuid),
