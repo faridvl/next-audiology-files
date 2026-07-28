@@ -16,7 +16,7 @@ const userSpecialtyToApiSpeciality: Record<UserSpecialty, MedicalSpeciality> = {
   [UserSpecialty.GENERAL]: MedicalSpeciality.GENERAL,
 };
 
-export function useConsultaControl(patientUuid: string, encounterUuid: string) {
+export function useConsultaControl(patientUuid: string, encounterUuid: string, onSaved?: () => void) {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const { user } = useSession();
@@ -95,7 +95,8 @@ export function useConsultaControl(patientUuid: string, encounterUuid: string) {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: [FETCH_ENCOUNTER_KEY, encounterUuid] });
           toast.success('Control clínico guardado');
-          navigation.patients.consulta(patientUuid);
+          if (onSaved) onSaved();
+          else navigation.patients.consulta(patientUuid);
         },
       },
     );

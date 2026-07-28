@@ -10,7 +10,7 @@ import { MedicalSpeciality } from '@/types/medical-controls/medical-control.type
 import { useMedicalControlsQuery } from '@/shared/api/querys/medical-controls-query';
 import { useNavigation } from '@/hooks/use-navigation';
 import { MedicalHistorySidebar } from '../control-history/control-history';
-import { AudiometryCapture } from '../../audiogram-capture/audiogram-capture';
+import { AudiogramEditor } from '../../audiogram-editor/audiogram-editor';
 
 
 // --- CONTENEDOR PRINCIPAL ---
@@ -159,9 +159,7 @@ export const NewControlContainer: React.FC<{ patientId: string; appointmentId?: 
                                         <div className="col-span-2 pt-4 animate-in fade-in zoom-in-95 duration-300">
                                             <div className="p-1 bg-neutral-100 rounded-[2.5rem]">
                                                 {/* Aquí va tu componente de captura */}
-                                                <AudiometryCapture
-                                                    onChange={() => { }}
-                                                />
+                                                <AudiogramEditor onChange={() => { }} />
                                             </div>
                                         </div>
                                     )}

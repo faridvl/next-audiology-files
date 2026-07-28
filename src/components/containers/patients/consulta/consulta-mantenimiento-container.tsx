@@ -14,18 +14,24 @@ import { TEXT } from '@/static/texts/i18n';
 interface Props {
   patientUuid: string;
   encounterUuid: string;
+  /** Dentro del panel de visita: sin header propio, y al guardar avisa al panel */
+  isEmbedded?: boolean;
+  onSaved?: () => void;
+  onCancel?: () => void;
 }
 
 const inputClass = 'w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm outline-none focus:bg-white focus:border-warning/40 transition-colors';
 const textareaClass = `${inputClass} resize-none`;
 
-export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid, encounterUuid }) => {
+export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid, encounterUuid, isEmbedded = false, onSaved, onCancel }) => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const { data: patient } = usePatientDetailQuery(patientUuid);
   const [description, setDescription] = useState('');
   const [nextMaintenanceAt, setNextMaintenanceAt] = useState('');
+
+  const handleCancel = () => (isEmbedded ? onCancel?.() : navigation.patients.consulta(patientUuid));
 
   const { executeCreateMaintenance, isPending } = useCreateMaintenanceMutation();
 
@@ -52,7 +58,8 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid, e
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: [FETCH_ENCOUNTER_KEY, encounterUuid] });
           toast.success(t(TEXT.CONSULTA.MAINTENANCE.SAVE_SUCCESS));
-          navigation.patients.consulta(patientUuid);
+          if (isEmbedded) onSaved?.();
+          else navigation.patients.consulta(patientUuid);
         },
         onError: () => toast.error(t(TEXT.CONSULTA.MAINTENANCE.SAVE_ERROR)),
       },
@@ -66,27 +73,29 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid, e
   ];
 
   return (
-    <div className="p-4 md:p-6 pb-24 space-y-6 animate-in fade-in duration-500">
+    <div className={isEmbedded ? 'space-y-4' : 'p-4 md:p-6 pb-24 space-y-6 animate-in fade-in duration-500'}>
 
-      {/* HEADER */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => navigation.patients.consulta(patientUuid)}
-          className="w-10 h-10 rounded-xl bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors shrink-0"
-        >
-          <ArrowLeft size={16} className="text-neutral-500" />
-        </button>
-        <div>
-          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-warning">
-            {t(TEXT.CONSULTA.MAINTENANCE.BREADCRUMB)}
-          </Typography>
-          <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
-            {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
-          </Typography>
+      {/* HEADER — solo como página propia; en el panel de visita lo pone el drawer */}
+      {!isEmbedded && (
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigation.patients.consulta(patientUuid)}
+            className="w-10 h-10 rounded-xl bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors shrink-0"
+          >
+            <ArrowLeft size={16} className="text-neutral-500" />
+          </button>
+          <div>
+            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-warning">
+              {t(TEXT.CONSULTA.MAINTENANCE.BREADCRUMB)}
+            </Typography>
+            <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
+              {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
+            </Typography>
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="bg-white border border-neutral-100 rounded-app-md p-5 md:p-8 space-y-6 shadow-sm">
+      <div className={isEmbedded ? 'space-y-6' : 'bg-white border border-neutral-100 rounded-app-md p-5 md:p-8 space-y-6 shadow-sm'}>
 
         <div className="space-y-2">
           <Typography variant={TypographyVariant.OVERLINE} as="label" className="block ml-1">
@@ -132,7 +141,7 @@ export const ConsultaMantenimientoContainer: React.FC<Props> = ({ patientUuid, e
       </div>
 
       <div className="flex justify-end gap-3">
-        <Button variant={ButtonVariant.CANCEL} onClick={() => navigation.patients.consulta(patientUuid)} text={t(TEXT.GENERAL.BUTTONS.CANCEL)} />
+        <Button variant={ButtonVariant.CANCEL} onClick={handleCancel} text={t(TEXT.GENERAL.BUTTONS.CANCEL)} />
         <Button
           variant={ButtonVariant.PRIMARY}
           className="!h-12 !px-10 !rounded-xl shadow-lg shadow-warning/20"

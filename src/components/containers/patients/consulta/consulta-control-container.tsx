@@ -13,12 +13,16 @@ import { MedicalHistorySidebar } from '@/components/containers/controls/control-
 interface Props {
   patientUuid: string;
   encounterUuid: string;
+  /** Dentro del panel de visita: sin header ni sidebar propios (el expediente ya está detrás) */
+  isEmbedded?: boolean;
+  onSaved?: () => void;
+  onCancel?: () => void;
 }
 
 const inputClass = 'w-full px-4 py-3 rounded-app-sm border border-neutral-200 bg-neutral-50/30 text-sm outline-none focus:bg-white focus:border-primary/30 transition-colors';
 const textareaClass = `${inputClass} min-h-[100px] resize-none`;
 
-export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid, encounterUuid }) => {
+export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid, encounterUuid, isEmbedded = false, onSaved, onCancel }) => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const { data: patient } = usePatientDetailQuery(patientUuid);
@@ -31,36 +35,39 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid, encount
     fields,
     isPending,
     handleSave,
-  } = useConsultaControl(patientUuid, encounterUuid);
+  } = useConsultaControl(patientUuid, encounterUuid, isEmbedded ? onSaved : undefined);
 
   const isAudiology = apiSpeciality === MedicalSpeciality.AUDIOLOGY;
+  const handleCancel = () => (isEmbedded ? onCancel?.() : navigation.patients.consulta(patientUuid));
 
   return (
-    <div className="p-4 md:p-6 pb-24 animate-in fade-in duration-500">
-      <div className="flex gap-6 items-start">
+    <div className={isEmbedded ? '' : 'p-4 md:p-6 pb-24 animate-in fade-in duration-500'}>
+      <div className={isEmbedded ? '' : 'flex gap-6 items-start'}>
 
         {/* COLUMNA PRINCIPAL — formulario */}
-        <div className="flex-1 min-w-0 space-y-6">
+        <div className={isEmbedded ? 'space-y-4' : 'flex-1 min-w-0 space-y-6'}>
 
-      {/* HEADER */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => navigation.patients.consulta(patientUuid)}
-          className="w-10 h-10 rounded-app-sm bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors shrink-0"
-        >
-          <ArrowLeft size={16} className="text-neutral-500" />
-        </button>
-        <div>
-          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-primary">
-            {t(TEXT.CONSULTA.CONTROL.BREADCRUMB)}
-          </Typography>
-          <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
-            {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
-          </Typography>
+      {/* HEADER — solo como página propia; en el panel de visita lo pone el drawer */}
+      {!isEmbedded && (
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigation.patients.consulta(patientUuid)}
+            className="w-10 h-10 rounded-app-sm bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors shrink-0"
+          >
+            <ArrowLeft size={16} className="text-neutral-500" />
+          </button>
+          <div>
+            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-primary">
+              {t(TEXT.CONSULTA.CONTROL.BREADCRUMB)}
+            </Typography>
+            <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
+              {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
+            </Typography>
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="bg-white border border-neutral-100 rounded-app-md p-5 md:p-8 space-y-6 shadow-sm">
+      <div className={isEmbedded ? 'space-y-6' : 'bg-white border border-neutral-100 rounded-app-md p-5 md:p-8 space-y-6 shadow-sm'}>
 
         {/* OTOSCOPÍA (solo audiología) */}
         {isAudiology && (
@@ -241,7 +248,7 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid, encount
 
       {/* BOTONES */}
       <div className="flex justify-end gap-3">
-        <Button variant={ButtonVariant.CANCEL} onClick={() => navigation.patients.consulta(patientUuid)} text={t(TEXT.GENERAL.BUTTONS.CANCEL)} />
+        <Button variant={ButtonVariant.CANCEL} onClick={handleCancel} text={t(TEXT.GENERAL.BUTTONS.CANCEL)} />
         <Button
           variant={ButtonVariant.PRIMARY}
           className="!h-12 !px-10 !rounded-app-sm shadow-lg shadow-primary-soft"
@@ -255,10 +262,13 @@ export const ConsultaControlContainer: React.FC<Props> = ({ patientUuid, encount
 
         </div>{/* fin columna principal */}
 
-        {/* COLUMNA HISTORIAL — solo desktop */}
-        <div className="hidden xl:block w-96 shrink-0">
-          <MedicalHistorySidebar patientId={patientUuid} />
-        </div>
+        {/* COLUMNA HISTORIAL — solo desktop y solo como página propia:
+            dentro del panel de visita el expediente ya está visible detrás. */}
+        {!isEmbedded && (
+          <div className="hidden xl:block w-96 shrink-0">
+            <MedicalHistorySidebar patientId={patientUuid} />
+          </div>
+        )}
 
       </div>
     </div>

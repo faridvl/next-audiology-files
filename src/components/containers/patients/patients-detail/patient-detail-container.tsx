@@ -31,8 +31,10 @@ const userSpecialtyToMedicalSpeciality: Record<UserSpecialty, MedicalSpeciality>
   [UserSpecialty.GENERAL]: MedicalSpeciality.GENERAL,
 };
 import { LinkDeviceModal } from "./link-device-modal";
-import { AudiogramChart, classifyHearingLoss } from "@/components/common/audiogram-chart/audiogram-chart";
-import { useState } from "react";
+import { AudiogramChart } from "@/components/common/audiogram/audiogram-chart";
+import { classifyHearingLoss, HEARING_LOSS_GRADE_COLOR, HEARING_LOSS_GRADE_LABEL_KEYS } from "@/shared/utils/audiometry";
+import { Ear } from "@/types/studies/audiometry.types";
+import { useState, useMemo } from "react";
 import { useDeletePatientMutation } from "@/shared/api/mutations/patients/use-delete-patient-mutation";
 import { DocumentsContainer } from "@/components/containers/documents/documents-view";
 import { usePatientBackgroundQuery } from "@/shared/api/querys/patient-background-query";
@@ -49,6 +51,11 @@ import { useCreateAppointmentMutation } from "@/shared/api/mutations/appointment
 import { useUpdateAppointmentMutation } from "@/shared/api/mutations/appointments/update-appointment-mutation";
 import { AppointmentStatus } from "@/types/appointments/appointment";
 import { FETCH_APPOINTMENT_BY_PATIENT_KEY } from "@/shared/api/querys/get-appoinment-by-patient-query";
+import { FETCH_CONTROLS_KEY } from "@/shared/api/querys/medical-controls-query";
+import { FETCH_ENCOUNTERS_BY_PATIENT_KEY } from "@/shared/api/querys/encounters-query";
+import { FETCH_STUDIES_BY_PATIENT_KEY } from "@/shared/api/querys/studies-query";
+import { FETCH_MAINTENANCE_BY_PATIENT_KEY } from "@/shared/api/querys/maintenance-query";
+import { VisitPanel } from "@/components/containers/patients/consulta/visit-panel";
 import { ChevronDown, ChevronUp, Trash2, Headphones, Plus, RotateCcw, ShieldCheck, Barcode, X, Save } from "lucide-react";
 import { AssignDeviceUnitModal } from "./assign-device-unit-modal";
 import { useTranslation } from "react-i18next";
@@ -76,23 +83,6 @@ const HeaderInfo = ({ icon, text, isWarning }: HeaderInfoProps) => (
     </div>
 );
 
-interface StatCardProps { title: string; value: string; icon: React.ReactNode; onClick: () => void; }
-const StatCard = ({ title, value, icon, onClick }: StatCardProps) => (
-    <button
-        onClick={onClick}
-        className="bg-white p-5 rounded-app-xl border border-neutral-100 shadow-sm flex items-start gap-4 hover:border-primary/30 hover:shadow-md transition-all text-left w-full group"
-    >
-        <div className="p-3 bg-neutral-50 rounded-app-md group-hover:bg-primary-soft transition-colors">
-            {icon}
-        </div>
-        <div className="flex-1">
-            <Typography variant={TypographyVariant.CAPTION} className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-0.5">{title}</Typography>
-            <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm font-bold text-neutral-900">{value}</Typography>
-        </div>
-        <ChevronRightIcon className="h-4 w-4 text-neutral-300 self-center group-hover:text-primary transition-colors" />
-    </button>
-);
-
 interface SpecFilterButtonProps { label: string; isActive: boolean; onClick: () => void; }
 const SpecFilterButton = ({ label, isActive, onClick }: SpecFilterButtonProps) => (
     <button
@@ -103,6 +93,15 @@ const SpecFilterButton = ({ label, isActive, onClick }: SpecFilterButtonProps) =
         {label}
     </button>
 );
+
+/** Aviso accionable en el encabezado del expediente — reemplaza las stat cards */
+interface PatientAlert {
+    key: string;
+    label: string;
+    icon: React.ReactNode;
+    styleClassName: string;
+    onClick?: () => void;
+}
 
 interface EncounterGroupRowProps {
     group: EncounterGroup;
@@ -652,6 +651,8 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
     const [isLinkDeviceOpen, setIsLinkDeviceOpen] = useState(false);
     const [isConfirmDelete, setIsConfirmDelete] = useState(false);
     const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+    const [isVisitPanelOpen, setIsVisitPanelOpen] = useState(false);
+    const [isContextOpen, setIsContextOpen] = useState(false);
     const queryClient = useQueryClient();
     const { user, tenant } = useSession();
     const canStartConsulta = user?.role && user.role !== UserRole.STAFF;
@@ -667,8 +668,63 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
     const {
         patient, history, groupedHistory, summary, isLoading, isFetching,
         hasMore, searchTerm, setSearchTerm, selectedSpec, setSelectedSpec, loadMore,
-        latestAudiogram, recordTypeFilter, setRecordTypeFilter, nextAppointmentData,
+        latestAudiogramThresholds, recordTypeFilter, setRecordTypeFilter, nextAppointmentData,
     } = usePatientDetail(id, canReadClinicalData);
+
+    const { data: background } = usePatientBackgroundQuery(id, canReadClinicalData);
+
+    // La especialidad de quien atiende determina qué se CREA en la visita
+    // (NOM-004 5.14: nunca qué se puede ver).
+    const visitSpeciality: MedicalSpeciality = user?.specialty
+        ? userSpecialtyToMedicalSpeciality[user.specialty]
+        : MedicalSpeciality.GENERAL;
+
+    // Solo lo accionable llega aquí — una fecha que no requiere acción no es una alerta.
+    const alerts = useMemo(() => {
+        const items: PatientAlert[] = [];
+
+        if (!nextAppointmentData) {
+            items.push({
+                key: 'no-appointment',
+                label: t(TEXT.PATIENTS.DETAIL.ALERTS.NO_APPOINTMENT),
+                icon: <CalendarIcon className="h-3.5 w-3.5 shrink-0" />,
+                styleClassName: 'bg-primary-soft/50 border-primary/20 text-primary',
+                onClick: () => setIsAppointmentModalOpen(true),
+            });
+        }
+
+        if (isAudiologyTenant) {
+            const overdueMaintenance = summary.pendingMaintenance.find(
+                (maintenance) => maintenance.nextMaintenanceAt && new Date(maintenance.nextMaintenanceAt) < new Date(),
+            );
+            if (overdueMaintenance?.nextMaintenanceAt) {
+                items.push({
+                    key: 'maintenance-due',
+                    label: t(TEXT.PATIENTS.DETAIL.ALERTS.MAINTENANCE_DUE, {
+                        date: new Date(overdueMaintenance.nextMaintenanceAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }),
+                    }),
+                    icon: <WrenchScrewdriverIcon className="h-3.5 w-3.5 shrink-0" />,
+                    styleClassName: 'bg-warning/10 border-warning/30 text-warning',
+                    onClick: () => navigation.maintenance.listFromPatient(id),
+                });
+            }
+        }
+
+        const positiveBackgroundCount = background
+            ? BACKGROUND_KEYS.filter((key) => background[key]).length
+            : 0;
+        if (positiveBackgroundCount > 0) {
+            items.push({
+                key: 'background',
+                label: t(TEXT.PATIENTS.DETAIL.ALERTS.BACKGROUND_POSITIVE, { count: positiveBackgroundCount }),
+                icon: <ShieldCheckIcon className="h-3.5 w-3.5 shrink-0" />,
+                styleClassName: 'bg-danger/10 border-danger/30 text-danger',
+                onClick: () => setIsContextOpen(true),
+            });
+        }
+
+        return items;
+    }, [nextAppointmentData, isAudiologyTenant, summary.pendingMaintenance, background, t, navigation, id]);
 
     if (isLoading || !patient) return (
         <div className="p-20 text-center animate-pulse text-neutral-400 font-bold uppercase tracking-widest">
@@ -752,7 +808,7 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                         <Typography variant={TypographyVariant.CAPTION} inline className="truncate font-black">{t(TEXT.PATIENTS.DETAIL.VIEW_FULL_FILE)}</Typography>
                     </button>
                     {canStartConsulta && (
-                        <Button variant={ButtonVariant.PRIMARY} className="rounded-app-sm px-5 h-10 shadow-lg shadow-primary-soft flex-1 sm:flex-none" onClick={() => navigation.patients.consulta(id)}>
+                        <Button variant={ButtonVariant.PRIMARY} className="rounded-app-sm px-5 h-10 shadow-lg shadow-primary-soft flex-1 sm:flex-none" onClick={() => setIsVisitPanelOpen(true)}>
                             <PlusIcon className="h-4 w-4 mr-2 shrink-0" />
                             <Typography variant={TypographyVariant.CAPTION} inline className="font-bold uppercase tracking-tight">{t(TEXT.PATIENTS.DETAIL.START_CONSULTA)}</Typography>
                         </Button>
@@ -760,59 +816,28 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                 </div>
             </div>
 
-            {/* INDICADORES RÁPIDOS */}
-            <div className={`grid grid-cols-1 gap-4 ${isAudiologyTenant ? 'md:grid-cols-3' : ''}`}>
-                <div className="flex flex-col gap-2">
-                    <StatCard
-                        title={t(TEXT.PATIENTS.DETAIL.STATS.NEXT_APPOINTMENT)}
-                        value={summary.nextAppointment}
-                        icon={<CalendarIcon className="h-5 w-5 text-primary" />}
-                        onClick={() => setIsAppointmentModalOpen(true)}
-                    />
-                    {!nextAppointmentData && (
+            {/* ALERTAS — solo lo accionable. Reemplaza las 3 stat cards, que ocupaban
+                un tercio de pantalla para mostrar 3 fechas que casi nunca requieren acción. */}
+            {alerts.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                    {alerts.map((alert) => (
                         <button
-                            onClick={() => setIsAppointmentModalOpen(true)}
-                            className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-primary/30 rounded-app-md text-[10px] font-black uppercase tracking-widest text-primary/70 hover:border-primary hover:text-primary transition-all"
+                            key={alert.key}
+                            onClick={alert.onClick}
+                            disabled={!alert.onClick}
+                            className={`flex items-center gap-2 px-3.5 py-2 rounded-app-sm border text-left transition-all ${alert.styleClassName} ${alert.onClick ? 'hover:brightness-95 cursor-pointer' : 'cursor-default'}`}
                         >
-                            <PlusIcon className="h-3 w-3" /> {t(TEXT.PATIENTS.DETAIL.STATS.SCHEDULE_APPOINTMENT)}
+                            {alert.icon}
+                            <Typography variant={TypographyVariant.CAPTION} inline className="text-[11px] font-bold">
+                                {alert.label}
+                            </Typography>
                         </button>
-                    )}
+                    ))}
                 </div>
-                {isAudiologyTenant && (
-                <>
-                <div className="flex flex-col gap-2">
-                    <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.NEXT_MAINTENANCE)} value={summary.warrantyExpiration} icon={<ShieldCheckIcon className="h-5 w-5 text-success" />} onClick={() => navigation.maintenance.list()} />
-                    {summary.pendingMaintenance.length === 0 && (
-                        <button
-                            onClick={() => navigation.patients.consulta(id)}
-                            className="w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-success/30 rounded-app-md text-[10px] font-black uppercase tracking-widest text-success/70 hover:border-success hover:text-success transition-all"
-                        >
-                            <PlusIcon className="h-3 w-3" /> {t(TEXT.PATIENTS.DETAIL.STATS.SCHEDULE_MAINTENANCE)}
-                        </button>
-                    )}
-                </div>
-                <StatCard title={t(TEXT.PATIENTS.DETAIL.STATS.MAINTENANCE_COUNT)} value={t(TEXT.PATIENTS.DETAIL.STATS.MAINTENANCE_COUNT_VALUE, { count: summary.pendingMaintenance.length })} icon={<WrenchScrewdriverIcon className="h-5 w-5 text-warning" />} onClick={() => navigation.maintenance.listFromPatient(id)} />
-                </>
-                )}
-            </div>
-
-            {/* NIVEL 2 — ESTADO CLÍNICO (1, se actualiza): antecedentes + dispositivos
-                activos son contexto permanente del paciente, no eventos en el tiempo. */}
-            {(canReadClinicalData || isAudiologyTenant) && (
-            <div className="space-y-3">
-                <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1">
-                    {t(TEXT.PATIENTS.DETAIL.LEVELS.CLINICAL_STATE)}
-                </Typography>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {canReadClinicalData && <BackgroundPanel patientUuid={id} />}
-                    {isAudiologyTenant && <DevicesPanel patientUuid={id} />}
-                </div>
-            </div>
             )}
 
-            {/* NIVEL 3 — CRONOLOGÍA (N, crece): encuentros, estudios y documentos —
-                lo que le PASÓ al paciente, en el tiempo. Documentos es fuente principal
-                (DOMAIN_ANALYSIS.md §4.9), no un apéndice al final. */}
+            {/* CRONOLOGÍA — lo primero que se consulta al abrir un expediente.
+                Sube por encima del contexto clínico: es el 80% de las lecturas. */}
             <div className="space-y-6">
                 <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1">
                     {t(TEXT.PATIENTS.DETAIL.LEVELS.TIMELINE)}
@@ -853,9 +878,9 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                     </div>
 
                     {/* AUDIOGRAMA MÁS RECIENTE */}
-                    {isAudiologyTenant && latestAudiogram && (
+                    {isAudiologyTenant && latestAudiogramThresholds.length > 0 && (
                         <div className="bg-white p-5 rounded-app-md border border-neutral-100 shadow-sm space-y-4">
-                            <div className="flex items-center justify-between">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
                                 <div>
                                     <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">
                                         {t(TEXT.PATIENTS.DETAIL.HISTORY.LATEST_AUDIOGRAM)}
@@ -865,27 +890,31 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                                     </Typography>
                                 </div>
                                 <div className="flex gap-2">
-                                    {(['OD', 'OI'] as const).map((side) => {
-                                        const hasData = Object.values(latestAudiogram[side] ?? {}).some(v => v !== '');
-                                        if (!hasData) return null;
-                                        const classification = classifyHearingLoss(latestAudiogram, side);
+                                    {[Ear.RIGHT, Ear.LEFT].map((ear) => {
+                                        const classification = classifyHearingLoss(latestAudiogramThresholds, ear);
+                                        if (!classification) return null;
+                                        const gradeColor = HEARING_LOSS_GRADE_COLOR[classification.grade];
                                         return (
                                             <div
-                                                key={side}
+                                                key={ear}
                                                 className="px-2.5 py-1.5 rounded-app-sm text-center"
-                                                style={{ backgroundColor: `${classification.color}12`, border: `1px solid ${classification.color}30` }}
+                                                style={{ backgroundColor: `${gradeColor}12`, border: `1px solid ${gradeColor}30` }}
                                             >
-                                                <div className="text-[8px] font-black uppercase tracking-widest text-neutral-400">{side}</div>
-                                                <div className="text-[10px] font-black" style={{ color: classification.color }}>
-                                                    {classification.label}
+                                                <div className="text-[8px] font-black uppercase tracking-widest text-neutral-400">{ear}</div>
+                                                <div className="text-[10px] font-black" style={{ color: gradeColor }}>
+                                                    {t(HEARING_LOSS_GRADE_LABEL_KEYS[classification.grade])}
                                                 </div>
-                                                <div className="text-[8px] text-neutral-400">{classification.pta} dB</div>
+                                                <div className="text-[8px] text-neutral-400">{classification.pureToneAverage} dB</div>
                                             </div>
                                         );
                                     })}
                                 </div>
                             </div>
-                            <AudiogramChart audiogram={latestAudiogram} compact showClassification={false} />
+                            <div className="overflow-x-auto -mx-1">
+                                <div className="min-w-[420px] px-1">
+                                    <AudiogramChart thresholds={latestAudiogramThresholds} isReadOnly isCompact />
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -925,7 +954,54 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                     <DocumentsContainer patientId={id} />
                 </div>
             </div>
+
+            {/* CONTEXTO CLÍNICO — antecedentes y audífonos son estado permanente,
+                no eventos. Se consultan al atender, no en cada lectura → colapsado.
+                Lo crítico (antecedentes positivos) ya subió a la línea de alertas. */}
+            {(canReadClinicalData || isAudiologyTenant) && (
+            <div className="space-y-3">
+                <button
+                    onClick={() => setIsContextOpen((open) => !open)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-white rounded-app-md border border-neutral-100 shadow-sm hover:border-neutral-300 transition-all"
+                >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                        <ClipboardList className="h-4 w-4 text-neutral-400 shrink-0" />
+                        <Typography variant={TypographyVariant.BODY_BOLD} className="text-sm text-neutral-800">
+                            {t(TEXT.PATIENTS.DETAIL.CONTEXT.TITLE)}
+                        </Typography>
+                        {!isContextOpen && (
+                            <Typography variant={TypographyVariant.CAPTION} inline className="text-[10px] text-neutral-400 truncate hidden sm:inline">
+                                {t(TEXT.PATIENTS.DETAIL.CONTEXT.SHOW)}
+                            </Typography>
+                        )}
+                    </div>
+                    {isContextOpen ? <ChevronUp className="h-4 w-4 text-neutral-400 shrink-0" /> : <ChevronDown className="h-4 w-4 text-neutral-400 shrink-0" />}
+                </button>
+
+                {isContextOpen && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {canReadClinicalData && <BackgroundPanel patientUuid={id} />}
+                        {isAudiologyTenant && <DevicesPanel patientUuid={id} />}
+                    </div>
+                )}
+            </div>
+            )}
         </div>
+
+        {isVisitPanelOpen && canStartConsulta && (
+            <VisitPanel
+                patientUuid={id}
+                speciality={visitSpeciality}
+                isAudiologyTenant={isAudiologyTenant}
+                onClose={() => {
+                    setIsVisitPanelOpen(false);
+                    queryClient.invalidateQueries({ queryKey: [FETCH_CONTROLS_KEY, id] });
+                    queryClient.invalidateQueries({ queryKey: [FETCH_ENCOUNTERS_BY_PATIENT_KEY, id] });
+                    queryClient.invalidateQueries({ queryKey: [FETCH_STUDIES_BY_PATIENT_KEY, id] });
+                    queryClient.invalidateQueries({ queryKey: [FETCH_MAINTENANCE_BY_PATIENT_KEY, id] });
+                }}
+            />
+        )}
 
         {isLinkDeviceOpen && (
             <LinkDeviceModal

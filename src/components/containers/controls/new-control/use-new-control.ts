@@ -7,6 +7,7 @@ import { useNavigation } from '@/hooks/use-navigation';
 import { useSession } from '@/hooks/use-session';
 import { ClinicalTemplate } from '@/types/clinical-template/clinical-template.types';
 import { useClinicalTemplateBySpecialityQuery } from '@/shared/api/querys/clinical-templates-query';
+import { AudiometryThreshold } from '@/types/studies/audiometry.types';
 
 // Mapeo de UserSpecialty (sesión) a MedicalSpeciality (API)
 const userSpecialtyToApiSpeciality: Record<UserSpecialty, MedicalSpeciality> = {
@@ -39,7 +40,7 @@ export const useNewControl = (patientId: string) => {
   const [showAudiogram, setShowAudiogram] = useState(false);
   const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
   const [dynamicFieldValues, setDynamicFieldValues] = useState<Record<string, string | boolean | number>>({});
-  const [audiogramData, setAudiogramData] = useState<{ OD: Record<number, string>; OI: Record<number, string> }>({ OD: {}, OI: {} });
+  const [audiogramThresholds, setAudiogramThresholds] = useState<AudiometryThreshold[]>([]);
 
   // Especialidad resuelta: usuario logueado > tipo de negocio del tenant
   const resolvedSpecialty = resolveSpecialty(user?.specialty, tenant?.businessType);
@@ -101,7 +102,7 @@ export const useNewControl = (patientId: string) => {
         cleaningPerformed: false,
         usesAuxiliaries: false,
         tinnitus: false,
-        audiogram: audiogramData,
+        audiogram: { thresholds: audiogramThresholds },
       };
     } else if (apiSpeciality === MedicalSpeciality.DENTAL) {
       findings = {
@@ -158,7 +159,7 @@ export const useNewControl = (patientId: string) => {
       setIsFollowUpModalOpen,
       setFormData,
       setDynamicFieldValue,
-      setAudiogramData,
+      setAudiogramThresholds,
     },
     methods: { setQuickDate, handleSave },
   };

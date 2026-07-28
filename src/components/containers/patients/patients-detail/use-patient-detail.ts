@@ -8,7 +8,9 @@ import { useStudiesByPatientQuery } from '@/shared/api/querys/studies-query';
 import { MaintenanceEntity } from '@/types/maintenance/maintenance.types';
 import { ClinicalControl, ControlType } from '@/types/otros/clinical';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
-import { AudiometriaTonalPayload, StudyType } from '@/types/studies/study.types';
+import { StudyType } from '@/types/studies/study.types';
+import { AudiometryThreshold } from '@/types/studies/audiometry.types';
+import { parseAudiometryPayload } from '@/shared/utils/audiometry';
 import { AppointmentStatus } from '@/types/appointments/appointment';
 
 interface MedicalControlResponse {
@@ -233,14 +235,16 @@ export function usePatientDetail(uuid: string, canReadClinicalData = true) {
     });
   }, [maintenancesData]);
 
-  const latestAudiogram = useMemo((): AudiometriaTonalPayload | null => {
+  // Umbrales tipados del audiograma más reciente. Soporta la forma legacy
+  // (solo OD/OI aéreo) además de la tipada — sin migración de datos.
+  const latestAudiogramThresholds = useMemo((): AudiometryThreshold[] => {
     const audiometryStudies = (studiesData ?? [])
       .filter((study) => study.tipo === StudyType.AUDIOMETRIA_TONAL)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     const latest = audiometryStudies[0];
-    if (!latest) return null;
-    return latest.payload as unknown as AudiometriaTonalPayload;
+    if (!latest) return [];
+    return parseAudiometryPayload(latest.payload);
   }, [studiesData]);
 
   const summary = {
@@ -256,7 +260,7 @@ export function usePatientDetail(uuid: string, canReadClinicalData = true) {
     history: mappedHistory,
     groupedHistory,
     summary,
-    latestAudiogram,
+    latestAudiogramThresholds,
     nextAppointmentData,
 
     // Estados de carga

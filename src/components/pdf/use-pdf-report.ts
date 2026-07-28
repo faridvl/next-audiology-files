@@ -7,7 +7,9 @@ import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
 import { useStudiesByPatientQuery } from '@/shared/api/querys/studies-query';
 import { useSession } from '@/hooks/use-session';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
-import { StudyType, AudiometriaTonalPayload } from '@/types/studies/study.types';
+import { StudyType } from '@/types/studies/study.types';
+import { AudiometryThreshold, ConductionRoute, Ear } from '@/types/studies/audiometry.types';
+import { parseAudiometryPayload } from '@/shared/utils/audiometry';
 import { PdfReportProps, PdfReportAudiogramRow } from '@/types/pdf/report.types';
 
 const AUDIOLOGY_AUDIOGRAM_FREQUENCIES = [250, 500, 1000, 2000, 4000, 8000];
@@ -43,21 +45,22 @@ const formatBirthDate = (isoString?: string): string => {
   });
 };
 
-// El audiograma vive en su propia entidad Study (payload AudiometriaTonalPayload,
-// anidado por oído, claves = frecuencia, valores = umbral en dB HL como string).
-// Antes se guardaba disfrazado de MedicalControl.findings.audiogram — esa forma
-// legacy se soporta como fallback para registros creados antes de esta migración.
-const parseThreshold = (value: string | undefined): number | null => {
-  if (value === undefined || value === '') return null;
-  const parsed = Number(value);
-  return Number.isNaN(parsed) ? null : parsed;
-};
+// El audiograma vive en su propia entidad Study. `parseAudiometryPayload` lee
+// tanto los umbrales tipados (vía/enmascaramiento/sin-respuesta) como la forma
+// legacy `{OD,OI}`, así que la tabla del PDF sirve a ambos sin migrar datos.
+// La tabla del informe muestra solo vía aérea, que es el umbral de referencia.
+const buildAudiogramRows = (thresholds: AudiometryThreshold[]): PdfReportAudiogramRow[] => {
+  const airThresholds = thresholds.filter((item) => item.route === ConductionRoute.AIR);
+  const findDecibels = (frequency: number, ear: Ear): number | null => {
+    const match = airThresholds.find((item) => item.frequency === frequency && item.ear === ear);
+    if (!match) return null;
+    return match.isNoResponse ? null : match.decibels;
+  };
 
-const buildAudiogramRows = (audiogramData: AudiometriaTonalPayload): PdfReportAudiogramRow[] => {
   return AUDIOLOGY_AUDIOGRAM_FREQUENCIES.map((frequency) => ({
     frequency,
-    thresholdRight: parseThreshold(audiogramData.OD?.[frequency]),
-    thresholdLeft: parseThreshold(audiogramData.OI?.[frequency]),
+    thresholdRight: findDecibels(frequency, Ear.RIGHT),
+    thresholdLeft: findDecibels(frequency, Ear.LEFT),
   }));
 };
 
@@ -65,9 +68,10 @@ const buildAudiogramRows = (audiogramData: AudiometriaTonalPayload): PdfReportAu
 const extractLegacyAudiogramRows = (
   findings: Record<string, unknown>,
 ): PdfReportAudiogramRow[] | undefined => {
-  const audiogramData = findings.audiogram as AudiometriaTonalPayload | undefined;
-  if (!audiogramData) return undefined;
-  return buildAudiogramRows(audiogramData);
+  if (!findings.audiogram) return undefined;
+  const thresholds = parseAudiometryPayload(findings.audiogram);
+  if (thresholds.length === 0) return undefined;
+  return buildAudiogramRows(thresholds);
 };
 
 // Construye el mapa de findings para mostrar en la tabla key-value
@@ -115,7 +119,7 @@ export function usePdfReport(controlUuid: string, patientUuid: string): UsePdfRe
     const audiogram =
       speciality === MedicalSpeciality.AUDIOLOGY
         ? audiometryStudy
-          ? buildAudiogramRows(audiometryStudy.payload as unknown as AudiometriaTonalPayload)
+          ? buildAudiogramRows(parseAudiometryPayload(audiometryStudy.payload))
           : extractLegacyAudiogramRows(findings)
         : undefined;
 

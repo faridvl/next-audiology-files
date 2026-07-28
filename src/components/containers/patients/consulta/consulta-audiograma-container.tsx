@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { ArrowLeft, Save, Paperclip, X, FileText } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
@@ -8,8 +8,9 @@ import { usePatientDetailQuery } from '@/shared/api/querys/get-patient-query';
 import { useCreateStudyMutation } from '@/shared/api/mutations/studies/create-study-mutation';
 import { useUploadDocumentMutation } from '@/shared/api/mutations/documents/upload-document-mutation';
 import { FETCH_ENCOUNTER_KEY } from '@/shared/api/querys/encounters-query';
-import { AudiometryCapture } from '@/components/containers/audiogram-capture/audiogram-capture';
+import { AudiogramEditor } from '@/components/containers/audiogram-editor/audiogram-editor';
 import { StudyType } from '@/types/studies/study.types';
+import { AudiometryThreshold, HearingLossScale } from '@/types/studies/audiometry.types';
 import { DocumentCategoryApiValue } from '@/types/documents/document.types';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -18,16 +19,26 @@ import { TEXT } from '@/static/texts/i18n';
 interface Props {
   patientUuid: string;
   encounterUuid: string;
+  /** Dentro del panel de visita: sin header propio, y al guardar avisa al panel */
+  isEmbedded?: boolean;
+  onSaved?: () => void;
+  onCancel?: () => void;
 }
 
-export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid, encounterUuid }) => {
+export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid, encounterUuid, isEmbedded = false, onSaved, onCancel }) => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { data: patient } = usePatientDetailQuery(patientUuid);
-  const [audiogramData, setAudiogramData] = useState<{ OD: Record<number, string>; OI: Record<number, string> }>({ OD: {}, OI: {} });
+
+  const handleCancel = () => (isEmbedded ? onCancel?.() : navigation.patients.consulta(patientUuid));
+  const [thresholds, setThresholds] = useState<AudiometryThreshold[]>([]);
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
+
+  // useCallback: AudiogramEditor lo llama dentro de un efecto — una referencia
+  // nueva en cada render provocaría un bucle de actualización.
+  const handleThresholdsChange = useCallback((next: AudiometryThreshold[]) => setThresholds(next), []);
 
   const { executeCreateStudy, isPending: isCreatingStudy } = useCreateStudyMutation();
   const { executeUploadDocument, isPending: isUploadingDocument } = useUploadDocumentMutation();
@@ -44,14 +55,17 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid, enco
         encounterUuid,
         patientUuid,
         tipo: StudyType.AUDIOMETRIA_TONAL,
-        payload: { OD: audiogramData.OD, OI: audiogramData.OI },
+        // Umbrales tipados con vía, enmascaramiento y sin-respuesta + la escala
+        // que produjo la clasificación (DOMAIN_ANALYSIS.md §3.2).
+        payload: { thresholds, classificationScale: HearingLossScale.WHO_2021 },
         documentUuid,
       },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: [FETCH_ENCOUNTER_KEY, encounterUuid] });
           toast.success(t(TEXT.CONSULTA.AUDIOGRAM.SAVE_SUCCESS));
-          navigation.patients.consulta(patientUuid);
+          if (isEmbedded) onSaved?.();
+          else navigation.patients.consulta(patientUuid);
         },
         onError: () => toast.error(t(TEXT.CONSULTA.AUDIOGRAM.SAVE_ERROR)),
       },
@@ -59,7 +73,7 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid, enco
   }
 
   function handleSave() {
-    const hasValues = Object.values(audiogramData.OD).some((v) => v !== '') || Object.values(audiogramData.OI).some((v) => v !== '');
+    const hasValues = thresholds.length > 0;
     if (!hasValues && !attachedFile) {
       toast.error(t(TEXT.CONSULTA.AUDIOGRAM.EMPTY_ERROR));
       return;
@@ -80,25 +94,27 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid, enco
   }
 
   return (
-    <div className="p-4 md:p-6 pb-24 space-y-6 animate-in fade-in duration-500">
+    <div className={isEmbedded ? 'space-y-4' : 'p-4 md:p-6 pb-24 space-y-6 animate-in fade-in duration-500'}>
 
-      {/* HEADER */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => navigation.patients.consulta(patientUuid)}
-          className="w-10 h-10 rounded-app-sm bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors shrink-0"
-        >
-          <ArrowLeft size={16} className="text-neutral-500" />
-        </button>
-        <div>
-          <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-accent">
-            {t(TEXT.CONSULTA.AUDIOGRAM.BREADCRUMB)}
-          </Typography>
-          <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
-            {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
-          </Typography>
+      {/* HEADER — solo como página propia; en el panel de visita lo pone el drawer */}
+      {!isEmbedded && (
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigation.patients.consulta(patientUuid)}
+            className="w-10 h-10 rounded-app-sm bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors shrink-0"
+          >
+            <ArrowLeft size={16} className="text-neutral-500" />
+          </button>
+          <div>
+            <Typography variant={TypographyVariant.CAPTION} className="text-[9px] font-black uppercase tracking-widest text-accent">
+              {t(TEXT.CONSULTA.AUDIOGRAM.BREADCRUMB)}
+            </Typography>
+            <Typography variant={TypographyVariant.SUBTITLE} className="text-neutral-800 leading-tight">
+              {patient ? `${patient.firstName} ${patient.lastName}` : '…'}
+            </Typography>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ADJUNTAR ARCHIVO DEL EQUIPO */}
       <div className="bg-neutral-50 border border-dashed border-neutral-200 rounded-app-md p-4">
@@ -129,12 +145,10 @@ export const ConsultaAudiogramaContainer: React.FC<Props> = ({ patientUuid, enco
         )}
       </div>
 
-      <div className="shadow-sm">
-        <AudiometryCapture onChange={setAudiogramData} />
-      </div>
+      <AudiogramEditor onChange={handleThresholdsChange} />
 
       <div className="flex justify-end gap-3">
-        <Button variant={ButtonVariant.CANCEL} onClick={() => navigation.patients.consulta(patientUuid)} text={t(TEXT.GENERAL.BUTTONS.CANCEL)} />
+        <Button variant={ButtonVariant.CANCEL} onClick={handleCancel} text={t(TEXT.GENERAL.BUTTONS.CANCEL)} />
         <Button
           variant={ButtonVariant.PRIMARY}
           className="!h-12 !px-10 !rounded-app-sm shadow-lg shadow-accent/20"

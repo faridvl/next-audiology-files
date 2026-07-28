@@ -9,7 +9,8 @@ import { useSession } from '@/hooks/use-session';
 import { useAddCorrectionNoteMutation } from '@/shared/api/mutations/medical-controls/use-add-correction-note-mutation';
 import { toast } from 'sonner';
 import { MedicalSpeciality, AudiologyFindings, AudiogramData } from '@/types/medical-controls/medical-control.types';
-import { AudiogramChart, classifyHearingLoss } from '@/components/common/audiogram-chart/audiogram-chart';
+import { AudiogramChart } from '@/components/common/audiogram/audiogram-chart';
+import { parseAudiometryPayload } from '@/shared/utils/audiometry';
 
 const specialityLabels: Record<MedicalSpeciality, string> = {
     [MedicalSpeciality.AUDIOLOGY]: 'Audiología Clínica',
@@ -130,9 +131,11 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
         return parts.join(' ') || '—';
     };
 
-    const audiogram = data.control.speciality === MedicalSpeciality.AUDIOLOGY
-        ? ((data.control.findings as AudiologyFindings).audiogram as AudiogramData | undefined)
-        : undefined;
+    // Registros anteriores a S6 guardaban el audiograma dentro de findings —
+    // parseAudiometryPayload lee esa forma legacy y la normaliza a umbrales.
+    const audiogramThresholds = data.control.speciality === MedicalSpeciality.AUDIOLOGY
+        ? parseAudiometryPayload((data.control.findings as AudiologyFindings).audiogram)
+        : [];
 
     // Campos genéricos: cualquier clave no conocida de la especialidad actual
     const renderGenericFindings = () => {
@@ -262,13 +265,13 @@ export const ControlDetailContainer: React.FC<Props> = ({ patientId, controlId, 
                     </div>
 
                     {/* AUDIOGRAMA */}
-                    {audiogram && (
+                    {audiogramThresholds.length > 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-4 border-t border-neutral-50 pt-8">
                             <div className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] self-start pt-1">
                                 Audiograma
                             </div>
                             <div className="md:col-span-3">
-                                <AudiogramChart audiogram={audiogram} showClassification />
+                                <AudiogramChart thresholds={audiogramThresholds} isReadOnly />
                             </div>
                         </div>
                     )}

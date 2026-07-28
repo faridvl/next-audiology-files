@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
-import { AudiometryCapture } from '@/components/containers/audiogram-capture/audiogram-capture';
+import { AudiogramEditor } from '@/components/containers/audiogram-editor/audiogram-editor';
 import { useNewControl } from './use-new-control';
 import { TEXT } from '@/static/texts/i18n';
 import { MedicalSpeciality } from '@/types/medical-controls/medical-control.types';
@@ -227,7 +227,7 @@ export const NewControlContainer: React.FC<Props> = ({ patientId }) => {
                                     </div>
                                     {showAudiogram && (
                                         <div className="animate-in slide-in-from-top-4 duration-300">
-                                            <AudiometryCapture onChange={setters.setAudiogramData} />
+                                            <AudiogramEditor onChange={setters.setAudiogramThresholds} />
                                         </div>
                                     )}
                                 </div>

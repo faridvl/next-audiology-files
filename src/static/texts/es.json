@@ -324,7 +324,21 @@
       "linkDevice": "Vincular audífono",
       "changeDevice": "Cambiar audífono",
       "viewFullFile": "Ver ficha completa",
-      "startConsulta": "Iniciar consulta",
+      "startConsulta": "Registrar visita",
+      "continueVisit": "Continuar visita de hoy",
+      "alerts": {
+        "noAppointment": "Sin próxima cita agendada",
+        "warrantyExpired": "Garantía vencida",
+        "maintenanceDue": "Mantenimiento pendiente desde {{date}}",
+        "backgroundPositive": "{{count}} antecedentes relevantes",
+        "nextAppointment": "Próxima cita: {{date}}",
+        "schedule": "Agendar"
+      },
+      "context": {
+        "title": "Contexto clínico",
+        "show": "Ver antecedentes, audífonos y documentos",
+        "hide": "Ocultar contexto"
+      },
       "stats": {
         "nextAppointment": "Próxima cita",
         "nextMaintenance": "Próx. mantenimiento",
@@ -416,6 +430,22 @@
     "error": "No se pudo vincular el audífono"
   },
   "consulta": {
+    "visit": {
+      "title": "Visita de hoy",
+      "subtitleNew": "Nada obligatorio — registra solo lo que se hizo",
+      "subtitleResumed": "Visita ya iniciada — puedes seguir agregando",
+      "closePanel": "Cerrar panel",
+      "addNote": "Nota clínica",
+      "addAudiogram": "Audiograma",
+      "addMaintenance": "Mantenimiento",
+      "nothingYet": "Aún no se ha registrado nada en esta visita",
+      "savedInVisit": "Registrado en esta visita",
+      "finish": "Finalizar visita",
+      "finishing": "Finalizando...",
+      "finishError": "No se pudo finalizar la visita. Intenta nuevamente.",
+      "preparing": "Preparando visita...",
+      "backToVisit": "Volver a la visita"
+    },
     "header": {
       "dayLabel": "Consulta del día",
       "progressLabel": "Progreso",
@@ -454,6 +484,34 @@
       "diagnosisPlaceholder": "Escribe el diagnóstico de esta consulta...",
       "save": "Guardar control",
       "saving": "Guardando..."
+    },
+    "audiogramEditor": {
+      "earRight": "Oído derecho",
+      "earLeft": "Oído izquierdo",
+      "routeAir": "Vía aérea",
+      "routeBone": "Vía ósea",
+      "masked": "Enmascarado",
+      "maskedHint": "Se introdujo ruido en el oído contrario para aislar la medición",
+      "noResponse": "Sin respuesta",
+      "noResponseHint": "No se alcanzó umbral al máximo de salida del equipo",
+      "instructions": "Toca la grilla para marcar un umbral. Toca un símbolo existente para borrarlo.",
+      "clearEar": "Limpiar oído",
+      "clearAll": "Limpiar todo",
+      "legend": "Simbología",
+      "legendAir": "Vía aérea — línea continua",
+      "legendBone": "Vía ósea — línea discontinua",
+      "legendMasked": "Enmascarado",
+      "legendNoResponse": "Sin respuesta",
+      "pta": "PTA",
+      "noData": "Sin datos",
+      "grades": {
+        "normal": "Normal",
+        "mild": "Leve",
+        "moderate": "Moderada",
+        "moderatelySevere": "Moderada-severa",
+        "severe": "Severa",
+        "profound": "Profunda"
+      }
     },
     "audiogram": {
       "breadcrumb": "Audiograma",
