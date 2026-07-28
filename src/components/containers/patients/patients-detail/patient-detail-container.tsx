@@ -30,6 +30,14 @@ const userSpecialtyToMedicalSpeciality: Record<UserSpecialty, MedicalSpeciality>
   [UserSpecialty.DENTAL]: MedicalSpeciality.DENTAL,
   [UserSpecialty.GENERAL]: MedicalSpeciality.GENERAL,
 };
+
+/** `OTHER` no acota: una clínica de tipo genérico puede registrar cualquier especialidad */
+const businessTypeToMedicalSpeciality: Record<BusinessType, MedicalSpeciality | undefined> = {
+  [BusinessType.AUDIOLOGY]: MedicalSpeciality.AUDIOLOGY,
+  [BusinessType.DENTAL]: MedicalSpeciality.DENTAL,
+  [BusinessType.GENERAL]: MedicalSpeciality.GENERAL,
+  [BusinessType.OTHER]: undefined,
+};
 import { LinkDeviceModal } from "./link-device-modal";
 import { AudiogramChart } from "@/components/common/audiogram/audiogram-chart";
 import { classifyHearingLoss, HEARING_LOSS_GRADE_COLOR, HEARING_LOSS_GRADE_LABEL_KEYS } from "@/shared/utils/audiometry";
@@ -663,15 +671,29 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
     // Dispositivos, mantenimientos y audiograma son módulos de audiología —
     // una clínica de psicología no los usa (DOMAIN_ANALYSIS.md §4.8).
     const isAudiologyTenant = tenant?.businessType === BusinessType.AUDIOLOGY;
+    // La especialidad del negocio acota qué filtros tienen sentido ofrecer.
+    // Sin businessType configurado no se acota nada — no se ocultan filtros por accidente.
+    const tenantSpeciality = tenant?.businessType
+        ? businessTypeToMedicalSpeciality[tenant.businessType as BusinessType]
+        : undefined;
     const { deletePatient, isPending: isDeletingPatient } = useDeletePatientMutation();
 
     const {
         patient, history, groupedHistory, summary, isLoading, isFetching,
         hasMore, searchTerm, setSearchTerm, selectedSpec, setSelectedSpec, loadMore,
         latestAudiogramThresholds, recordTypeFilter, setRecordTypeFilter, nextAppointmentData,
-    } = usePatientDetail(id, canReadClinicalData);
+        specialityOptions, availableRecordTypes,
+    } = usePatientDetail(id, canReadClinicalData, tenantSpeciality);
 
     const { data: background } = usePatientBackgroundQuery(id, canReadClinicalData);
+
+    // Con un solo tipo de registro, la fila de filtros no ofrece ninguna decisión.
+    const visibleRecordTypeCount = [
+        availableRecordTypes.hasControls,
+        isAudiologyTenant && availableRecordTypes.hasAudiograms,
+        isAudiologyTenant && availableRecordTypes.hasMaintenances,
+    ].filter(Boolean).length;
+    const hasMultipleRecordTypes = visibleRecordTypeCount > 1;
 
     // La especialidad de quien atiende determina qué se CREA en la visita
     // (NOM-004 5.14: nunca qué se puede ver).
@@ -731,10 +753,6 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
             {t(TEXT.PATIENTS.DETAIL.LOADING)}
         </div>
     );
-
-    // El filtro por especialidad es una preferencia de vista del usuario, no una
-    // restricción de lectura (NOM-004 5.14): siempre se ofrecen todas las especialidades.
-    const specialityOptions = Object.values(MedicalSpeciality);
 
     return (
         <>
@@ -847,16 +865,22 @@ export const PatientDetailContainer = ({ id }: { id: string }) => {
                 {canReadClinicalData && (
                 <div className="space-y-4">
                     <div className="flex flex-col gap-3 bg-white p-4 rounded-app-md border border-neutral-100 shadow-sm">
-                        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                            <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_ALL)} isActive={recordTypeFilter === 'ALL'} onClick={() => setRecordTypeFilter('ALL')} />
-                            <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_CONTROLS)} isActive={recordTypeFilter === 'CONTROL'} onClick={() => setRecordTypeFilter('CONTROL')} />
-                            {isAudiologyTenant && (
-                                <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_AUDIOGRAMS)} isActive={recordTypeFilter === 'AUDIOGRAM'} onClick={() => setRecordTypeFilter('AUDIOGRAM')} />
-                            )}
-                            {isAudiologyTenant && (
-                                <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_MAINTENANCE)} isActive={recordTypeFilter === 'MAINTENANCE'} onClick={() => setRecordTypeFilter('MAINTENANCE')} />
-                            )}
-                        </div>
+                        {/* Solo los tipos que este expediente realmente contiene:
+                            un filtro que nunca devuelve nada es ruido. */}
+                        {hasMultipleRecordTypes && (
+                            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                                <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_ALL)} isActive={recordTypeFilter === 'ALL'} onClick={() => setRecordTypeFilter('ALL')} />
+                                {availableRecordTypes.hasControls && (
+                                    <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_CONTROLS)} isActive={recordTypeFilter === 'CONTROL'} onClick={() => setRecordTypeFilter('CONTROL')} />
+                                )}
+                                {isAudiologyTenant && availableRecordTypes.hasAudiograms && (
+                                    <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_AUDIOGRAMS)} isActive={recordTypeFilter === 'AUDIOGRAM'} onClick={() => setRecordTypeFilter('AUDIOGRAM')} />
+                                )}
+                                {isAudiologyTenant && availableRecordTypes.hasMaintenances && (
+                                    <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_MAINTENANCE)} isActive={recordTypeFilter === 'MAINTENANCE'} onClick={() => setRecordTypeFilter('MAINTENANCE')} />
+                                )}
+                            </div>
+                        )}
                         {specialityOptions.length > 1 && (
                             <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
                                 <SpecFilterButton label={t(TEXT.PATIENTS.DETAIL.HISTORY.FILTER_ALL_SPECIALTY)} isActive={selectedSpec === 'ALL'} onClick={() => setSelectedSpec('ALL')} />

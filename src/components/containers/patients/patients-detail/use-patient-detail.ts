@@ -47,7 +47,11 @@ interface AppointmentResponse {
 
 export type RecordTypeFilter = 'ALL' | 'CONTROL' | 'AUDIOGRAM' | 'MAINTENANCE';
 
-export function usePatientDetail(uuid: string, canReadClinicalData = true) {
+export function usePatientDetail(
+  uuid: string,
+  canReadClinicalData = true,
+  tenantSpeciality?: MedicalSpeciality,
+) {
   // --- ESTADOS ---
   const [page, setPage] = useState(1);
   const [allRecords, setAllRecords] = useState<MedicalControlResponse[]>([]);
@@ -84,6 +88,44 @@ export function usePatientDetail(uuid: string, canReadClinicalData = true) {
       });
     }
   }, [historyData]);
+
+  // Dos reglas encadenadas:
+  // 1. La CLÍNICA acota qué especialidades existen en este negocio — una clínica
+  //    de audiología no ofrece un filtro DENTAL aunque un registro viejo lo traiga.
+  // 2. El PACIENTE acota, de esas, cuáles tiene su expediente — un filtro que
+  //    nunca devuelve nada es ruido, no una opción.
+  // Nota: esto es preferencia de VISTA, no control de acceso. El expediente sigue
+  // mostrando todos los registros por defecto (NOM-004 5.14).
+  const specialityOptions = useMemo((): MedicalSpeciality[] => {
+    const present = new Set(allRecords.map((record) => record.header.speciality));
+    return Object.values(MedicalSpeciality).filter((speciality) => {
+      if (tenantSpeciality && speciality !== tenantSpeciality) return false;
+      return present.has(speciality);
+    });
+  }, [allRecords, tenantSpeciality]);
+
+  // Tipos de registro presentes en el expediente — mismo criterio: un filtro
+  // que nunca devuelve nada es ruido, no una opción.
+  const availableRecordTypes = useMemo(() => ({
+    hasControls: allRecords.length > 0,
+    hasAudiograms: (studiesData ?? []).some((study) => study.tipo === StudyType.AUDIOMETRIA_TONAL),
+    hasMaintenances: ((maintenancesData ?? []) as MaintenanceEntity[]).length > 0,
+  }), [allRecords, studiesData, maintenancesData]);
+
+  // Si la especialidad filtrada deja de estar presente, el usuario quedaría con
+  // un filtro activo que ya no aparece como botón y una lista vacía sin causa visible.
+  useEffect(() => {
+    if (selectedSpec !== 'ALL' && !specialityOptions.includes(selectedSpec as MedicalSpeciality)) {
+      setSelectedSpec('ALL');
+    }
+  }, [specialityOptions, selectedSpec]);
+
+  useEffect(() => {
+    const isUnavailable =
+      (recordTypeFilter === 'AUDIOGRAM' && !availableRecordTypes.hasAudiograms) ||
+      (recordTypeFilter === 'MAINTENANCE' && !availableRecordTypes.hasMaintenances);
+    if (isUnavailable) setRecordTypeFilter('ALL');
+  }, [availableRecordTypes, recordTypeFilter]);
 
   // --- LÓGICA DE CLIENTE: FILTRADO, MAPEO Y ORDEN ---
   const mappedHistory = useMemo(() => {
@@ -278,6 +320,8 @@ export function usePatientDetail(uuid: string, canReadClinicalData = true) {
     setSearchTerm,
     selectedSpec,
     setSelectedSpec,
+    specialityOptions,
+    availableRecordTypes,
     recordTypeFilter,
     setRecordTypeFilter,
 
